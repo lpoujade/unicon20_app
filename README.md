@@ -1,6 +1,6 @@
 # unicons
 
-un test unicon
+Un test d'application pour l'unicon 2020
 
 ## Getting Started
 
