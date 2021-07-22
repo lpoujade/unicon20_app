@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 //import 'package:flutter_html/flutter_html.dart';
 import 'api.dart' as api;
+import 'article.dart';
 
 ///////////////Programme principale
 void main() {
@@ -71,13 +72,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             children: [Column(children: [Container(
                 color: Colors.blueAccent,
                 height: 55,
-                child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20)),),
+                child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20))),
                 ),
               ////affichage de la liste d'element à afficher pour cet ecran
               Expanded(child: ListView(
                   children: _listeHome,
-                  ),),
-            ],),
+                  )),
+            ]),
             Column(
               ////Seconde barre en haut de l'ecran avec gestion de plusieurs fenetres
               children: [ Container(
@@ -88,22 +89,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white70,
                   tabs: [
-                  Tab(text: 's',),
-                  Tab(text: 'm',),
-                  Tab(text: 's',),
+                  Tab(text: 's'),
+                  Tab(text: 'm'),
+                  Tab(text: 's'),
                   Tab(text: 's'),
                   ],
-                  ),),
+                  )),
               ////affichage de la liste d'element à afficher pour ces ecrans
               Expanded(
                 child: Container(
                   child: TabBarView(
                     controller: _pageController,
                     children: [
-                    ListView(children: _listeP1,),
-                    ListView(children: _listeP2,),
-                    ListView(children: _listeP3,),
-                    ListView(children: _listeP4,),
+                    ListView(children: _listeP1),
+                    ListView(children: _listeP2),
+                    ListView(children: _listeP3),
+                    ListView(children: _listeP4),
                     ]
                     ),
                   ),
@@ -115,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                   Container(
                     color: Colors.blueAccent,
                     height: 55,
-                    child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20)),),
+                    child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
                     ),
                   ////affichage de la liste d'element à afficher pour cet ecran
                   Expanded(child: ListView( children: _listeInfo )),
@@ -149,10 +150,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   @override
     void initState() {
 
-      //Recupération des données a afficher
-      // _GenerateCards();
-      // _listeHome = await getData(8);
-      // _listeInfo = await getData(11);
+      // todo 2 setState ?
       getData(8).then((r) => setState(() {_listeHome = r;}));
       getData(11).then((r) => setState(() {_listeInfo = r;}));
       super.initState();
@@ -166,55 +164,44 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       super.dispose();
     }
 
-Future<List<Widget>> getData(int category) async {
+  Future<List<Widget>> getData(int category) async {
     List<Widget> list = <Widget>[];
-    final postlist = await api.getPostsList(category);
-    postlist.forEach((title, content) => {
-        list.add(Card(
+    final postlist = await get_articles();
+    var saved_articles_id = [];
+    postlist.forEach((article) {
+        saved_articles_id.add(article.id);
+        list.add(
+            Card(
               child: ListTile(
-                title: Text(title),
+                title: Text(article.title),
                 leading: Icon(Icons.landscape),
                 trailing: Icon(Icons.arrow_forward_ios_outlined),
                 onTap: (){
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => TextPage(title: title, paragraphe: content))
+                    MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
                     );
-                }, subtitle: Text('...'),
-                )))
+                }, subtitle: Text('...')
+                )));
+        });
+    final new_articles = await api.getPostsList(category, saved_articles_id.join(','));
+    new_articles.forEach((article) {
+        save_article(article);
+        list.add(
+            Card(
+              child: ListTile(
+                title: Text(article.title),
+                leading: Icon(Icons.landscape),
+                trailing: Icon(Icons.arrow_forward_ios_outlined),
+                onTap: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+                    );
+                }, subtitle: Text('...')
+                )));
         });
     return list;
-}
-
-
-  /// Fonction de récupération des donnés ainsi que de la mise en forme de ces donnés dans une liste de widget
-  Future<void> _GenerateCards() async {
-
-    List<Widget> listeHometmp = <Widget>[];
-    final postlist = await api.getPostsList(8);
-    postlist.forEach((title, content) => {
-        listeHometmp.add(Card(
-              child: ListTile(
-                title: Text(title),
-                leading: Icon(Icons.landscape),
-                trailing: Icon(Icons.arrow_forward_ios_outlined),
-                onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TextPage(title: title, paragraphe: content))
-                    );
-                }, subtitle: Text('...'),
-                )))
-        });
-
-    switch(0){
-      case 0:setState(() {_listeHome = listeHometmp;});break;
-      case 1:setState(() {_listeP1 = listeHometmp;});break;
-      case 2:setState(() {_listeP2 = listeHometmp;});break;
-      case 3:setState(() {_listeP3 = listeHometmp;});break;
-      case 4:setState(() {_listeP4 = listeHometmp;});break;
-      case 5:setState(() {_listeInfo = listeHometmp;});break;
-    }
   }
 }
 
@@ -253,7 +240,7 @@ class TextPage extends StatelessWidget{
                 children: [
                 FlatButton(
                   onPressed: (){Navigator.pop(context);},
-                  child: Icon(Icons.arrow_back, size: 25,color: Colors.white,),
+                  child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
                   ),
                 Expanded(
                   child: Text(title),
@@ -263,7 +250,7 @@ class TextPage extends StatelessWidget{
               ),
             body: Container(
               padding: EdgeInsets.all(32),
-              child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold,),))
+              child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
               ),
             ),
           );
