@@ -7,22 +7,22 @@ class Article {
   final content;
 
   Article({
-      required this.id,
-      required this.title,
-      required this.content,
-      });
+    required this.id,
+    required this.title,
+    required this.content,
+  });
 
   Map<String, dynamic> toMap() {
     var map = {'title': title, 'content': content};
     if (id != 0)
-        map['rowid'] = id;
+      map['rowid'] = id;
     return map;
   }
 
   @override
-    String toString() {
-      return "Article('$id', '$title')";
-    }
+  String toString() {
+    return "Article('$id', '$title')";
+  }
 }
 
 Future<void> save_article(Article article) async {
@@ -32,7 +32,7 @@ Future<void> save_article(Article article) async {
       'article',
       article.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+  );
 }
 
 Future<List<Article>> get_articles() async {
@@ -42,9 +42,9 @@ Future<List<Article>> get_articles() async {
 
   return List.generate(maps.length, (i) {
     return Article(
-      id: maps[i]['rowid'],
-      title: maps[i]['title'],
-      content: maps[i]['content'],
+        id: maps[i]['rowid'],
+        title: maps[i]['title'],
+        content: maps[i]['content'],
     );
   });
 }
@@ -53,9 +53,9 @@ Future<void> update_article(Article article) async {
   final db = await database();
 
   await db.update(
-    'article',
-    article.toMap(),
-    where: 'rowid = ?',
-    whereArgs: [article.id],
+      'article',
+      article.toMap(),
+      where: 'rowid = ?',
+      whereArgs: [article.id],
   );
 }

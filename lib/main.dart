@@ -14,16 +14,16 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-    Widget build(BuildContext context) {
-      return MaterialApp(   //// info standars à l'appli
-          //debugShowCheckedModeBanner: false,
-          title: 'unicons',
-          theme: ThemeData(
+  Widget build(BuildContext context) {
+    return MaterialApp(   //// info standars à l'appli
+        //debugShowCheckedModeBanner: false,
+        title: 'unicons',
+        theme: ThemeData(
             primarySwatch: Colors.green,
-            ),
-          home: MyHomePage(),   //appelle de la page principale
-          );
-    }
+        ),
+        home: MyHomePage(),   //appelle de la page principale
+    );
+  }
 }
 
 //////// classe de la page principale, renvoie sur une autre classe
@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
-    State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 ////// vraie classe de la page principale
@@ -51,156 +51,156 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   //// création de la page principale
   @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-          // gestion de la barre en haut de l'écran:
-          appBar: AppBar(
+  Widget build(BuildContext context) {
+    return Scaffold(
+        // gestion de la barre en haut de l'écran:
+        appBar: AppBar(
             title: Row(
-              children: [
-              Image.asset('res/tmp.jpg', width: 45, height: 45, ),  //l'image à gauche de la barre
-              const Expanded(
-                child: Center(child: Text('unicons')),  //le texte au centre de la barre
-                ),
-              ],
-              ),
+                children: [
+                  Image.asset('res/tmp.jpg', width: 45, height: 45, ),  //l'image à gauche de la barre
+                  const Expanded(
+                      child: Center(child: Text('unicons')),  //le texte au centre de la barre
+                  ),
+                ],
             ),
+        ),
 
-          //// affichage des pages principales
-          body: TabBarView(
+        //// affichage des pages principales
+        body: TabBarView(
             controller: _principalController,
             //Seconde barre en haut de l'écran
             children: [Column(children: [Container(
-                color: Colors.blueAccent,
-                height: 55,
-                child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20))),
-                ),
-              ////affichage de la liste d'element à afficher pour cet ecran
-              Expanded(child: ListView(
-                  children: _listeHome,
-                  )),
-            ]),
-            Column(
-              ////Seconde barre en haut de l'ecran avec gestion de plusieurs fenetres
-              children: [ Container(
-                padding: EdgeInsets.all(4.0),
-                color: Colors.blueAccent,
-                child: TabBar(
-                  controller: _pageController,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white70,
-                  tabs: [
-                  Tab(text: 's'),
-                  Tab(text: 'm'),
-                  Tab(text: 's'),
-                  Tab(text: 's'),
-                  ],
-                  )),
-              ////affichage de la liste d'element à afficher pour ces ecrans
-              Expanded(
-                child: Container(
-                  child: TabBarView(
-                    controller: _pageController,
-                    children: [
-                    ListView(children: _listeP1),
-                    ListView(children: _listeP2),
-                    ListView(children: _listeP3),
-                    ListView(children: _listeP4),
-                    ]
-                    ),
-                  ),
-                ),
-              ],
-              ),
-              //Seconde barre en haut de l'écran
-              Column(children: [
-                  Container(
                     color: Colors.blueAccent,
                     height: 55,
-                    child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+                    child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20))),
+            ),
+                ////affichage de la liste d'element à afficher pour cet ecran
+                Expanded(child: ListView(
+                        children: _listeHome,
+                )),
+            ]),
+            Column(
+                ////Seconde barre en haut de l'ecran avec gestion de plusieurs fenetres
+                children: [ Container(
+                    padding: EdgeInsets.all(4.0),
+                    color: Colors.blueAccent,
+                    child: TabBar(
+                        controller: _pageController,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white70,
+                        tabs: [
+                          Tab(text: 's'),
+                          Tab(text: 'm'),
+                          Tab(text: 's'),
+                          Tab(text: 's'),
+                        ],
+                    )),
+                ////affichage de la liste d'element à afficher pour ces ecrans
+                Expanded(
+                    child: Container(
+                        child: TabBarView(
+                            controller: _pageController,
+                            children: [
+                              ListView(children: _listeP1),
+                              ListView(children: _listeP2),
+                              ListView(children: _listeP3),
+                              ListView(children: _listeP4),
+                            ]
+                        ),
                     ),
+                ),
+                ],
+                ),
+                //Seconde barre en haut de l'écran
+                Column(children: [
+                  Container(
+                      color: Colors.blueAccent,
+                      height: 55,
+                      child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+                  ),
                   ////affichage de la liste d'element à afficher pour cet ecran
                   Expanded(child: ListView( children: _listeInfo )),
-              ],
-              ),
-              ],
-              ),
-              ////Barre du bas de l'ecran avec les 3 onglets principaux
-              bottomNavigationBar: Container(
-                  color: Colors.white,
-                  padding: EdgeInsets.all(4.0),
-                  child: TabBar(
-                    controller: _principalController,
-                    indicatorColor: Colors.green,
-                    indicatorSize :TabBarIndicatorSize.label,
-                    indicatorWeight: 2,
-                    indicatorPadding: EdgeInsets.only(bottom: 4.0),
-                    labelColor: Colors.green,
-                    unselectedLabelColor: Colors.blue,
-                    tabs: [
-                    Tab(icon: Icon(Icons.home)),
-                    Tab(icon: Icon(Icons.access_time)),
-                    Tab(icon: Icon(Icons.info)),
-                    ],
+                ],
+                ),
+                ],
+                ),
+                ////Barre du bas de l'ecran avec les 3 onglets principaux
+                bottomNavigationBar: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(4.0),
+                    child: TabBar(
+                        controller: _principalController,
+                        indicatorColor: Colors.green,
+                        indicatorSize :TabBarIndicatorSize.label,
+                        indicatorWeight: 2,
+                        indicatorPadding: EdgeInsets.only(bottom: 4.0),
+                        labelColor: Colors.green,
+                        unselectedLabelColor: Colors.blue,
+                        tabs: [
+                          Tab(icon: Icon(Icons.home)),
+                          Tab(icon: Icon(Icons.access_time)),
+                          Tab(icon: Icon(Icons.info)),
+                        ],
                     ),
-                  ),
-              );
-    }
+                ),
+                );
+  }
 
   //lors de l'initialisation
   @override
-    void initState() {
+  void initState() {
 
-      // todo 2 setState ?
-      getData(8).then((r) => setState(() {_listeHome = r;}));
-      getData(11).then((r) => setState(() {_listeInfo = r;}));
-      super.initState();
-    }
+    // todo 2 setState ?
+    getData(8).then((r) => setState(() {_listeHome = r;}));
+    getData(11).then((r) => setState(() {_listeInfo = r;}));
+    super.initState();
+  }
 
   // On ferme l'appli proprement
   @override
-    void dispose(){
-      _pageController.dispose();
-      _principalController.dispose();
-      super.dispose();
-    }
+  void dispose(){
+    _pageController.dispose();
+    _principalController.dispose();
+    super.dispose();
+  }
 
   Future<List<Widget>> getData(int category) async {
     List<Widget> list = <Widget>[];
     final postlist = await get_articles();
     var saved_articles_id = [];
     postlist.forEach((article) {
-        saved_articles_id.add(article.id);
-        list.add(
-            Card(
+      saved_articles_id.add(article.id);
+      list.add(
+          Card(
               child: ListTile(
-                title: Text(article.title),
-                leading: Icon(Icons.landscape),
-                trailing: Icon(Icons.arrow_forward_ios_outlined),
-                onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+                  title: Text(article.title),
+                  leading: Icon(Icons.landscape),
+                  trailing: Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
                     );
-                }, subtitle: Text('...')
-                )));
-        });
+                  }, subtitle: Text('...')
+              )));
+    });
     final new_articles = await api.getPostsList(category, saved_articles_id.join(','));
     new_articles.forEach((article) {
-        save_article(article);
-        list.add(
-            Card(
+      save_article(article);
+      list.add(
+          Card(
               child: ListTile(
-                title: Text(article.title),
-                leading: Icon(Icons.landscape),
-                trailing: Icon(Icons.arrow_forward_ios_outlined),
-                onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+                  title: Text(article.title),
+                  leading: Icon(Icons.landscape),
+                  trailing: Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
                     );
-                }, subtitle: Text('...')
-                )));
-        });
+                  }, subtitle: Text('...')
+              )));
+    });
     return list;
   }
 }
@@ -208,16 +208,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
 // Permet de faire du bleuaccent en une couleur materiel
 Map<int, Color> color ={
-50:Color.fromRGBO(68,138,255, .1),
-   100:Color.fromRGBO(68,138,255, .2),
-   200:Color.fromRGBO(68,138,255, .3),
-   300:Color.fromRGBO(68,138,255, .4),
-   400:Color.fromRGBO(68,138,255, .5),
-   500:Color.fromRGBO(68,138,255, .6),
-   600:Color.fromRGBO(68,138,255, .7),
-   700:Color.fromRGBO(68,138,255, .8),
-   800:Color.fromRGBO(68,138,255, .9),
-   900:Color.fromRGBO(68,138,255, 1),};
+  50:Color.fromRGBO(68,138,255, .1),
+  100:Color.fromRGBO(68,138,255, .2),
+  200:Color.fromRGBO(68,138,255, .3),
+  300:Color.fromRGBO(68,138,255, .4),
+  400:Color.fromRGBO(68,138,255, .5),
+  500:Color.fromRGBO(68,138,255, .6),
+  600:Color.fromRGBO(68,138,255, .7),
+  700:Color.fromRGBO(68,138,255, .8),
+  800:Color.fromRGBO(68,138,255, .9),
+  900:Color.fromRGBO(68,138,255, 1),};
 
 
 // Page d'affichage du texte
@@ -228,31 +228,31 @@ class TextPage extends StatelessWidget{
   final String paragraphe;
 
   @override
-    Widget build(BuildContext context) {
-      return MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
             primarySwatch: MaterialColor(0xff448aff, color),
-            ),
-          home: Scaffold(
+        ),
+        home: Scaffold(
             appBar: AppBar(
-              title: Row(
-                children: [
-                FlatButton(
-                  onPressed: (){Navigator.pop(context);},
-                  child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
-                  ),
-                Expanded(
-                  child: Text(title),
-                  ),
-                ],
+                title: Row(
+                    children: [
+                      FlatButton(
+                          onPressed: (){Navigator.pop(context);},
+                          child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
+                      ),
+                      Expanded(
+                          child: Text(title),
+                      ),
+                    ],
                 ),
-              ),
-            body: Container(
-              padding: EdgeInsets.all(32),
-              child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
-              ),
             ),
-          );
-    }
+            body: Container(
+                padding: EdgeInsets.all(32),
+                child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+            ),
+        ),
+        );
+  }
 }
