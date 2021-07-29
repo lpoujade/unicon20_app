@@ -28,3 +28,7 @@ flutter:
   uses-material-design: true
   assets:
     - res/
+  fonts:
+    - family: aAnggota
+      fonts:
+        - asset: res/font/aAnggota.ttf
