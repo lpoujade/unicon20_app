@@ -1,0 +1,817 @@
+import 'package:flutter/material.dart';
+<<<<<<< HEAD
+||||||| 06108bd
+import 'package:flutter/services.dart' show rootBundle;
+//import 'package:flutter_html/flutter_html.dart';
+=======
+//import 'package:flutter/services.dart' show rootBundle;
+//import 'package:flutter_html/flutter_html.dart';
+>>>>>>> master
+import 'api.dart' as api;
+import 'article.dart';
+<<<<<<< HEAD
+import 'db.dart';
+||||||| 06108bd
+=======
+import 'text_page.dart';
+>>>>>>> master
+
+<<<<<<< HEAD
+import 'dart:developer';
+
+/// Programme principale
+||||||| 06108bd
+///////////////Programme principale
+=======
+/// Launching of the programme.
+>>>>>>> master
+void main() {
+	runApp(const MyApp());
+}
+
+<<<<<<< HEAD
+/// Premiere classe appellé donc premiere page créé
+||||||| 06108bd
+//////////// Premiere classe appellé donc premiere page créé
+=======
+/// First creating page of the application.
+>>>>>>> master
+class MyApp extends StatelessWidget {
+	const MyApp({Key? key}) : super(key: key);
+
+<<<<<<< HEAD
+	@override
+	Widget build(BuildContext context) {
+		return MaterialApp(   /// info standars à l'appli
+				//debugShowCheckedModeBanner: false,
+				title: 'unicon',
+				theme: ThemeData(
+						primarySwatch: Colors.green,
+				),
+				home: MyHomePage(),   //appelle de la page principale
+		);
+	}
+||||||| 06108bd
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(   //// info standars à l'appli
+        //debugShowCheckedModeBanner: false,
+        title: 'unicons',
+        theme: ThemeData(
+            primarySwatch: Colors.green,
+        ),
+        home: MyHomePage(),   //appelle de la page principale
+    );
+  }
+=======
+  /// The information of the first page we draw to screen.
+  ///
+  /// This create the main core of the application, here it create the mores basics information
+  /// and call 'MyHomePage' class which contain all the others information.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        // To get rid of the 'DEBUG' banner
+        //debugShowCheckedModeBanner: false,
+
+        title: 'Unicon 2020',
+        theme: ThemeData(
+            primarySwatch: Colors.green,
+            fontFamily: 'aAnggota',
+        ),
+        home: const MyHomePage(),
+    );
+  }
+>>>>>>> master
+}
+
+<<<<<<< HEAD
+/// classe de la page principale, renvoie sur une autre classe
+||||||| 06108bd
+//////// classe de la page principale, renvoie sur une autre classe
+=======
+/// The calling of the drawing of the first screen.
+>>>>>>> master
+class MyHomePage extends StatefulWidget {
+	const MyHomePage({Key? key}) : super(key: key);
+
+	@override
+	State<MyHomePage> createState() => _MyHomePageState();
+}
+
+<<<<<<< HEAD
+/// vraie classe de la page principale
+||||||| 06108bd
+////// vraie classe de la page principale
+=======
+/// The drawing of the first screen.
+///
+/// This screen is composed of 2 controllers :
+///   - The biggest one always use.
+///   - The smallest one only effective when the biggest one is on the 2nd selection.
+/// This screen takes the information on the 'WorldPress' and draw them with the good format.
+>>>>>>> master
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
+<<<<<<< HEAD
+	/// création et configuration des 2 controller
+	late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 0); // controle la barre de navigation du bas de l'écran
+	late final TabController _pageController = TabController(length: 4, vsync: this, initialIndex: 0);  //controlle quand on est dans l'onglet planning
+||||||| 06108bd
+  //// création et configuration des 2 controller
+  late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 0); // controle la barre de navigation du bas de l'écran
+  late final TabController _pageController = TabController(length: 4, vsync: this, initialIndex: 0);  //controlle quand on est dans l'onglet planning
+=======
+>>>>>>> master
+
+<<<<<<< HEAD
+	/// création des listes qui contiendront toute les infos a affichés (récupéré pour le moment null part...)
+	List<Widget> _listeHome = <Widget>[];
+	List<Widget> _listeP1 = <Widget>[];
+	List<Widget> _listeP2 = <Widget>[];
+	List<Widget> _listeP3 = <Widget>[];
+	List<Widget> _listeP4 = <Widget>[];
+	List<Widget> _listeInfo = <Widget>[];
+||||||| 06108bd
+  //// création des listes qui contiendront toute les infos a affichés (récupéré pour le moment null part...)
+  List<Widget> _listeHome = <Widget>[];
+  List<Widget> _listeP1 = <Widget>[];
+  List<Widget> _listeP2 = <Widget>[];
+  List<Widget> _listeP3 = <Widget>[];
+  List<Widget> _listeP4 = <Widget>[];
+  List<Widget> _listeInfo = <Widget>[];
+=======
+  // Creating the two controllers.
+  late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 0);
+  late final TabController _secondPageController = TabController(length: 4, vsync: this, initialIndex: 0);
+
+  //Creating all the list that will contain future information to draw on screen.
+  List<Widget> _listHome = <Widget>[];
+  List<Widget> _listInfo = <Widget>[];
+>>>>>>> master
+
+  // todo : change to get a real planning shape.
+  final List<Widget> _listP1 = <Widget>[];
+  final List<Widget> _listP2 = <Widget>[];
+  final List<Widget> _listP3 = <Widget>[];
+  final List<Widget> _listP4 = <Widget>[];
+
+<<<<<<< HEAD
+	/// création de la page principale
+	@override
+	Widget build(BuildContext context) {
+		return Scaffold(
+				// gestion de la barre en haut de l'écran:
+				appBar: AppBar(
+						title: Row(
+								children: [
+									Image.asset('res/tmp.jpg', width: 45, height: 45),  //l'image à gauche de la barre
+									const Expanded(
+											child: Center(child: Text('unicon')),  //le texte au centre de la barre
+									),
+								],
+						),
+				),
+||||||| 06108bd
+  //// création de la page principale
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        // gestion de la barre en haut de l'écran:
+        appBar: AppBar(
+            title: Row(
+                children: [
+                  Image.asset('res/tmp.jpg', width: 45, height: 45, ),  //l'image à gauche de la barre
+                  const Expanded(
+                      child: Center(child: Text('unicons')),  //le texte au centre de la barre
+                  ),
+                ],
+            ),
+        ),
+=======
+
+  /// The drawing of the first screen we draw.
+  ///
+  /// Taking care of the 3 different 'pages' in the page :
+  ///   - The home one.
+  ///   - The planning one.
+  ///   - The info one ( todo : transform to map )
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        // Taking care of the top bar.
+        appBar: AppBar(
+            title: Row(
+                children: [
+                  Image.asset('res/topLogo.png', width: 75, height: 75, ),
+                  const Expanded( child: Center(child: Text('Unicon           ', style: TextStyle(color: Colors.white, fontSize: 30), ), ), ),
+                ],
+            ),
+        ),
+>>>>>>> master
+
+<<<<<<< HEAD
+				/// affichage des pages principales
+				body: TabBarView(
+						controller: _principalController,
+						//Seconde barre en haut de l'écran
+						children: [Column(children: [Container(
+										color: Colors.blueAccent,
+										height: 55,
+										child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20))),
+						),
+								/// affichage de la liste d'element à afficher pour cet ecran
+								Expanded(child: ListView(
+												children: _listeHome,
+								)),
+						]),
+						Column(
+								/// Seconde barre en haut de l'ecran avec gestion de plusieurs fenetres
+								children: [ Container(
+										padding: EdgeInsets.all(4.0),
+										color: Colors.blueAccent,
+										child: TabBar(
+												controller: _pageController,
+												labelColor: Colors.white,
+												unselectedLabelColor: Colors.white70,
+												tabs: [
+													Tab(text: 's'),
+													Tab(text: 'm'),
+													Tab(text: 's'),
+													Tab(text: 's'),
+												],
+										)),
+								/// affichage de la liste d'element à afficher pour ces ecrans
+								Expanded(
+										child: Container(
+												child: TabBarView(
+														controller: _pageController,
+														children: [
+															ListView(children: _listeP1),
+															ListView(children: _listeP2),
+															ListView(children: _listeP3),
+															ListView(children: _listeP4),
+														]
+												),
+										),
+								),
+								],
+								),
+								//Seconde barre en haut de l'écran
+								Column(children: [
+									Container(
+											color: Colors.blueAccent,
+											height: 55,
+											child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+									),
+									/// affichage de la liste d'element à afficher pour cet ecran
+									Expanded(child: ListView( children: _listeInfo )),
+								],
+								),
+								],
+								),
+								/// Barre du bas de l'ecran avec les 3 onglets principaux
+								bottomNavigationBar: Container(
+										color: Colors.white,
+										padding: EdgeInsets.all(4.0),
+										child: TabBar(
+												controller: _principalController,
+												indicatorColor: Colors.green,
+												indicatorSize :TabBarIndicatorSize.label,
+												indicatorWeight: 2,
+												indicatorPadding: EdgeInsets.only(bottom: 4.0),
+												labelColor: Colors.green,
+												unselectedLabelColor: Colors.blue,
+												tabs: [
+													Tab(icon: Icon(Icons.home)),
+													Tab(icon: Icon(Icons.access_time)),
+													Tab(icon: Icon(Icons.info)),
+												],
+										),
+								),
+								);
+	}
+||||||| 06108bd
+        //// affichage des pages principales
+        body: TabBarView(
+            controller: _principalController,
+            //Seconde barre en haut de l'écran
+            children: [Column(children: [Container(
+                    color: Colors.blueAccent,
+                    height: 55,
+                    child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 20))),
+            ),
+                ////affichage de la liste d'element à afficher pour cet ecran
+                Expanded(child: ListView(
+                        children: _listeHome,
+                )),
+            ]),
+            Column(
+                ////Seconde barre en haut de l'ecran avec gestion de plusieurs fenetres
+                children: [ Container(
+                    padding: EdgeInsets.all(4.0),
+                    color: Colors.blueAccent,
+                    child: TabBar(
+                        controller: _pageController,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white70,
+                        tabs: [
+                          Tab(text: 's'),
+                          Tab(text: 'm'),
+                          Tab(text: 's'),
+                          Tab(text: 's'),
+                        ],
+                    )),
+                ////affichage de la liste d'element à afficher pour ces ecrans
+                Expanded(
+                    child: Container(
+                        child: TabBarView(
+                            controller: _pageController,
+                            children: [
+                              ListView(children: _listeP1),
+                              ListView(children: _listeP2),
+                              ListView(children: _listeP3),
+                              ListView(children: _listeP4),
+                            ]
+                        ),
+                    ),
+                ),
+                ],
+                ),
+                //Seconde barre en haut de l'écran
+                Column(children: [
+                  Container(
+                      color: Colors.blueAccent,
+                      height: 55,
+                      child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+                  ),
+                  ////affichage de la liste d'element à afficher pour cet ecran
+                  Expanded(child: ListView( children: _listeInfo )),
+                ],
+                ),
+                ],
+                ),
+                ////Barre du bas de l'ecran avec les 3 onglets principaux
+                bottomNavigationBar: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(4.0),
+                    child: TabBar(
+                        controller: _principalController,
+                        indicatorColor: Colors.green,
+                        indicatorSize :TabBarIndicatorSize.label,
+                        indicatorWeight: 2,
+                        indicatorPadding: EdgeInsets.only(bottom: 4.0),
+                        labelColor: Colors.green,
+                        unselectedLabelColor: Colors.blue,
+                        tabs: [
+                          Tab(icon: Icon(Icons.home)),
+                          Tab(icon: Icon(Icons.access_time)),
+                          Tab(icon: Icon(Icons.info)),
+                        ],
+                    ),
+                ),
+                );
+  }
+=======
+        // The body of the app.
+        body: TabBarView(
+            controller: _principalController,
+            children: [
+
+              /// The first 'page' of the biggest controller.
+              Column(children: [Container(
+                    color: Colors.blueAccent,
+                    height: 55,
+                    child: const Center(child: Text('News', style: TextStyle(color: Colors.white, fontSize: 30, ))),
+                ),
+
+                // Drawing the content of the first 'page'
+                Expanded(child: ListView(
+                        children: _listHome,
+                )),
+              ]),
+
+            /// The second 'page' of the biggest controller. todo : change it to a real agenda
+            Column(
+              // Taking care of the top bar that uses the second controller.
+                children: [ Container(
+                    padding: const EdgeInsets.all(4.0),
+                    color: Colors.blueAccent,
+                    child: TabBar(
+                        controller: _secondPageController,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white70,
+                        tabs: [
+                          const Tab(text: 's'),
+                          const Tab(text: 'm'),
+                          const Tab(text: 's'),
+                          const Tab(text: 's'),
+                        ],
+                    )),
+
+                // Drawing the content of the second 'page'
+                Expanded(
+                    child: TabBarView(
+                            controller: _secondPageController,
+                            children: [
+                              ListView(children: _listP1),
+                              ListView(children: _listP2),
+                              ListView(children: _listP3),
+                              ListView(children: _listP4),
+                            ]
+                        ),
+                ),
+                ],
+                ),
+
+              /// The third 'page' of the biggest controller. todo : change it to map
+                Column(children: [
+                  // Taking care of the top bar that uses the second controller.
+                  Container(
+                      color: Colors.blueAccent,
+                      height: 55,
+                      child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+                  ),
+
+                  // Drawing the content of the third 'page'
+                  Expanded(child: ListView( children: _listInfo )),
+                ],
+                ),
+                ],
+                ),
+
+
+                /// Creating the bar at the bottom of the screen.
+                ///
+                /// This bare help navigation between the 3 principals 'pages' ans uses the
+                /// principal controller.
+                bottomNavigationBar: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(4.0),
+                    child: TabBar(
+                        controller: _principalController,
+                        indicatorColor: Colors.green,
+                        indicatorSize :TabBarIndicatorSize.label,
+                        indicatorWeight: 2,
+                        indicatorPadding: const EdgeInsets.only(bottom: 4.0),
+                        labelColor: Colors.green,
+                        unselectedLabelColor: Colors.blue,
+                        tabs: [
+                          Tab(icon: Icon(Icons.home)),
+                          Tab(icon: Icon(Icons.access_time)),
+                          Tab(icon: Icon(Icons.info)),
+                        ],
+                    ),
+                ),
+                );
+  }
+>>>>>>> master
+
+<<<<<<< HEAD
+	//lors de l'initialisation
+	@override
+	void initState() {
+||||||| 06108bd
+  //lors de l'initialisation
+  @override
+  void initState() {
+=======
+  /// At the creation of the app.
+  ///
+  /// When the app launch, we get the information from the wordpress database 8
+  /// or database 11.
+  @override
+  void initState() {
+>>>>>>> master
+
+<<<<<<< HEAD
+		log('init state');
+		getData();
+		super.initState();
+	}
+||||||| 06108bd
+    // todo 2 setState ?
+    getData(8).then((r) => setState(() {_listeHome = r;}));
+    getData(11).then((r) => setState(() {_listeInfo = r;}));
+    super.initState();
+  }
+=======
+    // todo 2 setState ?
+    getData(8).then((r) => setState(() {_listHome = r;}));
+    getData(11).then((r) => setState(() {_listInfo = r;}));
+    super.initState();
+  }
+>>>>>>> master
+
+<<<<<<< HEAD
+	// On ferme l'appli proprement
+	@override
+	void dispose(){
+		_pageController.dispose();
+		_principalController.dispose();
+		super.dispose();
+	}
+||||||| 06108bd
+  // On ferme l'appli proprement
+  @override
+  void dispose(){
+    _pageController.dispose();
+    _principalController.dispose();
+    super.dispose();
+  }
+=======
+  /// At the closing of the app, we destroy everything so it close clean.
+  @override
+  void dispose(){
+    _secondPageController.dispose();
+    _principalController.dispose();
+    super.dispose();
+  }
+>>>>>>> master
+
+<<<<<<< HEAD
+	/// Get articles from database and from wordpress, update state accordingly
+	getData() async {
+		List<Widget> list = <Widget>[];
+		final postlist = await get_articles();
+		log("found articles: $postlist");
+		var saved_articles_id = [];
+		postlist.forEach((article) {
+			saved_articles_id.add(article.id);
+			list.add(
+					Card(
+							child: ListTile(
+									title: Text(article.title),
+									leading: Icon(Icons.landscape),
+									trailing: Icon(Icons.arrow_forward_ios_outlined),
+									onTap: (){
+										Navigator.push(
+												context,
+												MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+										);
+									}, subtitle: Text('...')
+							)));
+		});
+		setState(() { _listeHome = list; });
+		final last_sync_if_any = await get_last_sync_date();
+		final new_articles = await api.getPostsList(since: last_sync_if_any);
+		new_articles.forEach((article) {
+			save_article(article);
+			list.add(
+					Card(
+							child: ListTile(
+									title: Text(article.title),
+									leading: Icon(Icons.landscape),
+									trailing: Icon(Icons.arrow_forward_ios_outlined),
+									onTap: (){
+										Navigator.push(
+												context,
+												MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+										);
+									}, subtitle: Text('...')
+							)));
+			setState((){_listeHome = list;});
+		});
+	}
+||||||| 06108bd
+  Future<List<Widget>> getData(int category) async {
+    List<Widget> list = <Widget>[];
+    final postlist = await get_articles();
+    var saved_articles_id = [];
+    postlist.forEach((article) {
+      saved_articles_id.add(article.id);
+      list.add(
+          Card(
+              child: ListTile(
+                  title: Text(article.title),
+                  leading: Icon(Icons.landscape),
+                  trailing: Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+                    );
+                  }, subtitle: Text('...')
+              )));
+    });
+    final new_articles = await api.getPostsList(category, saved_articles_id.join(','));
+    new_articles.forEach((article) {
+      save_article(article);
+      list.add(
+          Card(
+              child: ListTile(
+                  title: Text(article.title),
+                  leading: Icon(Icons.landscape),
+                  trailing: Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraphe: article.content))
+                    );
+                  }, subtitle: Text('...')
+              )));
+    });
+    return list;
+  }
+=======
+  ///Retrieval of wordpress information and put it in a list. todo : look like a same info appear multiple time.....
+  Future<List<Widget>> getData(int category) async {
+
+    // Variables initialisation.
+    List<Widget> list = <Widget>[];
+    final postlist = await get_articles();
+    var savedArticlesId = [];
+
+    // Taking care of every existing article we need to put on the app from the postlist.
+    postlist.forEach((article) {
+      savedArticlesId.add(article.id);
+      list.add(
+          Card(
+              child: ListTile(
+                  title: Text(article.title),
+                  leading: const Icon(Icons.landscape),
+                  trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        /// If the user click, we send him on a new page name TextPage with its own characteristics.
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraph: article.content))
+                    );
+                  },
+                  // todo: change the text to a part of the paragraph one.
+                  subtitle: const Text('...')
+              )));
+    });
+
+    final newArticles = await api.getPostsList(category, savedArticlesId.join(','));
+
+    // Taking care of every existing article we need to put on the app from the articles.
+    newArticles.forEach((article) {
+      save_article(article);
+      list.add(
+          Card(
+              child: ListTile(
+                  title: Text(article.title),
+                  leading: const Icon(Icons.info),
+                  trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        /// If the user click, we send him on a new page name TextPage with its own characteristics.
+                        MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraph: article.content))
+                    );
+                  },
+                  // todo: change the text to a part of the paragraph one.
+                  subtitle: const Text('...')
+              )));
+    });
+    return list;
+  }
+>>>>>>> master
+}
+<<<<<<< HEAD
+
+
+/// Permet de faire du bleuaccent en une couleur materiel
+||||||| 06108bd
+
+
+// Permet de faire du bleuaccent en une couleur materiel
+=======
+/*
+///
+>>>>>>> master
+Map<int, Color> color ={
+<<<<<<< HEAD
+	50:Color.fromRGBO(68,138,255, .1),
+	100:Color.fromRGBO(68,138,255, .2),
+	200:Color.fromRGBO(68,138,255, .3),
+	300:Color.fromRGBO(68,138,255, .4),
+	400:Color.fromRGBO(68,138,255, .5),
+	500:Color.fromRGBO(68,138,255, .6),
+	600:Color.fromRGBO(68,138,255, .7),
+	700:Color.fromRGBO(68,138,255, .8),
+	800:Color.fromRGBO(68,138,255, .9),
+	900:Color.fromRGBO(68,138,255, 1),};
+||||||| 06108bd
+  50:Color.fromRGBO(68,138,255, .1),
+  100:Color.fromRGBO(68,138,255, .2),
+  200:Color.fromRGBO(68,138,255, .3),
+  300:Color.fromRGBO(68,138,255, .4),
+  400:Color.fromRGBO(68,138,255, .5),
+  500:Color.fromRGBO(68,138,255, .6),
+  600:Color.fromRGBO(68,138,255, .7),
+  700:Color.fromRGBO(68,138,255, .8),
+  800:Color.fromRGBO(68,138,255, .9),
+  900:Color.fromRGBO(68,138,255, 1),};
+=======
+  50:const Color.fromRGBO(68,138,255, .1),
+  100:const Color.fromRGBO(68,138,255, .2),
+  200:const Color.fromRGBO(68,138,255, .3),
+  300:const Color.fromRGBO(68,138,255, .4),
+  400:const Color.fromRGBO(68,138,255, .5),
+  500:const Color.fromRGBO(68,138,255, .6),
+  600:const Color.fromRGBO(68,138,255, .7),
+  700:const Color.fromRGBO(68,138,255, .8),
+  800:const Color.fromRGBO(68,138,255, .9),
+  900:const Color.fromRGBO(68,138,255, 1),};
+>>>>>>> master
+
+
+/// Page d'affichage du texte
+class TextPage extends StatelessWidget{
+
+	const TextPage({Key? key, required this.title, required this.paragraphe}) : super(key: key);
+	final String title;
+	final String paragraphe;
+
+<<<<<<< HEAD
+	@override
+	Widget build(BuildContext context) {
+		return MaterialApp(
+				title: 'Flutter Demo',
+				theme: ThemeData(
+						primarySwatch: MaterialColor(0xff448aff, color),
+				),
+				home: Scaffold(
+						appBar: AppBar(
+								title: Row(
+										children: [
+											TextButton(
+													onPressed: (){Navigator.pop(context);},
+													child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
+											),
+											Expanded(
+													child: Text(title),
+											),
+										],
+								),
+						),
+						body: Container(
+								padding: EdgeInsets.all(32),
+								child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+						),
+				),
+				);
+	}
+}
+||||||| 06108bd
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+            primarySwatch: MaterialColor(0xff448aff, color),
+        ),
+        home: Scaffold(
+            appBar: AppBar(
+                title: Row(
+                    children: [
+                      FlatButton(
+                          onPressed: (){Navigator.pop(context);},
+                          child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
+                      ),
+                      Expanded(
+                          child: Text(title),
+                      ),
+                    ],
+                ),
+            ),
+            body: Container(
+                padding: EdgeInsets.all(32),
+                child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+            ),
+        ),
+        );
+  }
+}
+=======
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+            primarySwatch: MaterialColor(0xff448aff, color),
+        ),
+        home: Scaffold(
+            appBar: AppBar(
+                title: Row(
+                    children: [
+                      TextButton(
+                          onPressed: (){Navigator.pop(context);},
+                          child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
+                      ),
+                      Expanded(
+                          child: Text(title),
+                      ),
+                    ],
+                ),
+            ),
+            body: Container(
+                padding: EdgeInsets.all(32),
+                child: SingleChildScrollView(child: Text(paragraphe, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+            ),
+        ),
+        );
+  }
+}*/
+>>>>>>> master
