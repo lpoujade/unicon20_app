@@ -36,7 +36,7 @@ class TextPage extends StatelessWidget{
                     children: [
                       TextButton(
                           onPressed: (){Navigator.pop(context);},
-                          child: Icon(Icons.arrow_back, size: 25,color: Colors.white),
+                          child: const Icon(Icons.arrow_back, size: 25,color: Colors.white),
                       ),
                       Expanded(
                           child: Text(title),
@@ -45,8 +45,8 @@ class TextPage extends StatelessWidget{
                 ),
             ),
             body: Container(
-                padding: EdgeInsets.all(32),
-                child: SingleChildScrollView(child: Text(paragraph, style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+                padding: const EdgeInsets.all(32),
+                child: SingleChildScrollView(child: Text(paragraph, style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
             ),
         ),
         );

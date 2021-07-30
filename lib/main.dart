@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 //import 'package:flutter_html/flutter_html.dart';
 import 'api.dart' as api;
 import 'article.dart';
-import 'textPage.dart';
+import 'text_page.dart';
 
 /// Launching of the programme.
 void main() {
@@ -122,8 +122,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
                 // Drawing the content of the second 'page'
                 Expanded(
-                    child: Container(
-                        child: TabBarView(
+                    child: TabBarView(
                             controller: _secondPageController,
                             children: [
                               ListView(children: _listP1),
@@ -132,7 +131,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                               ListView(children: _listP4),
                             ]
                         ),
-                    ),
                 ),
                 ],
                 ),
