@@ -1,22 +1,23 @@
 import 'db.dart';
 import 'package:sqflite/sqflite.dart';
+import 'dart:developer';
 
 class Article {
   final id;
   final title;
   final content;
+  // final bool important;
+  var date = DateTime.now();
 
   Article({
     required this.id,
     required this.title,
     required this.content,
+    required this.date
   });
 
-  Map<String, dynamic> toMap() {
-    var map = {'title': title, 'content': content};
-    if (id != 0)
-      map['rowid'] = id;
-    return map;
+  Map<String, dynamic> toSqlMap() {
+    return {'id': id, 'title': title, 'content': content, 'date': date.millisecondsSinceEpoch};
   }
 
   @override
@@ -30,32 +31,22 @@ Future<void> save_article(Article article) async {
 
   await db.insert(
       'article',
-      article.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      article.toSqlMap(),
+      conflictAlgorithm: ConflictAlgorithm.fail,
   );
 }
 
 Future<List<Article>> get_articles() async {
   final db = await database();
 
-  final List<Map<String, dynamic>> maps = await db.query('article');
+  List<Map<String, dynamic>> maps = await db.rawQuery('select * from article');
 
   return List.generate(maps.length, (i) {
     return Article(
-        id: maps[i]['rowid'],
+        id: maps[i]['id'],
         title: maps[i]['title'],
         content: maps[i]['content'],
+        date: DateTime.fromMillisecondsSinceEpoch(maps[i]['date'])
     );
   });
-}
-
-Future<void> update_article(Article article) async {
-  final db = await database();
-
-  await db.update(
-      'article',
-      article.toMap(),
-      where: 'rowid = ?',
-      whereArgs: [article.id],
-  );
 }
