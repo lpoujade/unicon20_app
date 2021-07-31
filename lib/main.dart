@@ -4,6 +4,7 @@ import 'api.dart' as api;
 import 'article.dart';
 import 'db.dart';
 import 'dart:developer';
+import 'names.dart';
 
 /// Launching of the programme.
 void main() {
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
 				// To get rid of the 'DEBUG' banner
 				//debugShowCheckedModeBanner: false,
 
-				title: 'Unicon 2020',
+				title: Strings.Title,
 				theme: ThemeData(
 						primarySwatch: Colors.green,
 						fontFamily: 'aAnggota',
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
 		);
 	}
 }
+
 
 /// The calling of the drawing of the first screen.
 class MyHomePage extends StatefulWidget {
@@ -78,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 						title: Row(
 								children: [
 									Image.asset('res/topLogo.png', width: 75, height: 75, ),
-									const Expanded( child: Center(child: Text('Unicon           ', style: TextStyle(color: Colors.white, fontSize: 30), ), ), ),
+									const Expanded( child: Center(child: Text(Strings.DrawTitle, style: TextStyle(color: Colors.white, fontSize: 30), ), ), ),
 								],
 						),
 				),
@@ -218,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 									}, subtitle: Text('...')
 							)));
 		});
-		setState(() { _listHome = list; });
+		//setState(() { _listHome = list; });
 		final last_sync_if_any = await get_last_sync_date();
 		final new_articles = await api.getPostsList(since: last_sync_if_any);
 		new_articles.forEach((article) {
@@ -236,7 +238,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 										);
 									}, subtitle: Text('...')
 							)));
-			setState((){_listHome = list;});
+			//setState((){_listHome = list;});
 		});
+		await Future.delayed(const Duration(microseconds: 1));
+		setState((){_listHome = list;});
 	}
 }

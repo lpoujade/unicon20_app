@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// Function used to transform the 'blueAccent' color to a 'material color'.
@@ -29,6 +32,9 @@ class TextPage extends StatelessWidget{
         title: 'Flutter Demo',
         theme: ThemeData(
             primarySwatch: MaterialColor(0xff448aff, color),
+            textTheme: const TextTheme(
+              bodyText2: TextStyle(fontSize: 18,),
+            ),
         ),
         home: Scaffold(
             appBar: AppBar(
@@ -45,10 +51,63 @@ class TextPage extends StatelessWidget{
                 ),
             ),
             body: Container(
-                padding: const EdgeInsets.all(32),
-                child: SingleChildScrollView(child: Text(paragraph, style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)))
+                padding: const EdgeInsets.all(8),
+                child: SingleChildScrollView(
+                    child: Html(data: paragraph, ),
+
+
+                )
             ),
         ),
         );
   }
+
+
+//Text(formatText(paragraph), style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold
+//))
+/*
+  RichText formatText(String p){
+    List<TextSpan> _text = <TextSpan>[];
+    List<String> splitted = p.split("<");
+
+    bool bold = false;
+    bool inList = false;
+
+
+    for(var sentence in splitted){
+      //log(sentence[0]);
+
+      if(sentence[0] == "/") {
+        int n = 0;
+        if(sentence[1] == "s"){
+          bold = false;
+          log(sentence);
+        }
+        while(sentence[n] != ">"){n++;}
+
+        _text.add(TextSpan(
+          text: sentence.substring(n+1),
+          style: const TextStyle(color: Colors.black),
+        ));
+      }else if(sentence[0] != "\n"){
+        int n = 0;
+
+        if(sentence[0] == "s"){
+          bold = true;
+        }
+
+        while(sentence[n] != ">"){n++;}
+
+
+
+        _text.add(TextSpan(
+          text: sentence.substring(n+1),
+          style: TextStyle(color: Colors.black, fontWeight: bold ? FontWeight.bold : FontWeight.normal, ),
+
+        ));
+      }
+    }
+
+    return RichText(text: TextSpan(children: _text));
+  }*/
 }
