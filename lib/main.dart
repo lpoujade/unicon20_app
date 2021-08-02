@@ -5,6 +5,9 @@ import 'article.dart';
 import 'db.dart';
 import 'dart:developer';
 import 'names.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
+
+
 
 /// Launching of the programme.
 void main() {
@@ -52,26 +55,19 @@ class MyHomePage extends StatefulWidget {
 /// This screen takes the information on the 'WorldPress' and draw them with the good format.
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
-	// Creating the two controllers.
-	late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 0);
-	late final TabController _secondPageController = TabController(length: 4, vsync: this, initialIndex: 0);
+	// Creating the the controller.
+	late final TabController _principalController = TabController(length: 2, vsync: this, initialIndex: 0);
 
-	//Creating all the list that will contain future information to draw on screen.
+	//Creating the list that will contain future information to draw on screen.
 	List<Widget> _listHome = <Widget>[];
-	List<Widget> _listInfo = <Widget>[];
 
-	// todo : change to get a real planning shape.
-	final List<Widget> _listP1 = <Widget>[];
-	final List<Widget> _listP2 = <Widget>[];
-	final List<Widget> _listP3 = <Widget>[];
-	final List<Widget> _listP4 = <Widget>[];
 
 	/// The drawing of the first screen we draw.
 	///
 	/// Taking care of the 3 different 'pages' in the page :
 	///   - The home one.
 	///   - The planning one.
-	///   - The info one ( todo : transform to map )
+	///   - not existing one ( todo : transform to map )
 	@override
 	Widget build(BuildContext context) {
 		return Scaffold(
@@ -103,39 +99,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 								)),
 						]),
 
-						/// The second 'page' of the biggest controller. todo : change it to a real agenda
-						Column(
+						/// The second 'page' of the biggest controller.
+							Column(children: [ Expanded(
 								// Taking care of the top bar that uses the second controller.
-								children: [ Container(
-										padding: const EdgeInsets.all(4.0),
-										color: Colors.blueAccent,
-										child: TabBar(
-												controller: _secondPageController,
-												labelColor: Colors.white,
-												unselectedLabelColor: Colors.white70,
-												tabs: [
-													const Tab(text: 's'),
-													const Tab(text: 'm'),
-													const Tab(text: 's'),
-													const Tab(text: 's'),
-												],
-										)),
+								child:  WeekView(
+										dates: [DateTime(2022, 7, 24), DateTime(2022, 7, 25), DateTime(2022, 7, 26), ],
+										userZoomable: true,
+										initialTime: DateTime.now(),
+										// todo : get all the event and ad theme to the agenda: events:[ FlutterWeekViewEvent( title: description: start : end:)]
 
-								// Drawing the content of the second 'page'
-								Expanded(
-										child: TabBarView(
-												controller: _secondPageController,
-												children: [
-													ListView(children: _listP1),
-													ListView(children: _listP2),
-													ListView(children: _listP3),
-													ListView(children: _listP4),
-												]
-										),
+
+								),
 								),
 								],
 								),
 
+
+								/*
 								/// The third 'page' of the biggest controller. todo : change it to map
 								Column(children: [
 									// Taking care of the top bar that uses the second controller.
@@ -148,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 										// Drawing the content of the third 'page'
 										Expanded(child: ListView( children: _listInfo )),
 								],
-								),
+								),*/
 								],
 								),
 
@@ -171,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 												tabs: [
 													Tab(icon: Icon(Icons.home)),
 													Tab(icon: Icon(Icons.access_time)),
-													Tab(icon: Icon(Icons.info)),
+													//Tab(icon: Icon(Icons.info)),
 												],
 										),
 								),
@@ -193,7 +173,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 	/// At the closing of the app, we destroy everything so it close clean.
 	@override
 	void dispose(){
-		_secondPageController.dispose();
 		_principalController.dispose();
 		super.dispose();
 	}
@@ -204,20 +183,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 		final postlist = await get_articles();
 		log("found articles: $postlist");
 		var saved_articles_id = [];
+		bool important = false;
+
 		postlist.forEach((article) {
 			saved_articles_id.add(article.id);
+
+			// todo : change the importante variable only if the article is important
+
+
 			list.add(
 					Card(
 							child: ListTile(
-									title: Text(article.title),
-									leading: Icon(Icons.landscape),
-									trailing: Icon(Icons.arrow_forward_ios_outlined),
+									tileColor: important ? Colors.blue : Colors.white,
+									title: Text(article.title, style: const TextStyle(fontFamily: 'LinLiber', ), ),
+									leading: Icon(Icons.landscape, color: important ? Colors.red : Colors.grey,),
+									trailing: Icon(Icons.arrow_forward_ios_outlined, color: important ? Colors.red : Colors.grey,),
 									onTap: (){
 										Navigator.push(
 												context,
 												MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraph: article.content))
 										);
-									}, subtitle: Text('...')
+									}, subtitle: Text('...', style: TextStyle(fontFamily: 'LinLiber', ), )
 							)));
 		});
 		//setState(() { _listHome = list; });
@@ -228,15 +214,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 			list.add(
 					Card(
 							child: ListTile(
-									title: Text(article.title),
-									leading: Icon(Icons.landscape),
-									trailing: Icon(Icons.arrow_forward_ios_outlined),
+									tileColor: important ? Colors.blue : Colors.white,
+									title: Text(article.title, style: const TextStyle(fontFamily: 'LinLiber', ), ),
+									leading: Icon(Icons.landscape, color: important ? Colors.red : Colors.grey,),
+									trailing: Icon(Icons.arrow_forward_ios_outlined, color: important ? Colors.red : Colors.grey,),
 									onTap: (){
 										Navigator.push(
 												context,
 												MaterialPageRoute(builder: (context) => TextPage(title: article.title, paragraph: article.content))
 										);
-									}, subtitle: Text('...')
+									}, subtitle: const Text('...', style: TextStyle(fontFamily: 'LinLiber', ),)
 							)));
 			//setState((){_listHome = list;});
 		});

@@ -19,6 +19,7 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   flutter_html: ^2.1.1
+  flutter_week_view: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +35,14 @@ flutter:
     - family: aAnggota
       fonts:
         - asset: res/font/aAnggota.ttf
+    - family: LinLiber
+      fonts:
+        - asset: res/font/LinLibertine_R.ttf
+        - asset: res/font/LinLibertine_RB.ttf
+          style: italic
+        - asset: res/font/LinLibertine_RBI.ttf
+          style: italic
+          weight: 700
+        - asset: res/font/LinLibertine_RI.ttf
+          weight: 700
+
