@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'api.dart' as api;
@@ -41,7 +42,7 @@ class Article {
 /// `last_sync_date` is the date of the newest article in local db
 class ArticleList {
   late Database _db;
-  var _articles = <Article>[];
+  final articles = ValueNotifier<List<Article>>([]);
 
   DateTime? last_sync_date;
   bool up_to_date = false;
@@ -53,39 +54,34 @@ class ArticleList {
     last_sync_date = await db.get_last_sync_date(_db);
   }
 
-  bool get has_articles { return _articles.length >= 1; }
   
   /// TODO db init
 
-  /// Get articles from db
-  Future<List<Article>> get_articles() async {
+  /// Init db, read articles from it, then get
+  /// updates from wordpress
+  get_articles() async {
     await _init_db();
-    var from_db = get_from_db().then((articles) {
-      _articles += articles;
-      return articles;
+    await get_from_db().then((local_articles) {
+      articles.value += local_articles;
     });
-
-    return from_db;
+    get_articles_from_wp();
   }
 
   /// Download new articles
-  Future<List<Article>> more() async {
-    if (up_to_date) return _articles;
+  get_articles_from_wp() async {
     var from_wp = api.get_posts_from_wp(since: last_sync_date);
     waiting_network = true;
-    from_wp.then((articles) {
-      _articles += articles;
-      articles.forEach((article) {
+    from_wp.then((wp_articles) {
+      articles.value += wp_articles;
+      wp_articles.forEach((article) {
         save_article(article);
       });
       up_to_date = true;
     })
     .catchError((error) {
-      log('error download new articles: ${error}');
+      log('error while downloading new articles: ${error}');
     })
     .whenComplete(() { waiting_network = false; });
-    await Future.wait([from_wp]);
-    return _articles;
   }
 
   /// Insert a new article in db

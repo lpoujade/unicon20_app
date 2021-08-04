@@ -56,12 +56,8 @@ class MyHomePage extends StatefulWidget {
 /// This screen takes the information on the 'WorldPress' and draw them with the good format.
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
-	// Creating the the controller.
+	// Creating the controller.
 	late final TabController _principalController = TabController(length: 2, vsync: this, initialIndex: 0);
-
-	//Creating the list that will contain future information to draw on screen.
-	List<Widget> _listHome = <Widget>[];
-	late Future<List<Article>> articles;
 
 	final home_articles = ArticleList();
 
@@ -95,21 +91,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                         style: TextStyle(color: Colors.white, fontSize: 30)))),
             // Drawing the content of the first 'page'
             Expanded(
-                child: FutureBuilder<List<Article>>(
-                    future: articles,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError && !home_articles.has_articles) {
-                        log("failed to get articles: ${snapshot.error}");
-                        return Text(
-                            'failed to get articles: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-												if (!home_articles.up_to_date)
-                          articles = home_articles.more();
+                child: ValueListenableBuilder<List<Article>>(
+                    valueListenable: home_articles.articles,
+                    builder: (context, articles, Widget? child) {
+                      if (articles.length > 0) {
+                        articles.sort((a, b) {
+                          return b.date.compareTo(a.date);
+                        });
                         return ListView(
-                            children: snapshot.data!.map((e) {
+                            children: articles.map((e) {
 															return build_card(e);
 														}).toList());
                       }
+                      // while we don't have articles
+                      // TODO timeout ?
                       return const CircularProgressIndicator();
                     }))
           ]),
@@ -179,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     super.initState();
 
 		log('init state');
-		articles = home_articles.get_articles();
+		home_articles.get_articles();
 	}
 	/// At the closing of the app, we destroy everything so it close clean.
 	@override
@@ -196,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     return Card(
         child: ListTile(
             title: Text(article.title, style: const TextStyle(fontFamily: 'LinLiber')),
-            subtitle: Text(article.content.substring(0, sub_len), style: TextStyle(fontFamily: 'LinLiber', )),
+            subtitle: Text(article.content.substring(0, sub_len), style: TextStyle(fontFamily: 'LinLiber')),
             leading: Icon(Icons.landscape),
             trailing: Icon(Icons.arrow_forward_ios_outlined, color: article.important ? Colors.red : Colors.grey),
             onTap: () {
