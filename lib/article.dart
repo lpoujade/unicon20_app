@@ -38,8 +38,8 @@ class Article {
 }
 
 /// Hold a list of [Article], a connection to [Database] and
-/// handle connections to wordpress  
-/// `last_sync_date` is the date of the newest article in local db
+/// handle connections to wordpress
+/// `last_sync_date` is the date of the newest article in local db (if any)
 class ArticleList {
   late Database _db;
   final articles = ValueNotifier<List<Article>>([]);
@@ -54,7 +54,6 @@ class ArticleList {
     last_sync_date = await db.get_last_sync_date(_db);
   }
 
-  
   /// TODO db init
 
   /// Init db, read articles from it, then get
@@ -81,16 +80,18 @@ class ArticleList {
     .catchError((error) {
       log('error while downloading new articles: ${error}');
     })
-    .whenComplete(() { waiting_network = false; });
+    .whenComplete(() {
+      waiting_network = false;
+    });
   }
 
   /// Insert a new article in db
   save_article(Article article) async {
     _db.insert(
-      'article',
-      article.toSqlMap(),
-      conflictAlgorithm: ConflictAlgorithm.fail
-    );
+        'article',
+        article.toSqlMap(),
+        conflictAlgorithm: ConflictAlgorithm.fail
+        );
   }
 
   /// Read articles saved in db
@@ -98,12 +99,13 @@ class ArticleList {
     var raw_articles = await _db.rawQuery('select * from article');
 
     return raw_articles.map((a) {
+      // weird 'cast' to dynamic
       dynamic timestamp = a['date'];
-      return Article(id: a['id'],
+      return Article(
+          id: a['id'],
           title: a['title'],
           content: a['content'],
-          date: DateTime.fromMillisecondsSinceEpoch(timestamp)
-      );
+          date: DateTime.fromMillisecondsSinceEpoch(timestamp));
     }).toList();
   }
 }
