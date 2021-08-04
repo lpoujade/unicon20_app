@@ -1,10 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-
-import 'article.dart';
-import 'names.dart';
 import 'text_page.dart';
+import 'api.dart' as api;
+import 'article.dart';
+import 'db.dart';
+import 'dart:developer';
+import 'names.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
+
+
 
 /// Launching of the programme.
 void main() {
@@ -49,38 +54,35 @@ class MyHomePage extends StatefulWidget {
 ///   - The biggest one always use.
 ///   - The smallest one only effective when the biggest one is on the 2nd selection.
 /// This screen takes the information on the 'WorldPress' and draw them with the good format.
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  // Creating the two controllers.
-  late final TabController _principalController = TabController(length: 2, vsync: this, initialIndex: 0);
-  late final TabController _secondPageController = TabController(length: 4, vsync: this, initialIndex: 0);
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
-  late Future<List<Article>> articles;
+	// Creating the the controller.
+	late final TabController _principalController = TabController(length: 2, vsync: this, initialIndex: 0);
 
-  final home_articles = ArticleList();
+	//Creating the list that will contain future information to draw on screen.
+	List<Widget> _listHome = <Widget>[];
+	late Future<List<Article>> articles;
 
-  // todo : change to get a real planning shape.
-  final List<Widget> _listP1 = <Widget>[];
-  final List<Widget> _listP2 = <Widget>[];
-  final List<Widget> _listP3 = <Widget>[];
-  final List<Widget> _listP4 = <Widget>[];
+	final home_articles = ArticleList();
 
-  /// The drawing of the first screen we draw.
-  ///
-  /// Taking care of the 2 different 'pages' in the page :
-  ///   - The home one.
-  ///   - The planning one.
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        // Taking care of the top bar.
-        appBar: AppBar(
-            title: Row(children: [
-          Image.asset('res/topLogo.png', width: 75, height: 75),
-          const Expanded(
-              child: Center(
-                  child: Text(Strings.DrawTitle,
-                  style: TextStyle(color: Colors.white, fontSize: 30))))
-        ])),
+	/// The drawing of the first screen we draw.
+	///
+	/// Taking care of the 3 different 'pages' in the page :
+	///   - The home one.
+	///   - The planning one.
+	///   - not existing one ( todo : transform to map )
+	@override
+	Widget build(BuildContext context) {
+		return Scaffold(
+				// Taking care of the top bar.
+				appBar: AppBar(
+						title: Row(
+								children: [
+									Image.asset('res/topLogo.png', width: 75, height: 75, ),
+									const Expanded( child: Center(child: Text(Strings.DrawTitle, style: TextStyle(color: Colors.white, fontSize: 30), ), ), ),
+								],
+						),
+				),
 
         // The body of the app.
         body: TabBarView(controller: _principalController, children: [
@@ -96,13 +98,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: FutureBuilder<List<Article>>(
                     future: articles,
                     builder: (context, snapshot) {
-                      if (snapshot.hasError) {
+                      if (snapshot.hasError && !home_articles.has_articles) {
                         log("failed to get articles: ${snapshot.error}");
                         return Text(
                             'failed to get articles: ${snapshot.error}');
                       } else if (snapshot.hasData) {
 												if (!home_articles.up_to_date)
-													articles = home_articles.more();
+                          articles = home_articles.more();
                         return ListView(
                             children: snapshot.data!.map((e) {
 															return build_card(e);
@@ -112,62 +114,79 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     }))
           ]),
 
-          /// The second 'page' of the biggest controller. todo : change it to a real agenda
-          Column(children: [
-            Container(
-                padding: const EdgeInsets.all(4.0),
-                color: Colors.blueAccent,
-                child: TabBar(
-                    controller: _secondPageController,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white70,
-                    tabs: [
-                      const Tab(text: 's'),
-                      const Tab(text: 'm'),
-                      const Tab(text: 's'),
-                      const Tab(text: 's')
-                    ])),
+						/// The second 'page' of the biggest controller.
+							Column(children: [ Expanded(
+								// Taking care of the top bar that uses the second controller.
+								child:  WeekView(
+										dates: [DateTime(2022, 7, 24), DateTime(2022, 7, 25), DateTime(2022, 7, 26), ],
+										userZoomable: true,
+										initialTime: DateTime.now(),
+										// todo : get all the event and ad theme to the agenda: events:[ FlutterWeekViewEvent( title: description: start : end:)]
 
-            // Drawing the content of the second 'page'
-            Expanded(
-                child: TabBarView(controller: _secondPageController, children: [
-              ListView(children: _listP1),
-              ListView(children: _listP2),
-              ListView(children: _listP3),
-              ListView(children: _listP4)
-            ]))
-          ])
-        ]),
 
-        /// Creating the bar at the bottom of the screen.
-        ///
-        /// This bare help navigation between the 3 principals 'pages' ans uses the
-        /// principal controller.
-        bottomNavigationBar: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(4.0),
-            child: TabBar(
-                controller: _principalController,
-                indicatorColor: Colors.green,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicatorWeight: 2,
-                indicatorPadding: const EdgeInsets.only(bottom: 4.0),
-                labelColor: Colors.green,
-                unselectedLabelColor: Colors.blue,
-                tabs: [
-                  Tab(icon: Icon(Icons.home)),
-                  Tab(icon: Icon(Icons.access_time))
-                ])));
-  }
+								),
+								),
+								],
+								),
+
+
+								/*
+								/// The third 'page' of the biggest controller. todo : change it to map
+								Column(children: [
+									// Taking care of the top bar that uses the second controller.
+										Container(
+												color: Colors.blueAccent,
+												height: 55,
+												child: const Center(child: Text('Information', style: TextStyle(color: Colors.white, fontSize: 20))),
+										),
+
+										// Drawing the content of the third 'page'
+										Expanded(child: ListView( children: _listInfo )),
+								],
+								),*/
+								],
+								),
+
+
+								/// Creating the bar at the bottom of the screen.
+								///
+								/// This bare help navigation between the 3 principals 'pages' ans uses the
+								/// principal controller.
+								bottomNavigationBar: Container(
+										color: Colors.white,
+										padding: const EdgeInsets.all(4.0),
+										child: TabBar(
+												controller: _principalController,
+												indicatorColor: Colors.green,
+												indicatorSize :TabBarIndicatorSize.label,
+												indicatorWeight: 2,
+												indicatorPadding: const EdgeInsets.only(bottom: 4.0),
+												labelColor: Colors.green,
+												unselectedLabelColor: Colors.blue,
+												tabs: [
+													Tab(icon: Icon(Icons.home)),
+													Tab(icon: Icon(Icons.access_time)),
+													//Tab(icon: Icon(Icons.info)),
+												],
+										),
+								),
+								);
+	}
 
   /// At the creation of the app.
   @override
   void initState() {
     super.initState();
 
-    log('init state');
-    articles = home_articles.get_articles();
-  }
+		log('init state');
+		articles = home_articles.get_articles();
+	}
+	/// At the closing of the app, we destroy everything so it close clean.
+	@override
+	void dispose(){
+		_principalController.dispose();
+		super.dispose();
+	}
 
   /// Create a [Card] widget from an [Article]
   /// Expand to a [TextPage]
@@ -176,21 +195,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final sub_len = article.content.length > 30 ? 30 : article.content.length;
     return Card(
         child: ListTile(
-            title: Text(article.title),
-            subtitle: Text(article.content.substring(0, sub_len)),
+            title: Text(article.title, style: const TextStyle(fontFamily: 'LinLiber')),
+            subtitle: Text(article.content.substring(0, sub_len), style: TextStyle(fontFamily: 'LinLiber', )),
             leading: Icon(Icons.landscape),
-            trailing: Icon(Icons.arrow_forward_ios_outlined),
+            trailing: Icon(Icons.arrow_forward_ios_outlined, color: article.important ? Colors.red : Colors.grey),
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => text_page));
             }));
-  }
-
-  /// At the closing of the app, we destroy everything so it close clean.
-  @override
-  void dispose() {
-    _secondPageController.dispose();
-    _principalController.dispose();
-    super.dispose();
   }
 }

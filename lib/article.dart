@@ -10,7 +10,7 @@ class Article {
   final id;
   final title;
   var content;
-  // final bool important;
+  final bool important = false;
   // bool read;
   late final DateTime date;
 
@@ -52,6 +52,8 @@ class ArticleList {
     _db = await db.init_database();
     last_sync_date = await db.get_last_sync_date(_db);
   }
+
+  bool get has_articles { return _articles.length >= 1; }
   
   /// TODO db init
 
