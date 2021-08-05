@@ -15,12 +15,11 @@ class Article {
   // bool read;
   late final DateTime date;
 
-  Article({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.date
-  });
+  Article(
+      {required this.id,
+      required this.title,
+      required this.content,
+      required this.date});
 
   Map<String, dynamic> toSqlMap() {
     return {
@@ -44,14 +43,12 @@ class ArticleList {
   late Database _db;
   final articles = ValueNotifier<List<Article>>([]);
 
-  DateTime? last_sync_date;
   bool up_to_date = false;
   bool waiting_network = false;
 
   /// Get database connection and save last sync date
   _init_db() async {
     _db = await db.init_database();
-    last_sync_date = await db.get_last_sync_date(_db);
   }
 
   /// TODO db init
@@ -63,12 +60,21 @@ class ArticleList {
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });
-    get_articles_from_wp();
+    await get_articles_from_wp();
+  }
+
+  /// Clear and refresh articles list
+  Future<void> refresh() async {
+    articles.value = [];
+    await get_from_db().then((local_articles) {
+      articles.value += local_articles;
+    });
+    await get_articles_from_wp();
   }
 
   /// Download new articles
   get_articles_from_wp() async {
-    var from_wp = api.get_posts_from_wp(since: last_sync_date);
+    var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db));
     waiting_network = true;
     from_wp.then((wp_articles) {
       articles.value += wp_articles;
@@ -76,22 +82,17 @@ class ArticleList {
         save_article(article);
       });
       up_to_date = true;
-    })
-    .catchError((error) {
+    }).catchError((error) {
       log('error while downloading new articles: ${error}');
-    })
-    .whenComplete(() {
+    }).whenComplete(() {
       waiting_network = false;
     });
   }
 
   /// Insert a new article in db
   save_article(Article article) async {
-    _db.insert(
-        'article',
-        article.toSqlMap(),
-        conflictAlgorithm: ConflictAlgorithm.fail
-        );
+    _db.insert('article', article.toSqlMap(),
+        conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
   /// Read articles saved in db

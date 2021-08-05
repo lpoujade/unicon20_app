@@ -102,18 +102,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: ValueListenableBuilder<List<Article>>(
                     valueListenable: home_articles.articles,
                     builder: (context, articles, Widget? child) {
+                      Widget child;
                       if (articles.length > 0) {
                         articles.sort((a, b) {
                           return b.date.compareTo(a.date);
                         });
-                        return ListView(
-                            children: articles.map((e) {
+                        child = ListView(children: articles.map((e) {
                           return build_card(e);
                         }).toList());
+                      } else {
+                        // while we don't have articles
+                        // ListView here because we need a scroll view
+                        // as RefreshIncator child
+                        child = ListView(children: [CircularProgressIndicator()]);
                       }
-                      // while we don't have articles
-                      // TODO timeout ?
-                      return const CircularProgressIndicator();
+                      return RefreshIndicator(
+                          onRefresh: home_articles.refresh, child: child);
                     }))
           ]),
 
@@ -201,10 +205,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final sub_len = article.content.length > 30 ? 30 : article.content.length;
     return Card(
         child: ListTile(
-            title: Text(article.title, style: const TextStyle(fontFamily: 'LinLiber')),
-            subtitle: Text(article.content.substring(0, sub_len), style: TextStyle(fontFamily: 'LinLiber')),
+            title: Text(article.title,
+                style: const TextStyle(fontFamily: 'LinLiber')),
+            subtitle: Text(article.content.substring(0, sub_len),
+                style: TextStyle(fontFamily: 'LinLiber')),
             leading: Icon(Icons.landscape),
-            trailing: Icon(Icons.arrow_forward_ios_outlined, color: article.important ? Colors.red : Colors.grey),
+            trailing: Icon(Icons.arrow_forward_ios_outlined,
+                color: article.important ? Colors.red : Colors.grey),
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => text_page));

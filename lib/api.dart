@@ -3,11 +3,13 @@ import 'package:http/http.dart' as http;
 import 'article.dart' show Article;
 import 'dart:developer';
 
-const api_base = 'https://unicon20.fr/wp-json/wp/v2';
+const api_host = String.fromEnvironment('API_HOST',
+    defaultValue: 'https://unicon20.fr');
+const api_base = '${api_host}/wp-json/wp/v2';
 
 /// get posts from wordpress API
 ///
-/// return list of [Article]
+/// return a list of [Article]
 Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const []}) async {
   var path = api_base + '/posts';
@@ -18,7 +20,7 @@ Future<List<Article>> get_posts_from_wp(
   if (filters.isNotEmpty) path += '?' + filters.join('&');
   log("get '$path'");
   var url = Uri.parse(path);
-  // TODO error handling
+  // TODO error handling, timeout
   List<dynamic> postList = json.decode(await http.read(url));
 
   var articles = <Article>[];
