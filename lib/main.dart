@@ -254,13 +254,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return Card(
         child: ListTile(
             title: Text(article.title,
-                style: const TextStyle(fontFamily: 'LinLiber')),
+                style: TextStyle(fontFamily: 'LinLiber',
+                    color: (article.read ? Colors.grey : Colors.black))),
             subtitle: Text(article.content.substring(0, sub_len),
                 style: TextStyle(fontFamily: 'LinLiber')),
             leading: Icon(Icons.landscape),
-            trailing: Icon(Icons.arrow_forward_ios_outlined,
-                color: article.important ? Colors.red : Colors.grey),
+            trailing: Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
+                // color: article.important ? Colors.red : (article.read ? Colors.white : Colors.grey)),
             onTap: () {
+              article.read = true;
+              home_articles.update_article(article);
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => text_page));
             }));

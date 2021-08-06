@@ -12,21 +12,23 @@ class Article {
   final title;
   var content;
   final bool important = false;
-  // bool read;
+  bool read = false;
   late final DateTime date;
 
   Article(
       {required this.id,
       required this.title,
       required this.content,
-      required this.date});
+      required this.date,
+      required this.read});
 
   Map<String, dynamic> toSqlMap() {
     return {
       'id': id,
       'title': title,
       'content': content,
-      'date': date.millisecondsSinceEpoch
+      'date': date.millisecondsSinceEpoch,
+      'read': (read ? 1 : 0)
     };
   }
 
@@ -40,6 +42,7 @@ class Article {
 /// handle connections to wordpress
 /// `last_sync_date` is the date of the newest article in local db (if any)
 class ArticleList {
+  /// TODO proper db initialization
   late Database _db;
   final articles = ValueNotifier<List<Article>>([]);
 
@@ -50,8 +53,6 @@ class ArticleList {
   _init_db() async {
     _db = await db.init_database();
   }
-
-  /// TODO db init
 
   /// Init db, read articles from it, then get
   /// updates from wordpress
@@ -95,18 +96,28 @@ class ArticleList {
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
+  /// Update an existing article
+  update_article(Article article) async {
+    _db.update('article', article.toSqlMap(),
+    where: 'id = ?', whereArgs: [article.id]);
+  }
+
   /// Read articles saved in db
   Future<List<Article>> get_from_db() async {
     var raw_articles = await _db.rawQuery('select * from article');
 
     return raw_articles.map((a) {
-      // weird 'cast' to dynamic
+      // TODO solve this
+      // weird 'cast' to dynamic->int
       dynamic timestamp = a['date'];
+      // weird 'cast' to dynamic->bool
+      dynamic read = a['read'];
       return Article(
           id: a['id'],
           title: a['title'],
           content: a['content'],
-          date: DateTime.fromMillisecondsSinceEpoch(timestamp));
+          date: DateTime.fromMillisecondsSinceEpoch(timestamp),
+          read: (read == 1));
     }).toList();
   }
 }
