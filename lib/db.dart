@@ -6,7 +6,7 @@ const db_name = 'unicon_db.db';
 const db_version = 1;
 
 const init_sql = [
-  'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null)',
+  'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null, read integer default 0)',
 ];
 
 /// Open connection to database  

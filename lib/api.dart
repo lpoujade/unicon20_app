@@ -30,7 +30,8 @@ Future<List<Article>> get_posts_from_wp(
         id: p['id'],
         title: p['title']['rendered'],
         content: p['content']['rendered'],
-        date: DateTime.parse(p['date'])));
+        date: DateTime.parse(p['date']),
+        read: false));
   }
   return articles;
 }
