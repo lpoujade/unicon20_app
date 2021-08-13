@@ -9,6 +9,8 @@ const init_sql = [
   'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null)',
 ];
 
+/// Open connection to database  
+/// Also register callback for db creation/migration/configuration
 init_database() async {
   // await deleteDatabase(db_name);
   return openDatabase(join(await getDatabasesPath(), db_name),
@@ -21,6 +23,8 @@ init_database() async {
   });
 }
 
+/// Read date of the most recent article in local database,
+/// if any
 Future<DateTime?> get_last_sync_date(db) async {
   var sql = 'select date from article order by date desc limit 1';
   final result = await db.rawQuery(sql);
