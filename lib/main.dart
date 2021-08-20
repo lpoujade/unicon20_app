@@ -250,13 +250,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   /// Expand to a [TextPage]
   Widget build_card(Article article) {
     var text_page = TextPage(title: article.title, paragraph: article.content);
-    final sub_len = article.content.length > 30 ? 30 : article.content.length;
     return Card(
         child: ListTile(
             title: Text(article.title,
                 style: TextStyle(fontFamily: 'LinLiber',
                     color: (article.read ? Colors.grey : Colors.black))),
-            subtitle: Text(article.content.substring(0, sub_len),
+            subtitle: Text(getSubtitle(article.content),
                 style: TextStyle(fontFamily: 'LinLiber')),
             leading: Icon(Icons.landscape),
             trailing: Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
@@ -268,4 +267,31 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   context, MaterialPageRoute(builder: (context) => text_page));
             }));
   }
+
+  String getSubtitle(String article){
+    int first = 1;
+    bool foundStart = false;
+
+    while(!foundStart){
+      if(article.substring(first, first+1) == '<') {
+        while(article.substring(first, first+1) != '>'){
+          first++;
+        }
+        first++;
+      }else if(article.substring(first, first+1) == '\n'){
+        first += 1;
+      }else{
+        foundStart = true;
+      }
+
+    }
+    int subLen = article.length + first > 30+first ? 30+first : article.length;
+    for(int i = first; i < subLen; i++){
+      if(article.substring(i, i+1) == '<'){
+        subLen = i;
+      }
+    }
+    return article.substring(first, subLen);
+  }
+
 }

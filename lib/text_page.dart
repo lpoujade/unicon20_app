@@ -2,6 +2,10 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:html/dom.dart' as dom;
+import 'package:url_launcher/url_launcher.dart';
+
+
 /// Function used to transform the 'blueAccent' color to a 'material color'.
 Map<int, Color> color ={
   50:const Color.fromRGBO(68,138,255, .1),
@@ -57,7 +61,14 @@ class TextPage extends StatelessWidget {
         body: Container(
             padding: const EdgeInsets.all(8),
             child: SingleChildScrollView(
-              child: Html(data: paragraph,),
+              child: Html(
+                data: paragraph,
+                  onLinkTap: (String? urlLink, RenderContext context, Map<String, String> attributes, dom.Element? element) {
+                    if(urlLink!.isNotEmpty){
+                      _launchURL(urlLink);
+                    }
+                  }
+              ),
 
 
             )
@@ -65,4 +76,12 @@ class TextPage extends StatelessWidget {
       ),
     );
   }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }}
+
 }
