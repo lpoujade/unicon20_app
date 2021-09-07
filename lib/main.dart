@@ -1,15 +1,22 @@
 import 'dart:developer';
 
+import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'text_page.dart';
 import 'article.dart';
+import 'calendar_event.dart';
 import 'names.dart';
+import 'db.dart' as db;
 import 'package:flutter_week_view/flutter_week_view.dart';
 
 import 'package:background_fetch/background_fetch.dart';
 
+import 'db.dart' as db;
 /// Launching of the programme.
-void main() {
+main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  database_instance = await db.init_database();
   runApp(const MyApp());
 }
 
@@ -56,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late final TabController _principalController =
       TabController(length: 2, vsync: this, initialIndex: 0);
 
-  final home_articles = ArticleList();
-
+  final home_articles = ArticleList(db: database_instance);
+  final events = EventList(db: database_instance);
   /// The drawing of the first screen we draw.
   ///
   /// Taking care of the 3 different 'pages' in the page :
@@ -237,6 +244,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
     print('init state');
     home_articles.get_articles();
+    events.get_events();
+
     initBackgroundService().then((e) => BackgroundFetch.start());
   }
 

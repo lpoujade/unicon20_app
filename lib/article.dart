@@ -40,23 +40,18 @@ class Article {
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
-/// `last_sync_date` is the date of the newest article in local db (if any)
 class ArticleList {
-  /// TODO proper db initialization
   late Database _db;
   final articles = ValueNotifier<List<Article>>([]);
 
   bool waiting_network = false;
 
-  /// Get database connection and save last sync date
-  _init_db() async {
-    _db = await db.init_database();
+  ArticleList({required db}) {
+    this._db = db;
   }
 
-  /// Init db, read articles from it, then get
-  /// updates from wordpress
+  /// Read articles from db then from wordpress
   get_articles() async {
-    await _init_db();
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });
@@ -102,20 +97,16 @@ class ArticleList {
 
   /// Read articles from db
   Future<List<Article>> get_from_db() async {
-    var raw_articles = await _db.rawQuery('select * from article');
+    var raw_articles = await _db.query('article');
 
     return raw_articles.map((a) {
-      // TODO solve this
-      // weird 'cast' to dynamic->int
-      dynamic timestamp = a['date'];
-      // weird 'cast' to dynamic->bool
-      dynamic read = a['read'];
+      dynamic date = a['date'];
       return Article(
           id: a['id'],
           title: a['title'],
           content: a['content'],
-          date: DateTime.fromMillisecondsSinceEpoch(timestamp),
-          read: (read == 1));
+          date: DateTime.fromMillisecondsSinceEpoch(date),
+          read: (a['read'] == 1));
     }).toList();
   }
 }
