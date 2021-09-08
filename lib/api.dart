@@ -1,5 +1,6 @@
 import 'dart:convert' show json;
 import 'package:http/http.dart' as http;
+import 'package:http/retry.dart';
 import 'article.dart' show Article;
 import 'dart:developer';
 
@@ -18,20 +19,25 @@ Future<List<Article>> get_posts_from_wp(
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
-  log("get '$path'");
+  print("http GET '$path'");
   var url = Uri.parse(path);
-  // TODO error handling, timeout
-  List<dynamic> postList = json.decode(await http.read(url));
-
   var articles = <Article>[];
 
-  for (final p in postList) {
-    articles.add(Article(
-        id: p['id'],
-        title: p['title']['rendered'],
-        content: p['content']['rendered'],
-        date: DateTime.parse(p['date']),
-        read: false));
+  try {
+    var response = await http.read(url).timeout(Duration(seconds: 20));
+    List<dynamic> postList = json.decode(response);
+
+    for (final p in postList) {
+      articles.add(Article(
+              id: p['id'],
+              title: p['title']['rendered'],
+              content: p['content']['rendered'],
+              date: DateTime.parse(p['date']),
+              read: false));
+    }
+  } catch(err) {
+    print("network error: $err");
   }
+
   return articles;
 }
