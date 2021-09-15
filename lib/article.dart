@@ -46,7 +46,6 @@ class ArticleList {
   late Database _db;
   final articles = ValueNotifier<List<Article>>([]);
 
-  bool up_to_date = false;
   bool waiting_network = false;
 
   /// Get database connection and save last sync date
@@ -73,7 +72,7 @@ class ArticleList {
     await get_articles_from_wp();
   }
 
-  /// Download new articles
+  /// Download and save new articles
   get_articles_from_wp() async {
     var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db));
     waiting_network = true;
@@ -82,7 +81,6 @@ class ArticleList {
       wp_articles.forEach((article) {
         save_article(article);
       });
-      up_to_date = true;
     }).catchError((error) {
       log('error while downloading new articles: ${error}');
     }).whenComplete(() {
@@ -102,7 +100,7 @@ class ArticleList {
     where: 'id = ?', whereArgs: [article.id]);
   }
 
-  /// Read articles saved in db
+  /// Read articles from db
   Future<List<Article>> get_from_db() async {
     var raw_articles = await _db.rawQuery('select * from article');
 
