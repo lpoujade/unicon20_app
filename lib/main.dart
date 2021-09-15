@@ -12,7 +12,8 @@ import 'package:flutter_week_view/flutter_week_view.dart';
 
 import 'package:background_fetch/background_fetch.dart';
 
-import 'db.dart' as db;
+late final Database database_instance;
+
 /// Launching of the programme.
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
