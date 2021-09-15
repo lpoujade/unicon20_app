@@ -61,10 +61,7 @@ class ArticleList {
   /// Clear and refresh articles list
   Future<void> refresh() async {
     articles.value = [];
-    await get_from_db().then((local_articles) {
-      articles.value += local_articles;
-    });
-    await get_articles_from_wp();
+    get_articles();
   }
 
   /// Download and save new articles

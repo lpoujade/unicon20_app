@@ -13,6 +13,8 @@ const init_sql = [
 /// Open connection to database  
 /// Also register callback for db creation/migration/configuration
 init_database() async {
+  // TODO remove
+  // await deleteDatabase(db_name);
   var db_path = await getDatabasesPath();
   return openDatabase(join(db_path, db_name),
       version: db_version, onCreate: (Database db, int version) async {
