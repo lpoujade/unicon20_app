@@ -113,9 +113,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           return build_card(e);
                         }).toList());
                       } else {
-                        // while we don't have articles
-                        // ListView here because we need a scroll view
-                        // as RefreshIncator child
+                        // we need a scroll view as RefreshIncator child
                         child = ListView(children: [CircularProgressIndicator()]);
                       }
                       return RefreshIndicator(
@@ -242,6 +240,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     initBackgroundService().then((e) => BackgroundFetch.start());
   }
 
+  /// Initialize the background service used to fetch new event/posts
+  /// and show notifications
   Future<void> initBackgroundService() async {
     int status = await BackgroundFetch.configure(BackgroundFetchConfig(
         minimumFetchInterval: 15, stopOnTerminate: false,
@@ -249,19 +249,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         requiresCharging: false, requiresStorageNotLow: false,
         requiresDeviceIdle: false, requiredNetworkType: NetworkType.UNMETERED
     ), (String taskId) async {
-      print("[BackgroundFetch] Event received $taskId, will refresh articles");
-      setState(() {
-        home_articles.refresh();
-      });
+      setState(() { home_articles.refresh(); });
       BackgroundFetch.finish(taskId);
     }, (String taskId) async {  // <-- Task timeout handler.
       print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
     });
-    print('[BackgroundFetch] configure success: $status');
   }
 
   /// At the closing of the app, we destroy everything so it close clean.
+  /// (background service will still run)
   @override
   void dispose() {
     _principalController.dispose();
