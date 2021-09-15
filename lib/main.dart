@@ -256,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         requiresCharging: false, requiresStorageNotLow: false,
         requiresDeviceIdle: false, requiredNetworkType: NetworkType.UNMETERED
     ), (String taskId) async {
-      setState(() { home_articles.refresh(); });
+      setState(() { home_articles.refresh(); events.refresh(); });
       BackgroundFetch.finish(taskId);
     }, (String taskId) async {  // <-- Task timeout handler.
       print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");

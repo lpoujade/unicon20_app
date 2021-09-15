@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'api.dart' as api;
 import 'db.dart' as db;
 
+/// Event data
 class CalendarEvent {
   final uid;
   final String title;
@@ -61,6 +62,9 @@ class CalendarEvent {
   }
 }
 
+/// Hold a [CalendarEvent] list, a connection
+/// to [Database] and functions to read from
+/// google ics
 class EventList {
   late Database _db;
   final events = ValueNotifier<List<CalendarEvent>>([]);
@@ -75,7 +79,14 @@ class EventList {
         .then((e) {
           events.value += e;
         });
-    await get_events_from_google();
+    if (events.value.length == 0)
+      await get_events_from_google();
+  }
+
+  /// Clear and refresh events from db & google
+  refresh() async {
+    events.value = [];
+    get_events();
   }
 
   /// Download new events
@@ -91,12 +102,13 @@ class EventList {
     });
   }
 
+  /// Save a new [CalendarEvent]
   save_event(CalendarEvent event) {
     _db.insert('events', event.toSqlMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  /// Read events saved in db
+  /// Read events from db
   Future<List<CalendarEvent>> get_events_from_db() async {
     var raw_events = await _db.query('events');
 

@@ -62,6 +62,7 @@ Future<List<CalendarEvent>> get_events_from_google() async {
   List<CalendarEvent> event_list = [];
 
   for (String cal in calendars.keys) {
+    print("http GET '$cal': '${calendars[cal]}");
     String raw_ical = await http.read(Uri.parse(calendars[cal].toString()));
     var json = ICal.toJson(raw_ical);
     var json_events = json['VEVENT'];
