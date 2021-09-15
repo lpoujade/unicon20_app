@@ -14,8 +14,8 @@ dependencies:
   #flutter_html: ^2.1.0
   sqflite:
   path:
+  ical_parser:
   background_fetch:
-
 
   cupertino_icons: ^1.0.2
 

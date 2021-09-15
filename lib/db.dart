@@ -7,13 +7,16 @@ const db_version = 1;
 
 const init_sql = [
   'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null, read integer default 0)',
+  'create table events ( uid text unique not null, title text not null, start integer not null, end integer not null, location text not null, type text not null, description text, summary text)'
 ];
 
 /// Open connection to database  
 /// Also register callback for db creation/migration/configuration
 init_database() async {
+  // TODO remove
   // await deleteDatabase(db_name);
-  return openDatabase(join(await getDatabasesPath(), db_name),
+  var db_path = await getDatabasesPath();
+  return openDatabase(join(db_path, db_name),
       version: db_version, onCreate: (Database db, int version) async {
     var batch = db.batch();
     init_sql.forEach((script) => batch.execute(script));
