@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             Expanded(
                 child: ValueListenableBuilder<List<Article>>(
                     valueListenable: home_articles.articles,
-                    builder: (context, articles, Widget? child) {
+                    builder: (context, articles, Widget? unused_child) {
                       Widget child;
                       if (articles.length > 0) {
                         articles.sort((a, b) {
@@ -133,68 +133,39 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           Column(
             children: [
               Expanded(
-                // Taking care of the top bar that uses the second controller.
-                child: WeekView(
-                  dates: [
-                    DateTime(2022, 7, 24),
-                    DateTime(2022, 7, 25),
-                    DateTime(2022, 7, 26),
-                    DateTime(2022, 7, 27),
-                    DateTime(2022, 7, 28),
-                    DateTime(2022, 7, 29),
-                    DateTime(2022, 7, 30),
-                  ],
-                  userZoomable: true,
-                  initialTime: DateTime.now(),
-                  // todo : get all the event and ad theme to the agenda: events:[ FlutterWeekViewEvent( title: description: start : end:)]
-                  events:[
-                    FlutterWeekViewEvent(
-                      title: "Road: 10K",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 8),
-                      end: DateTime(2022, 7, 27, 12),
-                      backgroundColor: Colors.green,
-                    ),
-                    FlutterWeekViewEvent(
-                      title: "Hockey: Rink Build",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 9),
-                      end: DateTime(2022, 7, 27, 11),
-                      backgroundColor: Colors.red,
-                    ),
-                    FlutterWeekViewEvent(
-                      title: "Jumps: Track Hight & Long",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 10),
-                      end: DateTime(2022, 7, 27, 17),
-                      backgroundColor: Colors.blue,
-                    ),
-                    FlutterWeekViewEvent(
-                      title: "Trials: Build",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 10),
-                      end: DateTime(2022, 7, 27, 20),
-                      backgroundColor: Colors.grey,
-                    ),
-                    FlutterWeekViewEvent(
-                      title: "Hockay: A",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 12, 30),
-                      end: DateTime(2022, 7, 27, 22),
-                      backgroundColor: Colors.orange,
-                    ),
-                    FlutterWeekViewEvent(
-                      title: "Workshop: Children Meeting",
-                      description: 'null',
-                      start: DateTime(2022, 7, 27, 13),
-                      end: DateTime(2022, 7, 27, 15),
-                      backgroundColor: Colors.purple,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+                  child: ValueListenableBuilder<List<CalendarEvent>>(
+                      valueListenable: events.events,
+                      builder: (context, events, Widget? unused_child) {
+                        List<DateTime> dates = [];
+                        events.forEach((e) {
+                          var day = DateTime(e.start.year, e.start.month, e.start.day);
+                          if (!dates.contains(day)) dates.add(day);
+                        });
+                        dates.sort((a, b) => a.compareTo(b));
+                        // todo : add theme to the agenda
+                        return WeekView(
+                            dates: dates,
+                            userZoomable: true,
+                            initialTime: DateTime.now(),
+                            minimumTime: HourMinute(hour: 7, minute: 30),
+                            events: events.map((e) {
+                              return FlutterWeekViewEvent(
+                                  title: e.title,
+                                  description: e.description,
+                                  start: e.start,
+                                  end: e.end,
+                                  onTap: () {
+                                    // todo event page/popup
+                                    print("${e.title} ${e.start} ${e.location}");
+                                  }
+                              );
+                            }).toList()
+                        );
+                      }
+                  )
+              )
+            ]
+          )
 
           /*
                 /// The third 'page' of the biggest controller. todo : change it to map
