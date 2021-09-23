@@ -270,12 +270,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   String getSubtitle(String article){
     int first = 1;
+    int firstmem = 0;
     bool foundStart = false;
 
     while(!foundStart){
       if(article.substring(first, first+1) == '<') {
+        firstmem = first;
         while(article.substring(first, first+1) != '>'){
           first++;
+          if(first == firstmem+10){
+            if((article.substring(firstmem, firstmem+8) != "<picture")&& (article.substring(firstmem, firstmem+4) != "<img") && (article.substring(firstmem, firstmem+5) != "<href") && (article.substring(firstmem, firstmem+7) != "<figure")){
+              first = firstmem+1;
+              break;
+            }
+          }
         }
         first++;
       }else if(article.substring(first, first+1) == '\n'){
