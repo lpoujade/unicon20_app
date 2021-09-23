@@ -58,31 +58,33 @@ class ArticleList {
     await get_articles_from_wp();
   }
 
-  /// Clear and refresh articles list
-  Future<void> refresh() async {
-    articles.value = [];
-    get_articles();
+  /// Get new articles
+  Future<List<Article>> refresh() async {
+    return await get_articles_from_wp();
   }
 
   /// Download and save new articles
-  get_articles_from_wp() async {
+  Future<List<Article>> get_articles_from_wp() async {
+    List<Article> new_articles = [];
     var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db));
     waiting_network = true;
-    from_wp.then((wp_articles) {
+    await from_wp.then((wp_articles) {
       articles.value += wp_articles;
       wp_articles.forEach((article) {
         save_article(article);
+        new_articles.add(article);
       });
     }).catchError((error) {
       log('error while downloading new articles: ${error}');
     }).whenComplete(() {
       waiting_network = false;
     });
+    return new_articles;
   }
 
   /// Insert a new article in db
   save_article(Article article) async {
-    _db.insert('article', article.toSqlMap(),
+    await _db.insert('article', article.toSqlMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
@@ -92,14 +94,31 @@ class ArticleList {
     where: 'id = ?', whereArgs: [article.id]);
   }
 
+  Future<Article> get_article(int id) async {
+    var raw = await _db.query(
+        'article', where: 'id = ?', whereArgs: [id]);
+    if (raw.length > 1) {
+      log("error, multiple articles with same id '$id'");
+    }
+    var raw_article = raw.first;
+    dynamic date = raw_article['date'];
+    return Article(
+        id: id,
+        title: raw_article['title'],
+        content: raw_article['content'],
+        date: DateTime.fromMillisecondsSinceEpoch(date),
+        read: (raw_article['read'] == 1));
+  }
+
   /// Read articles from db
   Future<List<Article>> get_from_db() async {
     var raw_articles = await _db.query('article');
 
     return raw_articles.map((a) {
       dynamic date = a['date'];
+      dynamic id = a['id'];
       return Article(
-          id: a['id'],
+          id: id,
           title: a['title'],
           content: a['content'],
           date: DateTime.fromMillisecondsSinceEpoch(date),
