@@ -94,22 +94,6 @@ class ArticleList {
     where: 'id = ?', whereArgs: [article.id]);
   }
 
-  Future<Article> get_article(int id) async {
-    var raw = await _db.query(
-        'article', where: 'id = ?', whereArgs: [id]);
-    if (raw.length > 1) {
-      log("error, multiple articles with same id '$id'");
-    }
-    var raw_article = raw.first;
-    dynamic date = raw_article['date'];
-    return Article(
-        id: id,
-        title: raw_article['title'],
-        content: raw_article['content'],
-        date: DateTime.fromMillisecondsSinceEpoch(date),
-        read: (raw_article['read'] == 1));
-  }
-
   /// Read articles from db
   Future<List<Article>> get_from_db() async {
     var raw_articles = await _db.query('article');

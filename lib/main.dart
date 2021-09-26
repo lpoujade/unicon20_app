@@ -22,34 +22,6 @@ main() async {
   runApp(const MyApp());
 }
 
-/* TODO ios
-Future onDidReceiveLocalNotification(
-    int id, String? title, String? body, String? payload) async {
-  // display a dialog with the notification details, tap ok to go to another page
-  showDialog(
-    context: null,
-    builder: (BuildContext context) => CupertinoAlertDialog(
-      title: Text(title.toString()),
-      content: Text(body.toString()),
-      actions: [
-        CupertinoDialogAction(
-          isDefaultAction: true,
-          child: Text('Ok'),
-          onPressed: () async {
-            Navigator.of(context, rootNavigator: true).pop();
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MyApp(),
-              ),
-            );
-          },
-        )
-      ],
-    ),
-  );
-*/
-
 /// First creating page of the application.
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -87,7 +59,7 @@ class MyHomePage extends StatefulWidget {
 /// This screen is composed of 2 controllers :
 ///   - The biggest one always use.
 ///   - The smallest one only effective when the biggest one is on the 2nd selection.
-/// This screen takes the information on the 'WorldPress' and draw them with the good format.
+/// This screen takes the information on the 'WordPress' and draw them with the good format.
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   // Creating the controller.
   late final TabController _principalController =
@@ -258,7 +230,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     events.get_events();
     notifier.initialize((e) async {
       if (e != null && e.isNotEmpty) {
-        Article article = await home_articles.get_article(int.parse(e));
+        Article article = home_articles.articles.value.firstWhere((a) => a.id == int.parse(e));
         build_text_page(article, navigate: true);
       }
     });
@@ -308,6 +280,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
+    _principalController.index = 0;
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => textPage));
   }
