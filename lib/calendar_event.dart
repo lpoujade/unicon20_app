@@ -7,7 +7,7 @@ import 'db.dart' as db;
 
 /// Event data
 class CalendarEvent {
-  final uid;
+  final String uid;
   final String title;
   final DateTime start;
   final DateTime end;
@@ -32,7 +32,7 @@ class CalendarEvent {
   }) : day = start.day,
     startHour = start.hour,
     timeTaken = end.hour - start.hour,
-    backColor = Color.fromRGBO(100, 100, 100, .5);
+    backColor = const Color.fromRGBO(100, 100, 100, .5);
 
   CalendarEvent.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
@@ -44,7 +44,7 @@ class CalendarEvent {
       description = json['DESCRIPTION'].toString(),
       summary = json['SUMMARY'].toString(),
       day = DateTime.parse(json['DTSTART']).day,
-      backColor = Color.fromRGBO(100, 100, 100, .5),
+      backColor = const Color.fromRGBO(100, 100, 100, .5),
       startHour = DateTime.parse(json['DTSTART']).hour,
       timeTaken = DateTime.parse(json['DTEND']).hour - DateTime.parse(json['DTSTART']).hour;
 
@@ -70,7 +70,7 @@ class EventList {
   final events = ValueNotifier<List<CalendarEvent>>([]);
 
   EventList({required db}) {
-    this._db = db;
+    _db = db;
   }
 
   /// Get events from db and from google calendar
@@ -79,8 +79,9 @@ class EventList {
         .then((e) {
           events.value += e;
         });
-    if (events.value.length == 0)
+    if (events.value.isEmpty) {
       await get_events_from_google();
+    }
   }
 
   /// Clear and refresh events from db & google
@@ -94,11 +95,9 @@ class EventList {
     var new_events_list = api.get_events_from_google();
     new_events_list.then((new_event) {
       events.value += new_event;
-      new_event.forEach((event) {
-        save_event(event);
-      });
+      new_event.forEach(save_event);
     }).catchError((error) {
-      log('error while downloading new articles: ${error}');
+      log('error while downloading new articles: $error');
     });
   }
 
@@ -116,7 +115,7 @@ class EventList {
       dynamic start = e['start'];
       dynamic end = e['end'];
       return CalendarEvent(
-          uid: e['uid'],
+          uid: e['uid'].toString(),
           title: e['title'].toString(),
           start: DateTime.fromMillisecondsSinceEpoch(start),
           end: DateTime.fromMillisecondsSinceEpoch(end),
@@ -125,6 +124,6 @@ class EventList {
           description: e['description'].toString(),
           summary: e['summary'].toString()
       );
-    }).toList();;
+    }).toList();
   }
 }

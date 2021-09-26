@@ -8,9 +8,9 @@ import 'db.dart' as db;
 
 /// Article infos
 class Article {
-  final id;
-  final title;
-  var content;
+  final int id;
+  final String title;
+  final String content;
   final bool important = false;
   bool read = false;
   late final DateTime date;
@@ -47,7 +47,7 @@ class ArticleList {
   bool waiting_network = false;
 
   ArticleList({required db}) {
-    this._db = db;
+    _db = db;
   }
 
   /// Read articles from db then from wordpress
@@ -70,12 +70,12 @@ class ArticleList {
     waiting_network = true;
     await from_wp.then((wp_articles) {
       articles.value += wp_articles;
-      wp_articles.forEach((article) {
+      for (var article in wp_articles) {
         save_article(article);
         new_articles.add(article);
-      });
+      }
     }).catchError((error) {
-      log('error while downloading new articles: ${error}');
+      log('error while downloading new articles: $error');
     }).whenComplete(() {
       waiting_network = false;
     });
@@ -103,8 +103,8 @@ class ArticleList {
       dynamic id = a['id'];
       return Article(
           id: id,
-          title: a['title'],
-          content: a['content'],
+          title: a['title'].toString(),
+          content: a['content'].toString(),
           date: DateTime.fromMillisecondsSinceEpoch(date),
           read: (a['read'] == 1));
     }).toList();

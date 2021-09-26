@@ -117,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     valueListenable: home_articles.articles,
                     builder: (context, articles, Widget? unused_child) {
                       Widget child;
-                      if (articles.length > 0) {
+                      if (articles.isNotEmpty) {
                         articles.sort((a, b) {
                           return b.date.compareTo(a.date);
                         });
@@ -126,12 +126,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         }).toList());
                       } else {
                         // we need a scroll view as RefreshIncator child
-                        child = ListView(children: [CircularProgressIndicator()]);
+                        child = ListView(children: const [CircularProgressIndicator()]);
                       }
                       return RefreshIndicator(
                           onRefresh: () async {
                             var new_articles = await home_articles.refresh();
-                            if (new_articles.length > 0) {
+                            if (new_articles.isNotEmpty) {
                               var articles_titles = new_articles.map((a) { return a.title; });
                               String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
                               notifier.show('Fresh informations available !', articles_titles.join(' | '), payload);
@@ -210,9 +210,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           indicatorPadding: const EdgeInsets.only(bottom: 4.0),
           labelColor: Colors.green,
           unselectedLabelColor: Colors.blue,
-          tabs: [
-            const Tab(icon: Icon(Icons.home)),
-            const Tab(icon: Icon(Icons.access_time)),
+          tabs: const [
+            Tab(icon: Icon(Icons.home)),
+            Tab(icon: Icon(Icons.access_time)),
             //Tab(icon: Icon(Icons.info)),
           ],
         ),
@@ -251,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       var new_articles = await home_articles.refresh();
       await events.refresh(); 
       setState(() {
-        if (new_articles.length > 0) {
+        if (new_articles.isNotEmpty) {
           var articles_titles = new_articles.map((a) {
             return a.title;
           });
@@ -296,9 +296,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 style: TextStyle(fontFamily: 'LinLiber',
                     color: (article.read ? Colors.grey : Colors.black))),
             subtitle: Text(article.content.substring(0, sub_len),
-                style: TextStyle(fontFamily: 'LinLiber')),
-            leading: Icon(Icons.landscape),
-            trailing: Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
+                style: const TextStyle(fontFamily: 'LinLiber')),
+            leading: const Icon(Icons.landscape),
+            trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
                 // color: article.important ? Colors.red : (article.read ? Colors.white : Colors.grey)),
             onTap: () { openArticle(article, textPage); }
             ));

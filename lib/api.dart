@@ -10,7 +10,7 @@ import 'package:ical_parser/ical_parser.dart';
 // TODO move to env/conf
 const api_host = String.fromEnvironment('API_HOST',
     defaultValue: 'https://unicon20.fr');
-const api_base = '${api_host}/wp-json/wp/v2';
+const api_base = '$api_host/wp-json/wp/v2';
 
 /// get posts from wordpress API
 ///
@@ -28,7 +28,7 @@ Future<List<Article>> get_posts_from_wp(
   var articles = <Article>[];
 
   try {
-    var response = await http.read(url).timeout(Duration(seconds: 20));
+    var response = await http.read(url).timeout(const Duration(seconds: 20));
     List<dynamic> postList = json.decode(response);
 
     for (final p in postList) {

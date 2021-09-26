@@ -11,8 +11,8 @@ class Notifications {
   initialize(Future<dynamic> Function(String?) notif_callback) async {
     // app_icon from android/app/src/main/res/drawable
     const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-    final initializationSettingsIOS = IOSInitializationSettings();
-    final initializationSettings = InitializationSettings(
+    const initializationSettingsIOS = IOSInitializationSettings();
+    const initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid,
         iOS: initializationSettingsIOS);
 
