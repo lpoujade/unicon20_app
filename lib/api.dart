@@ -10,7 +10,7 @@ import 'package:ical_parser/ical_parser.dart';
 // TODO move to env/conf
 const api_host = String.fromEnvironment('API_HOST',
     defaultValue: 'https://unicon20.fr');
-const api_base = '${api_host}/wp-json/wp/v2';
+const api_base = '$api_host/wp-json/wp/v2';
 
 /// get posts from wordpress API
 ///
@@ -23,12 +23,12 @@ Future<List<Article>> get_posts_from_wp(
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
-  print("http GET '$path'");
+  log("http GET '$path'");
   var url = Uri.parse(path);
   var articles = <Article>[];
 
   try {
-    var response = await http.read(url).timeout(Duration(seconds: 20));
+    var response = await http.read(url).timeout(const Duration(seconds: 20));
     List<dynamic> postList = json.decode(response);
 
     for (final p in postList) {
@@ -40,7 +40,7 @@ Future<List<Article>> get_posts_from_wp(
               read: false));
     }
   } catch(err) {
-    print("network error: $err");
+    log("network error: $err");
   }
 
   return articles;
@@ -62,7 +62,7 @@ Future<List<CalendarEvent>> get_events_from_google() async {
   List<CalendarEvent> event_list = [];
 
   for (String cal in calendars.keys) {
-    print("http GET '$cal': '${calendars[cal]}");
+    log("http GET '$cal': '${calendars[cal]}");
     String raw_ical = await http.read(Uri.parse(calendars[cal].toString()));
     var json = ICal.toJson(raw_ical);
     var json_events = json['VEVENT'];

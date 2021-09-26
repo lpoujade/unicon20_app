@@ -8,9 +8,9 @@ import 'db.dart' as db;
 
 /// Article infos
 class Article {
-  final id;
-  final title;
-  var content;
+  final int id;
+  final String title;
+  final String content;
   final bool important = false;
   bool read = false;
   late final DateTime date;
@@ -47,7 +47,7 @@ class ArticleList {
   bool waiting_network = false;
 
   ArticleList({required db}) {
-    this._db = db;
+    _db = db;
   }
 
   /// Read articles from db then from wordpress
@@ -58,31 +58,33 @@ class ArticleList {
     await get_articles_from_wp();
   }
 
-  /// Clear and refresh articles list
-  Future<void> refresh() async {
-    articles.value = [];
-    get_articles();
+  /// Get new articles
+  Future<List<Article>> refresh() async {
+    return await get_articles_from_wp();
   }
 
   /// Download and save new articles
-  get_articles_from_wp() async {
+  Future<List<Article>> get_articles_from_wp() async {
+    List<Article> new_articles = [];
     var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db));
     waiting_network = true;
-    from_wp.then((wp_articles) {
+    await from_wp.then((wp_articles) {
       articles.value += wp_articles;
-      wp_articles.forEach((article) {
+      for (var article in wp_articles) {
         save_article(article);
-      });
+        new_articles.add(article);
+      }
     }).catchError((error) {
-      log('error while downloading new articles: ${error}');
+      log('error while downloading new articles: $error');
     }).whenComplete(() {
       waiting_network = false;
     });
+    return new_articles;
   }
 
   /// Insert a new article in db
   save_article(Article article) async {
-    _db.insert('article', article.toSqlMap(),
+    await _db.insert('article', article.toSqlMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
@@ -98,10 +100,11 @@ class ArticleList {
 
     return raw_articles.map((a) {
       dynamic date = a['date'];
+      dynamic id = a['id'];
       return Article(
-          id: a['id'],
-          title: a['title'],
-          content: a['content'],
+          id: id,
+          title: a['title'].toString(),
+          content: a['content'].toString(),
           date: DateTime.fromMillisecondsSinceEpoch(date),
           read: (a['read'] == 1));
     }).toList();

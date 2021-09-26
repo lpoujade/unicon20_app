@@ -17,7 +17,7 @@ init_database() async {
   return openDatabase(db_name, version: db_version,
       onCreate: (Database db, int version) async {
     var batch = db.batch();
-    init_sql.forEach((script) => batch.execute(script));
+    init_sql.forEach(batch.execute);
     await batch.commit();
   }, onConfigure: (Database db) async {
     await db.execute("pragma foreign_keys = ON");

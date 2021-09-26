@@ -1,23 +1,24 @@
 import 'dart:developer';
 
-import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:sqflite/sqflite.dart';
-import 'text_page.dart';
+import 'package:flutter/cupertino.dart';
+
 import 'article.dart';
 import 'calendar_event.dart';
-import 'names.dart';
 import 'db.dart' as db;
-import 'package:flutter_week_view/flutter_week_view.dart';
+import 'names.dart';
+import 'text_page.dart';
+import 'notifications.dart';
 
-import 'package:background_fetch/background_fetch.dart';
-
-late final Database database_instance;
+late final Database databaseInstance;
 
 /// Launching of the programme.
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  database_instance = await db.init_database();
+  databaseInstance = await db.init_database();
   runApp(const MyApp());
 }
 
@@ -58,14 +59,17 @@ class MyHomePage extends StatefulWidget {
 /// This screen is composed of 2 controllers :
 ///   - The biggest one always use.
 ///   - The smallest one only effective when the biggest one is on the 2nd selection.
-/// This screen takes the information on the 'WorldPress' and draw them with the good format.
+/// This screen takes the information on the 'WordPress' and draw them with the good format.
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   // Creating the controller.
   late final TabController _principalController =
       TabController(length: 2, vsync: this, initialIndex: 0);
 
-  final home_articles = ArticleList(db: database_instance);
-  final events = EventList(db: database_instance);
+  final home_articles = ArticleList(db: databaseInstance);
+  final events = EventList(db: databaseInstance);
+
+  final notifier = Notifications();
+
   /// The drawing of the first screen we draw.
   ///
   /// Taking care of the 3 different 'pages' in the page :
@@ -113,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     valueListenable: home_articles.articles,
                     builder: (context, articles, Widget? unused_child) {
                       Widget child;
-                      if (articles.length > 0) {
+                      if (articles.isNotEmpty) {
                         articles.sort((a, b) {
                           return b.date.compareTo(a.date);
                         });
@@ -122,12 +126,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         }).toList());
                       } else {
                         // we need a scroll view as RefreshIncator child
-                        child = ListView(children: [CircularProgressIndicator()]);
+                        child = ListView(children: const [CircularProgressIndicator()]);
                       }
                       return RefreshIndicator(
-                          onRefresh: home_articles.refresh, child: child);
-                    }))
-          ]),
+                          onRefresh: () async {
+                            var new_articles = await home_articles.refresh();
+                            if (new_articles.isNotEmpty) {
+                              var articles_titles = new_articles.map((a) { return a.title; });
+                              String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
+                              notifier.show('Fresh informations available !', articles_titles.join(' | '), payload);
+                            }
+                            }, child: child);
+                          }))
+                      ]),
 
           /// The second 'page' of the biggest controller.
           Column(
@@ -199,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           indicatorPadding: const EdgeInsets.only(bottom: 4.0),
           labelColor: Colors.green,
           unselectedLabelColor: Colors.blue,
-          tabs: [
+          tabs: const [
             Tab(icon: Icon(Icons.home)),
             Tab(icon: Icon(Icons.access_time)),
             //Tab(icon: Icon(Icons.info)),
@@ -214,9 +225,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    print('init state');
+    log('init state');
     home_articles.get_articles();
     events.get_events();
+    notifier.initialize((e) async {
+      if (e != null && e.isNotEmpty) {
+        Article article = home_articles.articles.value.firstWhere((a) => a.id == int.parse(e));
+        build_text_page(article, navigate: true);
+      }
+    });
 
     initBackgroundService().then((e) => BackgroundFetch.start());
   }
@@ -225,15 +242,26 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   /// and show notifications
   Future<void> initBackgroundService() async {
     int status = await BackgroundFetch.configure(BackgroundFetchConfig(
-        minimumFetchInterval: 15, stopOnTerminate: false,
-        enableHeadless: true, requiresBatteryNotLow: true,
-        requiresCharging: false, requiresStorageNotLow: false,
+        minimumFetchInterval: 15, stopOnTerminate: false, startOnBoot: true,
+        enableHeadless: true, requiresBatteryNotLow: true, requiresCharging: false,
+        requiresStorageNotLow: false,
         requiresDeviceIdle: false, requiredNetworkType: NetworkType.UNMETERED
     ), (String taskId) async {
-      setState(() { home_articles.refresh(); events.refresh(); });
+      log("background fetch fired");
+      var new_articles = await home_articles.refresh();
+      await events.refresh(); 
+      setState(() {
+        if (new_articles.isNotEmpty) {
+          var articles_titles = new_articles.map((a) {
+            return a.title;
+          });
+          String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
+          notifier.show('Fresh informations available !', articles_titles.join(' | '), payload);
+        }
+      });
       BackgroundFetch.finish(taskId);
     }, (String taskId) async {  // <-- Task timeout handler.
-      print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
+      log("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
     });
   }
@@ -246,10 +274,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  openArticle(Article article, TextPage textPage) {
+    article.read = true;
+    home_articles.update_article(article);
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+    _principalController.index = 0;
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => textPage));
+  }
+
   /// Create a [Card] widget from an [Article]
   /// Expand to a [TextPage]
   Widget build_card(Article article) {
-    var text_page = TextPage(title: article.title, paragraph: article.content);
+    var textPage = build_text_page(article);
     final sub_len = article.content.length > 30 ? 30 : article.content.length;
     return Card(
         child: ListTile(
@@ -257,15 +296,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 style: TextStyle(fontFamily: 'LinLiber',
                     color: (article.read ? Colors.grey : Colors.black))),
             subtitle: Text(article.content.substring(0, sub_len),
-                style: TextStyle(fontFamily: 'LinLiber')),
-            leading: Icon(Icons.landscape),
-            trailing: Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
+                style: const TextStyle(fontFamily: 'LinLiber')),
+            leading: const Icon(Icons.landscape),
+            trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
                 // color: article.important ? Colors.red : (article.read ? Colors.white : Colors.grey)),
-            onTap: () {
-              article.read = true;
-              home_articles.update_article(article);
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => text_page));
-            }));
+            onTap: () { openArticle(article, textPage); }
+            ));
+  }
+
+  /// Create a [TextPage] showing an [Article]
+  /// and push it as [MaterialPageRoute] using [Navigator]
+  /// if `navigate` is true
+  TextPage build_text_page(Article article, {navigate = false}) {
+    var textPage = TextPage(title: article.title, paragraph: article.content);
+    if (navigate == true) { openArticle(article, textPage); }
+    return textPage;
   }
 }
