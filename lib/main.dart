@@ -1,18 +1,22 @@
 import 'dart:developer';
 
 import 'package:background_fetch/background_fetch.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_week_view/flutter_week_view.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'api.dart' as api;
 import 'article.dart';
 import 'calendar_event.dart';
+import 'centered_circular_progress_indicator.dart';
 import 'db.dart' as db;
 import 'names.dart';
-import 'text_page.dart';
-import 'CenteredCircularProgressIndicator.dart';
 import 'notifications.dart';
+import 'text_page.dart';
 
 late final Database databaseInstance;
 
@@ -39,8 +43,7 @@ class MyApp extends StatelessWidget {
 
       title: Strings.Title,
       theme: ThemeData(
-        primarySwatch: Colors.green,
-        fontFamily: 'aAnggota',
+        primarySwatch: Colors.green
       ),
       home: const MyHomePage(),
     );
@@ -93,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               child: Center(
                 child: Text(
                   Strings.DrawTitle,
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'aAnggota'),
                 ),
               ),
             ),
@@ -118,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     valueListenable: home_articles.articles,
                     builder: (context, articles, Widget? unused_child) {
                       if (articles.isEmpty) {
-                        return CenteredCircularProgressIndicator();
+                        return const CenteredCircularProgressIndicator();
                       }
                       Widget child;
                       articles.sort((a, b) {
@@ -146,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       valueListenable: events.events,
                       builder: (context, events, Widget? unused_child) {
                         if (events.isEmpty) {
-                          return CenteredCircularProgressIndicator();
+                          return const CenteredCircularProgressIndicator();
                         }
                         List<DateTime> dates = [];
                         for (var e in events) {
@@ -154,24 +157,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           if (!dates.contains(day)) dates.add(day);
                         }
                         dates.sort((a, b) => a.compareTo(b));
-                        // todo : add theme to the agenda
-                        return WeekView(
+                        var wk = WeekView(
                             dates: dates,
                             initialTime: DateTime.now(),
-                            minimumTime: HourMinute(hour: 7, minute: 30),
-                            events: events.map((e) {
-                              return FlutterWeekViewEvent(
+                            minimumTime: const HourMinute(hour: 7, minute: 30),
+                            events: events.map((e) => FlutterWeekViewEvent(
                                   title: e.title,
                                   description: e.description,
                                   start: e.start,
+                                  backgroundColor: api.calendars[e.type]?['color'],
                                   end: e.end,
-                                  onTap: () {
-                                    // todo event page/popup
-                                    print("${e.title} ${e.start} ${e.location}");
-                                  }
-                              );
-                            }).toList()
+                                  padding: const EdgeInsets.all(1),
+                                  onTap: () { show_event_popup(e); }
+                              )).toList()
                         );
+                        wk.controller.changeZoomFactor(.6);
+                        return wk;
                       }
                   )
               )
@@ -275,8 +276,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   openArticle(Article article, TextPage textPage) {
-    article.read = true;
-    home_articles.update_article(article);
+    if (!article.read) {
+      article.read = true;
+      home_articles.update_article(article);
+    }
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -289,7 +292,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   /// Expand to a [TextPage]
   Widget build_card(Article article) {
     var textPage = build_text_page(article);
-    final sub_len = article.content.length > 30 ? 30 : article.content.length;
     final img = (article.img.isEmpty ? const Icon(Icons.landscape) : Image.network(article.img));
     return Card(
         child: ListTile(
@@ -298,9 +300,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     color: (article.read ? Colors.grey : Colors.black))),
             leading: img,
             trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
-                // color: article.important ? Colors.red : (article.read ? Colors.white : Colors.grey)),
             onTap: () { openArticle(article, textPage); }
-            ));
+        ));
   }
 
   /// Create a [TextPage] showing an [Article]
@@ -310,5 +311,43 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     var textPage = TextPage(title: article.title, paragraph: article.content);
     if (navigate == true) { openArticle(article, textPage); }
     return textPage;
+  }
+
+  void show_event_popup(CalendarEvent event) {
+    var buttons = [
+      DialogButton(child: const Text("add_to_agenda", style: TextStyle(fontSize: 15)),
+          onPressed: () => Navigator.pop(context)
+      )
+    ];
+    if (event.location.isNotEmpty) {
+      buttons.add(
+          DialogButton(child: const Text("go", style: TextStyle(fontSize: 15)),
+              onPressed: () {
+                // todo regex for coords
+                var loc = event.location.replaceAll('\\', '');
+                launch(Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': loc}).toString());
+              }
+          ));
+    }
+    Alert(
+        context: context,
+        style: const AlertStyle(isCloseButton: false),
+        buttons: buttons,
+        // todo handle overflow
+        content: Column(children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(event.title),
+                Text("${event.start.hour}:${event.start.minute} -> ${event.end.hour}:${event.end.minute}",
+                    style: const TextStyle(fontSize: 10))
+              ]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(event.type, style: const TextStyle(fontSize: 10)),
+                Text(event.location, style: const TextStyle(fontSize: 10))
+              ]),
+          Html(data: event.description)
+        ])
+    ).show();
   }
 }

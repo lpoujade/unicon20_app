@@ -16,6 +16,8 @@ dependencies:
   ical_parser:
   background_fetch:
   flutter_local_notifications:
+  rflutter_alert:
+  url_launcher:
 
   cupertino_icons: ^1.0.2
 

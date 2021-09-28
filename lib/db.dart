@@ -13,7 +13,7 @@ const init_sql = [
 /// Also register callback for db creation/migration/configuration
 init_database() async {
   // TODO remove
-  await deleteDatabase(db_name);
+  // await deleteDatabase(db_name);
   return openDatabase(db_name, version: db_version,
       onCreate: (Database db, int version) async {
     var batch = db.batch();
