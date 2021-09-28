@@ -5,7 +5,7 @@ const db_name = 'unicon_db.db';
 const db_version = 1;
 
 const init_sql = [
-  'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null, read integer default 0)',
+  'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null, read integer default 0, img text)',
   'create table events ( uid text unique not null, title text not null, start integer not null, end integer not null, location text not null, type text not null, description text, summary text)'
 ];
 
@@ -13,7 +13,7 @@ const init_sql = [
 /// Also register callback for db creation/migration/configuration
 init_database() async {
   // TODO remove
-  // await deleteDatabase(db_name);
+  await deleteDatabase(db_name);
   return openDatabase(db_name, version: db_version,
       onCreate: (Database db, int version) async {
     var batch = db.batch();

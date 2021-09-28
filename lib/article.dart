@@ -11,6 +11,7 @@ class Article {
   final int id;
   final String title;
   final String content;
+  final String img;
   final bool important = false;
   bool read = false;
   late final DateTime date;
@@ -19,6 +20,7 @@ class Article {
       {required this.id,
       required this.title,
       required this.content,
+      required this.img,
       required this.date,
       required this.read});
 
@@ -27,6 +29,7 @@ class Article {
       'id': id,
       'title': title,
       'content': content,
+      'img': img,
       'date': date.millisecondsSinceEpoch,
       'read': (read ? 1 : 0)
     };
@@ -105,6 +108,7 @@ class ArticleList {
           id: id,
           title: a['title'].toString(),
           content: a['content'].toString(),
+          img: a['img'].toString(),
           date: DateTime.fromMillisecondsSinceEpoch(date),
           read: (a['read'] == 1));
     }).toList();

@@ -11,6 +11,7 @@ import 'calendar_event.dart';
 import 'db.dart' as db;
 import 'names.dart';
 import 'text_page.dart';
+import 'CenteredCircularProgressIndicator.dart';
 import 'notifications.dart';
 
 late final Database databaseInstance;
@@ -116,23 +117,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: ValueListenableBuilder<List<Article>>(
                     valueListenable: home_articles.articles,
                     builder: (context, articles, Widget? unused_child) {
-                      Widget child;
-                      if (articles.isNotEmpty) {
-                        articles.sort((a, b) {
-                          return b.date.compareTo(a.date);
-                        });
-                        child = ListView(children: articles.map((e) {
-                          return build_card(e);
-                        }).toList());
-                      } else {
-                        // we need a scroll view as RefreshIncator child
-                        child = ListView(children: const [CircularProgressIndicator()]);
+                      if (articles.isEmpty) {
+                        return CenteredCircularProgressIndicator();
                       }
+                      Widget child;
+                      articles.sort((a, b) {
+                        return b.date.compareTo(a.date);
+                      });
+                      child = ListView(children:
+                          articles.map((e) => build_card(e)).toList());
                       return RefreshIndicator(
                           onRefresh: () async {
                             var new_articles = await home_articles.refresh();
                             if (new_articles.isNotEmpty) {
-                              var articles_titles = new_articles.map((a) { return a.title; });
+                              var articles_titles = new_articles.map((a) => a.title);
                               String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
                               notifier.show('Fresh informations available !', articles_titles.join(' | '), payload);
                             }
@@ -147,16 +145,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   child: ValueListenableBuilder<List<CalendarEvent>>(
                       valueListenable: events.events,
                       builder: (context, events, Widget? unused_child) {
+                        if (events.isEmpty) {
+                          return CenteredCircularProgressIndicator();
+                        }
                         List<DateTime> dates = [];
-                        events.forEach((e) {
+                        for (var e in events) {
                           var day = DateTime(e.start.year, e.start.month, e.start.day);
                           if (!dates.contains(day)) dates.add(day);
-                        });
+                        }
                         dates.sort((a, b) => a.compareTo(b));
                         // todo : add theme to the agenda
                         return WeekView(
                             dates: dates,
-                            userZoomable: true,
                             initialTime: DateTime.now(),
                             minimumTime: HourMinute(hour: 7, minute: 30),
                             events: events.map((e) {
@@ -290,14 +290,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   Widget build_card(Article article) {
     var textPage = build_text_page(article);
     final sub_len = article.content.length > 30 ? 30 : article.content.length;
+    final img = (article.img.isEmpty ? const Icon(Icons.landscape) : Image.network(article.img));
     return Card(
         child: ListTile(
             title: Text(article.title,
                 style: TextStyle(fontFamily: 'LinLiber',
                     color: (article.read ? Colors.grey : Colors.black))),
-            subtitle: Text(article.content.substring(0, sub_len),
-                style: const TextStyle(fontFamily: 'LinLiber')),
-            leading: const Icon(Icons.landscape),
+            leading: img,
             trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
                 // color: article.important ? Colors.red : (article.read ? Colors.white : Colors.grey)),
             onTap: () { openArticle(article, textPage); }
