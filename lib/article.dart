@@ -45,12 +45,17 @@ class Article {
 /// handle connections to wordpress
 class ArticleList {
   late Database _db;
+  String _lang = '-';
   final articles = ValueNotifier<List<Article>>([]);
 
   bool waiting_network = false;
 
   ArticleList({required db}) {
     _db = db;
+  }
+
+  set lang(String l) {
+    _lang = l;
   }
 
   /// Read articles from db then from wordpress
@@ -68,8 +73,12 @@ class ArticleList {
 
   /// Download and save new articles
   Future<List<Article>> get_articles_from_wp() async {
+    if (_lang == '-') {
+      print("ERROR can't get articles without language set");
+      return [];
+    }
     List<Article> new_articles = [];
-    var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db));
+    var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
     waiting_network = true;
     await from_wp.then((wp_articles) {
       articles.value += wp_articles;
