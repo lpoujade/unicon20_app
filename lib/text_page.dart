@@ -1,6 +1,7 @@
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Function used to transform the 'blueAccent' color to a 'material color'.
 Map<int, Color> color ={
@@ -29,13 +30,12 @@ class TextPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       theme: ThemeData(
         primarySwatch: MaterialColor(0xff448aff, color),
-        fontFamily: 'LinLiber',
         textTheme: const TextTheme(
-          bodyText2: TextStyle(fontSize: 18,),
-        ),
+          bodyText2: TextStyle(fontSize: 18)
+        )
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -57,9 +57,7 @@ class TextPage extends StatelessWidget {
         body: Container(
             padding: const EdgeInsets.all(8),
             child: SingleChildScrollView(
-              child: Html(data: paragraph,),
-
-
+              child: Html(data: paragraph, onLinkTap: (s, u1, u2, u3) => launch(s.toString())),
             )
         ),
       ),

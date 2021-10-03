@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'api.dart' as api;
-import 'db.dart' as db;
 
 /// Event data
 class CalendarEvent {

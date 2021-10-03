@@ -8,7 +8,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'article.dart';
 import 'calendar_event.dart';
-import 'centered_circular_progress_indicator.dart';
 import 'db.dart' as db;
 import 'notifications.dart';
 import 'text_page.dart';
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
       //debugShowCheckedModeBanner: false,
 
       title: config.Strings.Title,
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(primaryColor: const Color(config.AppColors.light_blue), fontFamily: 'Tahoma'),
       home: const MyHomePage(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -76,7 +75,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   // Creating the controller.
   late final TabController _principalController =
-      TabController(length: 3, vsync: this, initialIndex: 0);
+      TabController(length: 2, vsync: this, initialIndex: 0);
 
   final home_articles = ArticleList(db: databaseInstance);
   final events = EventList(db: databaseInstance);
@@ -99,29 +98,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
       // The body of the app.
       body: TabBarView(
-        controller: _principalController,
-        children: [
-          Column(children: [
-            Container(
-                color: Colors.blueAccent,
-                height: 55,
-                child: const Center(
-                    child: Text('News',
-                        style: TextStyle(color: Colors.white, fontSize: 30)
-                    )
-                )
-            ),
+          controller: _principalController,
+          children: [
             // Drawing the content of the first 'page'
-            Expanded(
-                child: ui_components.news_page(
-                    home_articles, notifier, openArticle))
-          ]),
+              ui_components.news_page(
+                  home_articles, notifier, openArticle)
+          ,
 
           /// The second 'page' of the biggest controller.
           Column(children: [
             Expanded(child: ui_components.calendar_page(events, context)),
           ])
-        ]
+          ]
       ),
 
       /// Creating the bar at the bottom of the screen.
@@ -133,16 +121,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         padding: const EdgeInsets.all(4.0),
         child: TabBar(
           controller: _principalController,
-          indicatorColor: Colors.green,
+          indicatorColor: const Color(config.AppColors.green),
           indicatorSize: TabBarIndicatorSize.label,
           indicatorWeight: 2,
           indicatorPadding: const EdgeInsets.only(bottom: 4.0),
-          labelColor: Colors.green,
-          unselectedLabelColor: Colors.blue,
+          labelColor: const Color(config.AppColors.green),
+          unselectedLabelColor: const Color(config.AppColors.light_blue),
           tabs: const [
             Tab(icon: Icon(Icons.home)),
-            Tab(icon: Icon(Icons.access_time)),
-            Tab(icon: Icon(Icons.info))
+            Tab(icon: Icon(Icons.access_time))
           ],
         ),
       ),
@@ -170,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   /// Initialize the background service used to fetch new event/posts
   /// and show notifications
   Future<void> initBackgroundService() async {
-    int status = await BackgroundFetch.configure(
+     await BackgroundFetch.configure(
         BackgroundFetchConfig(
             minimumFetchInterval: 15,
             stopOnTerminate: false,

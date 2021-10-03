@@ -4,6 +4,8 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:intl/intl.dart';
+import 'dart:ui';
 
 import 'centered_circular_progress_indicator.dart';
 import 'text_page.dart';
@@ -15,25 +17,23 @@ import 'config.dart' as config;
 /// Top bar
 var appBar = AppBar(
         title: Row(
-          children: [
-            Image.asset(
-              'res/topLogo.png',
-              width: 75,
-              height: 75,
-            ),
-            const Expanded(
-              child: Center(
-                child: Text(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset(
+                  'res/topLogo.png',
+                  width: 75,
+                  height: 75,
+              ),
+              const Text(
                   config.Strings.DrawTitle,
-                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'aAnggota'),
-                )
-              )
-            )
-          ]
+                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Futura', fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 75)
+            ]
         )
       );
 
-/// Return [Widget] for the news page
+/// Return [ListView] for the news page
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notifications notifier, var clicked_card) {
   return ValueListenableBuilder(valueListenable: home_articles.articles,
       builder: (context, articles, Widget? unused_child) {
@@ -58,6 +58,7 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notif
       });
 }
 
+
 /// Return [Widget] for calendar page
 ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, BuildContext context) {
   return ValueListenableBuilder<List<CalendarEvent>>(valueListenable: events.events,
@@ -68,6 +69,7 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
         List<DateTime> dates = [];
         for (var e in events) {
           var day = DateTime(e.start.year, e.start.month, e.start.day);
+          if (day.year != 2022) continue; // TODO remove once fixed on calendar
           if (!dates.contains(day)) dates.add(day);
         }
         dates.sort((a, b) => a.compareTo(b));
@@ -75,15 +77,26 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
             dates: dates,
             initialTime: DateTime.now(),
             minimumTime: const HourMinute(hour: 5, minute: 30),
+            hoursColumnStyle: HoursColumnStyle(
+                width: 25,
+                textAlignment: Alignment.centerRight,
+                timeFormatter: (HourMinute time) {
+              return time.hour.toString() + ' ';
+            }),
+            dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
+              var date = DateTime(year, month, day);
+              return DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
+                  + ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(date);
+            }),
             events: events.map((e) => FlutterWeekViewEvent(
-                    title: e.title,
-                    description: e.description,
-                    start: e.start,
-                    backgroundColor: config.calendars[e.type]?['color'],
-                    end: e.end,
-                    padding: const EdgeInsets.all(1),
-                    onTap: () { show_event_popup(e, context); }
-            )).toList()
+                            title: e.title,
+                            description: e.description,
+                            start: e.start,
+                            backgroundColor: config.calendars[e.type]?['color'],
+                            end: e.end,
+                            padding: const EdgeInsets.all(1),
+                            onTap: () { show_event_popup(e, context); }
+                    )).toList()
         );
         wk.controller.changeZoomFactor(.4);
         return wk;
@@ -95,13 +108,13 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
 /// Create and open an [Alert] popup to show [CalendarEvent] info
 void show_event_popup(CalendarEvent event, BuildContext context) {
   var buttons = [
-    DialogButton(child: const Text("add_to_agenda", style: TextStyle(fontSize: 15)),
+    DialogButton(child: const Text('+', style: TextStyle(fontSize: 15)),
         onPressed: () => Navigator.pop(context)
     )
   ];
   if (event.location.isNotEmpty) {
     buttons.add(
-        DialogButton(child: const Text("go", style: TextStyle(fontSize: 15)),
+        DialogButton(child: const Text("Go", style: TextStyle(fontSize: 15)),
             onPressed: () {
               // todo regex for coords
               var loc = event.location.replaceAll('\\', '');
@@ -109,38 +122,41 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
             }
         ));
   }
+  var start_hour = DateFormat.Hm().format(event.start);
+  var end_hour = DateFormat.Hm().format(event.end);
   Alert(
       context: context,
       style: const AlertStyle(isCloseButton: false),
       buttons: buttons,
-      // todo handle overflow
-      content: Column(children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(event.title),
-              Text("${event.start.hour}:${event.start.minute} -> ${event.end.hour}:${event.end.minute}",
-                  style: const TextStyle(fontSize: 10))
-            ]),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(event.type, style: const TextStyle(fontSize: 10)),
-              Text(event.location, style: const TextStyle(fontSize: 10))
-            ]),
-        Html(data: event.description)
-      ])
+      content: Column(crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(event.summary),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("$start_hour -> $end_hour",
+                      style: const TextStyle(fontSize: 10)),
+                  Column(mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: event.location
+                      .replaceAll(',', '')
+                      .split('\\').map((e) => Text(e, style: const TextStyle(fontSize: 10))).toList())
+                ]),
+            Html(data: event.description, onLinkTap: (s, u1, u2, u3) {
+              launch(s.toString());
+            })
+          ])
   ).show();
 }
 
 /// Create a [Card] widget from an [Article]
 /// Expand to a [TextPage]
 Widget build_card(Article article, var action) {
-  var textPage = TextPage(title: article.title, paragraph: article.content);
-  final img = (article.img.isEmpty ? const Icon(Icons.landscape) : Image.network(article.img));
+  final img = (article.img.isEmpty ? null : Image.network(article.img));
   return Card(
       child: ListTile(
           title: Text(article.title,
-              style: TextStyle(fontFamily: 'LinLiber',
-                  color: (article.read ? Colors.grey : Colors.black))),
+              style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
           leading: img,
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }

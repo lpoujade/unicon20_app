@@ -1,5 +1,5 @@
-name: unicons
-description: un test unicon
+name: unicon
+description: UNICON20 companion application
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -37,17 +37,25 @@ flutter:
   assets:
     - res/
   fonts:
+    - family: Tahoma
+      fonts:
+        - asset: res/font/tahoma.ttf
+    - family: Futura
+      fonts:
+        - asset: res/font/futura/futura.ttf
+        - asset: res/font/futura/futura-bold.ttf
+          weight: 700
     - family: aAnggota
       fonts:
         - asset: res/font/aAnggota.ttf
     - family: LinLiber
       fonts:
-        - asset: res/font/LinLibertine_R.ttf
-        - asset: res/font/LinLibertine_RB.ttf
+        - asset: res/font/linlibertine/LinLibertine_R.ttf
+        - asset: res/font/linlibertine/LinLibertine_RB.ttf
           style: italic
-        - asset: res/font/LinLibertine_RBI.ttf
+        - asset: res/font/linlibertine/LinLibertine_RBI.ttf
           style: italic
           weight: 700
-        - asset: res/font/LinLibertine_RI.ttf
+        - asset: res/font/linlibertine/LinLibertine_RI.ttf
           weight: 700
 

@@ -1,7 +1,5 @@
 import 'dart:convert' show json;
-import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ical_parser/ical_parser.dart';
 
@@ -14,7 +12,8 @@ import 'config.dart' as config;
 /// return a list of [Article]
 Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
-  var path = config.api_host + (lang.isEmpty ? '' : "/$lang") + config.api_path + '/posts';
+  var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
+  var path = config.api_host + _lang + config.api_path + '/posts';
   var filters = [];
   if (since != null) filters.add('after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));

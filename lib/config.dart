@@ -3,14 +3,25 @@
 import 'package:flutter/material.dart';
 
 class Strings {
-  static const String Title = "Unicon 2020";
+  static const String Title = "Unicon 20";
   static const String DrawTitle = 'Unicon';
 }
 
-const api_host = String.fromEnvironment('API_HOST',
-    defaultValue: 'https://unicon20.fr');
+class AppColors {
+  static const light_blue = 0xff0B73B1;
+  static const lighter_blue = 0xff05DCAD;
+  static const dark_blue = 0xff1D2B5A;
+  static const darker_blue = 0xff192945;
+  static const green = 0xff006A34;
+}
+
+/// WordPress base URL (fetched from env to ease development)
+const api_host = String.fromEnvironment('API_HOST', defaultValue: 'https://unicon20.fr');
+
+/// Base endpoint
 const api_path = '/wp-json/wp/v2';
 
+/// Calendars
 const Map<String, Map<String, dynamic>> calendars = {
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
