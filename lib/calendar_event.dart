@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'utils.dart';
 import 'api.dart' as api;
 
 /// Event data
@@ -14,10 +15,6 @@ class CalendarEvent {
   final String type;
   final String description;
   final String summary;
-  int day;
-  int startHour;
-  int timeTaken;
-  Color backColor;
 
   CalendarEvent({
     required this.uid,
@@ -28,24 +25,17 @@ class CalendarEvent {
     required this.type,
     required this.description,
     required this.summary
-  }) : day = start.day,
-    startHour = start.hour,
-    timeTaken = end.hour - start.hour,
-    backColor = const Color.fromRGBO(100, 100, 100, .5);
+  });
 
   CalendarEvent.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
-      title = json['SUMMARY'].toString(),
+      title = clean_ics_text_fields(json['SUMMARY']),
       start = DateTime.parse(json['DTSTART']),
       end = DateTime.parse(json['DTEND']),
-      location = json['LOCATION'].toString(),
+      location = clean_ics_text_fields(json['LOCATION']),
       type = calendar,
-      description = json['DESCRIPTION'].toString(),
-      summary = json['SUMMARY'].toString(),
-      day = DateTime.parse(json['DTSTART']).day,
-      backColor = const Color.fromRGBO(100, 100, 100, .5),
-      startHour = DateTime.parse(json['DTSTART']).hour,
-      timeTaken = DateTime.parse(json['DTEND']).hour - DateTime.parse(json['DTSTART']).hour;
+      description = clean_ics_text_fields(json['DESCRIPTION']),
+      summary = clean_ics_text_fields(json['SUMMARY']);
 
   Map<String, dynamic> toSqlMap() {
     return {

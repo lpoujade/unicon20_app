@@ -20,8 +20,7 @@ dependencies:
   flutter_local_notifications:
   rflutter_alert:
   url_launcher:
-
-  cupertino_icons: ^1.0.2
+  auto_size_text: 3.0.0-nullsafety.0
 
   flutter_html: ^2.1.1
   flutter_week_view: ^1.1.0

@@ -12,6 +12,7 @@ const init_sql = [
 /// Open connection to database
 /// Also register callback for db creation/migration/configuration
 init_database() async {
+  //await deleteDatabase(db_name);
   return openDatabase(db_name, version: db_version,
       onCreate: (Database db, int version) async {
     var batch = db.batch();

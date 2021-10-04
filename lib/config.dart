@@ -25,7 +25,7 @@ const api_path = '/wp-json/wp/v2';
 const Map<String, Map<String, dynamic>> calendars = {
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
-    'color': Colors.black
+    'color': Colors.grey
   },
   'freestyle': {
     'url': 'https://calendar.google.com/calendar/ical/4e19oc9m4f7jnfrt1c7hm3lekc%40group.calendar.google.com/public/basic.ics',

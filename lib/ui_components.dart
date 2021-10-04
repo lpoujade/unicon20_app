@@ -6,6 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import 'centered_circular_progress_indicator.dart';
 import 'text_page.dart';
@@ -33,7 +34,7 @@ var appBar = AppBar(
         )
       );
 
-/// Return [ListView] for the news page
+/// News page (first app screen)
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notifications notifier, var clicked_card) {
   return ValueListenableBuilder(valueListenable: home_articles.articles,
       builder: (context, articles, Widget? unused_child) {
@@ -59,7 +60,7 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notif
 }
 
 
-/// Return [Widget] for calendar page
+/// Calendar page
 ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, BuildContext context) {
   return ValueListenableBuilder<List<CalendarEvent>>(valueListenable: events.events,
       builder: (context, events, Widget? unused_child) {
@@ -76,29 +77,40 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
         var wk = WeekView(
             dates: dates,
             initialTime: DateTime.now(),
-            minimumTime: const HourMinute(hour: 5, minute: 30),
+            minimumTime: const HourMinute(hour: 7, minute: 30),
             hoursColumnStyle: HoursColumnStyle(
                 width: 25,
                 textAlignment: Alignment.centerRight,
-                timeFormatter: (HourMinute time) {
-              return time.hour.toString() + ' ';
-            }),
+                timeFormatter: (time) => (time.hour.toString() + ' ')
+            ),
             dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
               var date = DateTime(year, month, day);
               return DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
                   + ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(date);
             }),
             events: events.map((e) => FlutterWeekViewEvent(
+                            eventTextBuilder: (event, context, dayView, h, w) {
+                              List<Widget> elements = [
+                                  Expanded(child: AutoSizeText(event.title,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    minFontSize: 5,
+                                    wrapWords: false
+                                  ))
+                              ];
+
+                              return Column(children: elements);
+                            },
                             title: e.title,
                             description: e.description,
                             start: e.start,
                             backgroundColor: config.calendars[e.type]?['color'],
                             end: e.end,
                             padding: const EdgeInsets.all(1),
+                            margin: const EdgeInsets.fromLTRB(0, 1, 0, 0),
                             onTap: () { show_event_popup(e, context); }
                     )).toList()
         );
-        wk.controller.changeZoomFactor(.4);
+        wk.controller.changeZoomFactor(.45);
         return wk;
       }
   );
@@ -107,18 +119,14 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
 
 /// Create and open an [Alert] popup to show [CalendarEvent] info
 void show_event_popup(CalendarEvent event, BuildContext context) {
-  var buttons = [
-    DialogButton(child: const Text('+', style: TextStyle(fontSize: 15)),
-        onPressed: () => Navigator.pop(context)
-    )
-  ];
+  List<DialogButton> buttons = [];
   if (event.location.isNotEmpty) {
     buttons.add(
-        DialogButton(child: const Text("Go", style: TextStyle(fontSize: 15)),
+        DialogButton(child: const Icon(Icons.location_pin),
+            color: Colors.transparent,
             onPressed: () {
-              // todo regex for coords
-              var loc = event.location.replaceAll('\\', '');
-              launch(Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': loc}).toString());
+              // TODO regex for coords ?
+              launch(Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString());
             }
         ));
   }
@@ -126,23 +134,30 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
   var end_hour = DateFormat.Hm().format(event.end);
   Alert(
       context: context,
-      style: const AlertStyle(isCloseButton: false),
+      style: AlertStyle(
+          isCloseButton: false,
+          animationDuration: Duration(milliseconds: 100),
+          backgroundColor: config.calendars[event.type]!['color'],
+          alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero))
+          ),
       buttons: buttons,
       content: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(event.summary),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("$start_hour -> $end_hour",
-                      style: const TextStyle(fontSize: 10)),
-                  Column(mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: event.location
-                      .replaceAll(',', '')
-                      .split('\\').map((e) => Text(e, style: const TextStyle(fontSize: 10))).toList())
-                ]),
-            Html(data: event.description, onLinkTap: (s, u1, u2, u3) {
+            Container(
+                padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("$start_hour -> $end_hour",
+                          style: const TextStyle(fontSize: 10)),
+                      Column(mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: event.location
+                          .split(',').map((e) => Text(e, style: const TextStyle(fontSize: 10))).toList())
+                    ])
+            ),
+            Html(data: event.description.replaceAll('\\n', '<br />'), onLinkTap: (s, u1, u2, u3) {
               launch(s.toString());
             })
           ])
