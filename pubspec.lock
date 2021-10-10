@@ -199,9 +199,11 @@ packages:
   ical_parser:
     dependency: "direct main"
     description:
-      name: ical_parser
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: c2f727086da7870fcb829ca4770c3db269a7b127
+      url: "https://github.com/lpoujade/ical-parser"
+    source: git
     version: "1.1.0"
   intl:
     dependency: transitive

@@ -24,6 +24,7 @@ var appBar = AppBar(
                   'res/topLogo.png',
                   width: 75,
                   height: 75,
+                  color: Colors.black
               ),
               const Text(
                   config.Strings.DrawTitle,
@@ -120,15 +121,23 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
 /// Create and open an [Alert] popup to show [CalendarEvent] info
 void show_event_popup(CalendarEvent event, BuildContext context) {
   List<DialogButton> buttons = [];
-  if (event.location.isNotEmpty) {
+  if (event.location.isNotEmpty && event.location != 'TBD') { // TODO remove once calendar fixed
     buttons.add(
-        DialogButton(child: const Icon(Icons.location_pin),
+        DialogButton(
+            height: 60,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                    AutoSizeText(event.location.replaceAll(',', '\n'), textAlign: TextAlign.right),
+                    const Icon(Icons.location_pin)
+                ]),
             color: Colors.transparent,
             onPressed: () {
               // TODO regex for coords ?
               launch(Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString());
             }
-        ));
+    ));
   }
   var start_hour = DateFormat.Hm().format(event.start);
   var end_hour = DateFormat.Hm().format(event.end);
@@ -143,23 +152,17 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
       buttons: buttons,
       content: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(event.summary),
             Container(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("$start_hour -> $end_hour",
-                          style: const TextStyle(fontSize: 10)),
-                      Column(mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: event.location
-                          .split(',').map((e) => Text(e, style: const TextStyle(fontSize: 10))).toList())
-                    ])
+                child: Text("$start_hour -> $end_hour",
+                    style: const TextStyle(fontSize: 10)),
             ),
-            Html(data: event.description.replaceAll('\\n', '<br />'), onLinkTap: (s, u1, u2, u3) {
-              launch(s.toString());
-            })
+            Text(event.summary),
+            Html(
+                data: event.description.replaceAll('\\n', '<br />'),
+                onLinkTap: (s, u1, u2, u3) { launch(s.toString()); },
+                style: { 'a': Style(color: const Color(config.AppColors.darker_blue)) }
+            )
           ])
   ).show();
 }

@@ -16,6 +16,7 @@ dependencies:
   sqflite:
   path:
   ical_parser:
+    git: https://github.com/lpoujade/ical-parser
   background_fetch:
   flutter_local_notifications:
   rflutter_alert:

@@ -39,7 +39,11 @@ class MyApp extends StatelessWidget {
       //debugShowCheckedModeBanner: false,
 
       title: config.Strings.Title,
-      theme: ThemeData(primaryColor: const Color(config.AppColors.light_blue), fontFamily: 'Tahoma'),
+      theme: ThemeData(
+          primaryColor: const Color(config.AppColors.green),
+          fontFamily: 'Tahoma',
+          appBarTheme: const AppBarTheme(color: Color(config.AppColors.green))
+          ),
       home: const MyHomePage(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
