@@ -136,16 +136,16 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
       context: context,
       style: AlertStyle(
           isCloseButton: false,
-          animationDuration: Duration(milliseconds: 100),
+          animationDuration: const Duration(milliseconds: 100),
           backgroundColor: config.calendars[event.type]!['color'],
-          alertBorder: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero))
+          alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2)))
           ),
       buttons: buttons,
       content: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(event.summary),
             Container(
-                padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

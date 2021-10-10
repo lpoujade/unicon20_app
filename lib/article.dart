@@ -45,7 +45,8 @@ class Article {
 /// handle connections to wordpress
 class ArticleList {
   late Database _db;
-  String _lang = '-';
+  String? _lang;
+
   final articles = ValueNotifier<List<Article>>([]);
 
   bool waiting_network = false;
@@ -54,50 +55,64 @@ class ArticleList {
     _db = db;
   }
 
-  set lang(String l) {
-    _lang = l;
+  /// Update lang trigger a clear/download
+  init_lang() async {
+    _lang = await db.get_locale(_db);
   }
+
+  updateLang(l) async {
+    print("update lang to '$l'");
+    _lang = l;
+    await db.save_locale(_db, l);
+    articles.value = [];
+    await _db.delete('article');
+    await get_articles();
+  }
+
+  get lang { return _lang; }
 
   /// Read articles from db then from wordpress
   get_articles() async {
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });
-    await get_articles_from_wp();
+    await _get_articles_from_wp();
   }
 
   /// Get new articles
   Future<List<Article>> refresh() async {
-    return await get_articles_from_wp();
+    return await _get_articles_from_wp();
   }
 
   /// Download and save new articles
-  Future<List<Article>> get_articles_from_wp() async {
-    if (_lang == '-') {
-      print("ERROR can't get articles without language set");
-      return [];
+  Future<List<Article>> _get_articles_from_wp() async {
+    if (_lang == null) await init_lang();
+    List<Article> wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
+    await save_articles(wp_articles);
+    articles.value += wp_articles;
+    return wp_articles;
+  }
+
+  /// Insert a list of [Article] using [Batch]
+  save_articles(List<Article> articles) async {
+    var batch = _db.batch();
+    for (var a in articles) batch.insert('article', a.toSqlMap());
+    try {
+      batch.commit(noResult: true);
+    } catch (e) {
+      print("failed to insert some articles from '$articles': '$e'");
     }
-    List<Article> new_articles = [];
-    var from_wp = api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
-    waiting_network = true;
-    await from_wp.then((wp_articles) {
-      articles.value += wp_articles;
-      for (var article in wp_articles) {
-        save_article(article);
-        new_articles.add(article);
-      }
-    }).catchError((error) {
-      log('error while downloading new articles: $error');
-    }).whenComplete(() {
-      waiting_network = false;
-    });
-    return new_articles;
   }
 
   /// Insert a new article in db
   save_article(Article article) async {
-    await _db.insert('article', article.toSqlMap(),
-        conflictAlgorithm: ConflictAlgorithm.fail);
+    try {
+      await _db.insert('article', article.toSqlMap(),
+          conflictAlgorithm: ConflictAlgorithm.fail);
+      articles.value = articles.value + [article];
+    } catch (e) {
+      print("failed to save article '$article': '$e'");
+    }
   }
 
   /// Update an existing article

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 import 'article.dart';
 import 'calendar_event.dart';
@@ -82,6 +83,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   final notifier = Notifications();
 
+  late String lang;
+
   /// The drawing of the first screen we draw.
   ///
   /// Taking care of the 3 different 'pages' in the page :
@@ -90,8 +93,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   ///   - not existing one ( todo : transform to map )
   @override
   Widget build(BuildContext context) {
-    // todo ensure execution order (don't get articles before this)
-    home_articles.lang = Localizations.localeOf(context).languageCode;
     return Scaffold(
       // Taking care of the top bar.
       appBar: ui_components.appBar,
@@ -141,17 +142,26 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    home_articles.get_articles();
     events.get_events();
     notifier.initialize((e) async {
       if (e != null && e.isNotEmpty) {
+        int id = int.parse(e);
         Article article = home_articles.articles.value
-            .firstWhere((a) => a.id == int.parse(e));
+            .firstWhere((a) => a.id == id);
         openArticle(article);
       }
     });
 
     initBackgroundService().then((e) => BackgroundFetch.start());
+  }
+
+  @override
+  void didChangeDependencies() async {
+    if (home_articles.lang == null) await home_articles.init_lang();
+    var cur_lang = Localizations.localeOf(context).languageCode;
+    if (home_articles.lang != cur_lang) home_articles.updateLang(cur_lang);
+    else if (home_articles.articles.value.isEmpty) home_articles.get_articles();
+    super.didChangeDependencies();
   }
 
   /// Initialize the background service used to fetch new event/posts
