@@ -225,6 +225,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                TextPage(title: article.title, paragraph: article.content)));
+                TextPage(article: article)));
   }
 }

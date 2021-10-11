@@ -2,6 +2,9 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
+
+import 'article.dart';
 
 /// Function used to transform the 'blueAccent' color to a 'material color'.
 Map<int, Color> color ={
@@ -22,15 +25,13 @@ Map<int, Color> color ={
 /// It does create a top bar and the text in the body of the app.
 class TextPage extends StatelessWidget {
 
-  const TextPage({Key? key, required this.title, required this.paragraph})
+  const TextPage({Key? key, required this.article})
       : super(key: key);
-  final String title;
-  final String paragraph;
+  final Article article;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: title,
       theme: ThemeData(
         primarySwatch: MaterialColor(0xff448aff, color),
         textTheme: const TextTheme(
@@ -49,7 +50,7 @@ class TextPage extends StatelessWidget {
                     Icons.arrow_back, size: 25, color: Colors.white),
               ),
               Expanded(
-                child: Text(title),
+                child: Text(article.title),
               ),
             ],
           ),
@@ -57,7 +58,19 @@ class TextPage extends StatelessWidget {
         body: Container(
             padding: const EdgeInsets.all(8),
             child: SingleChildScrollView(
-              child: Html(data: paragraph, onLinkTap: (s, u1, u2, u3) => launch(s.toString())),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(DateFormat.yMd(Localizations.localeOf(context).languageCode).format(article.date),
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(fontSize: 12))
+                          ]),
+                      Html(data: article.content, onLinkTap: (s, u1, u2, u3) => launch(s.toString()))
+                    ])
             )
         ),
       ),

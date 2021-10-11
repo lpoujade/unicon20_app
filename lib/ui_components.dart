@@ -54,7 +54,7 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notif
               if (new_articles.isNotEmpty) {
                 var articles_titles = new_articles.map((a) => a.title);
                 String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
-                notifier.show('Fresh informations available !', articles_titles.join(' | '), payload);
+                notifier.show(new_articles.first.title, articles_titles.join(' | '), payload);
               }
             }, child: child);
       });
