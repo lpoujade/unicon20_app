@@ -124,7 +124,8 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
   if (event.location.isNotEmpty && event.location != 'TBD') { // TODO remove once calendar fixed
     buttons.add(
         DialogButton(
-            height: 60,
+            height: 80,
+            width: 300,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,9 +148,11 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
           isCloseButton: false,
           animationDuration: const Duration(milliseconds: 100),
           backgroundColor: config.calendars[event.type]!['color'],
-          alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2)))
+          alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2))),
+          buttonAreaPadding: const EdgeInsets.all(0)
           ),
       buttons: buttons,
+      // TODO scrollview
       content: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(

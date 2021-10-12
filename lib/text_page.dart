@@ -56,7 +56,6 @@ class TextPage extends StatelessWidget {
           ),
         ),
         body: Container(
-            padding: const EdgeInsets.all(8),
             child: SingleChildScrollView(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
