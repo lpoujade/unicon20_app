@@ -36,49 +36,61 @@ var appBar = AppBar(
       );
 
 /// News page (first app screen)
-ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, Notifications notifier, var clicked_card) {
+ValueListenableBuilder<List<Article>?> news_page(ArticleList home_articles, Notifications notifier, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.articles,
-      builder: (context, articles, Widget? unused_child) {
+      builder: (context, value, Widget? unused_child) {
+        if (value == null) {
+          print("allow to refresh");
+        }
+        List<Article> articles = value!;
         if (articles.isEmpty) {
           return const CenteredCircularProgressIndicator();
         }
         Widget child;
-        articles.sort((a, b) {
-          return b.date.compareTo(a.date);
-        });
+        articles.sort((a, b) => b.date.compareTo(a.date));
         child = ListView(children:
-            articles.map((e) => build_card(e, clicked_card)).toList());
+            articles.map((e) => build_card(e, clicked_card_callback)).toList());
         return RefreshIndicator(
             onRefresh: () async {
               var new_articles = await home_articles.refresh();
               if (new_articles.isNotEmpty) {
                 var articles_titles = new_articles.map((a) => a.title);
                 String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
-                notifier.show(new_articles.first.title, articles_titles.join(' | '), payload);
+                notifier.show(new_articles.first.title, articles_titles.join(config.notif_titles_separator), payload);
               }
             }, child: child);
       });
 }
 
-
 /// Calendar page
 ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, BuildContext context) {
-  return ValueListenableBuilder<List<CalendarEvent>>(valueListenable: events.events,
+  return ValueListenableBuilder<List<CalendarEvent>>(
+      valueListenable: events.events,
       builder: (context, events, Widget? unused_child) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();
         }
+        var min_time = HourMinute(hour: events.first.start.hour, minute: events.first.start.minute);
+        var max_time = HourMinute(hour: events.first.end.hour, minute: events.first.end.minute);
         List<DateTime> dates = [];
         for (var e in events) {
           var day = DateTime(e.start.year, e.start.month, e.start.day);
           if (day.year != 2022) continue; // TODO remove once fixed on calendar
           if (!dates.contains(day)) dates.add(day);
+
+          var ev_start = HourMinute(hour: e.start.hour, minute: e.start.minute);
+          var ev_end = HourMinute(hour: e.end.hour, minute: e.end.minute);
+          if (min_time > ev_start) min_time = ev_start;
+          if (max_time < ev_end) max_time = ev_end;
         }
+        min_time = min_time.subtract(HourMinute(minute: 30));
+        max_time = max_time.add(HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
         var wk = WeekView(
             dates: dates,
             initialTime: DateTime.now(),
-            minimumTime: const HourMinute(hour: 7, minute: 30),
+            minimumTime: min_time,
+            maximumTime: max_time,
             hoursColumnStyle: HoursColumnStyle(
                 width: 25,
                 textAlignment: Alignment.centerRight,
@@ -89,34 +101,39 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
               return DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
                   + ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(date);
             }),
-            events: events.map((e) => FlutterWeekViewEvent(
-                            eventTextBuilder: (event, context, dayView, h, w) {
-                              List<Widget> elements = [
-                                  Expanded(child: AutoSizeText(event.title,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                    minFontSize: 5,
-                                    wrapWords: false
-                                  ))
-                              ];
-
-                              return Column(children: elements);
-                            },
-                            title: e.title,
-                            description: e.description,
-                            start: e.start,
-                            backgroundColor: config.calendars[e.type]?['color'],
-                            end: e.end,
-                            padding: const EdgeInsets.all(1),
-                            margin: const EdgeInsets.fromLTRB(0, 1, 0, 0),
-                            onTap: () { show_event_popup(e, context); }
-                    )).toList()
+            events: events.map((e) => get_wkview_event(context, e)).toList(),
+            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
         );
-        wk.controller.changeZoomFactor(.45);
+        wk.controller.changeZoomFactor(.59);
         return wk;
       }
   );
 }
-        
+
+/// Create a [FlutterWeekViewEvent] from a [CalendarEvent]
+FlutterWeekViewEvent get_wkview_event(context, calendar_event) {
+  return FlutterWeekViewEvent(
+      eventTextBuilder: (event, context, dayView, h, w) {
+        List<Widget> elements = [
+          Expanded(child: AutoSizeText(event.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  minFontSize: 5,
+                  wrapWords: false
+          ))
+        ];
+
+        return Column(children: elements);
+      },
+      title: calendar_event.title,
+      description: calendar_event.description,
+      start: calendar_event.start,
+      backgroundColor: config.calendars[calendar_event.type]?['color'],
+      end: calendar_event.end,
+      padding: const EdgeInsets.all(1),
+      margin: const EdgeInsets.fromLTRB(0, 1, 0, 0),
+      onTap: () { show_event_popup(calendar_event, context); }
+  );
+}
 
 /// Create and open an [Alert] popup to show [CalendarEvent] info
 void show_event_popup(CalendarEvent event, BuildContext context) {
@@ -124,19 +141,21 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
   if (event.location.isNotEmpty && event.location != 'TBD') { // TODO remove once calendar fixed
     buttons.add(
         DialogButton(
-            height: 80,
-            width: 300,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    AutoSizeText(event.location.replaceAll(',', '\n'), textAlign: TextAlign.right),
+                  SizedBox(height: 80, width: 200, child:
+                    AutoSizeText(event.location.replaceAll(',', '\n'), textAlign: TextAlign.right, minFontSize: 6)),
                     const Icon(Icons.location_pin)
                 ]),
             color: Colors.transparent,
-            onPressed: () {
-              // TODO regex for coords ?
-              launch(Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString());
+            onPressed: () async {
+              var url = (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(event.location))
+                  ? Uri(scheme: 'geo', host: event.location).toString()
+                  : Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString();
+              // TODO toast ?
+              await canLaunch(url) ? await launch(url) : print("can't launch url '$url'");
             }
     ));
   }
@@ -164,7 +183,7 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
             Html(
                 data: event.description.replaceAll('\\n', '<br />'),
                 onLinkTap: (s, u1, u2, u3) { launch(s.toString()); },
-                style: { 'a': Style(color: const Color(config.AppColors.darker_blue)) }
+                style: { 'a': Style(color: const Color(config.AppColors.dark_blue)) }
             )
           ])
   ).show();
@@ -173,12 +192,23 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
 /// Create a [Card] widget from an [Article]
 /// Expand to a [TextPage]
 Widget build_card(Article article, var action) {
-  final img = (article.img.isEmpty ? null : Image.network(article.img));
+  /*
+  final img = article.img.isEmpty ? null
+      : FadeInImage(
+          placeholder: AssetImage('res/topLogo.png'),
+          image: NetworkImage(article.img),
+          alignment: Alignment.centerLeft,
+          excludeFromSemantics: true
+      );
+      */
   return Card(
       child: ListTile(
-          title: Text(article.title,
-              style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
-          leading: img,
+          title: Html(
+              data: "<p>${article.title}</p>",
+              shrinkWrap: true,
+              style: {"p": Style(fontSize: FontSize(15), color: (article.read ? Colors.grey : Colors.black))}
+          ),
+          // leading: SizedBox(width: 80, height: 80, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }
       ));

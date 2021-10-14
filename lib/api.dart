@@ -1,7 +1,10 @@
 import 'dart:convert' show json;
 
 import 'package:http/http.dart' as http;
+import 'package:http_retry/http_retry.dart';
 import 'package:ical_parser/ical_parser.dart';
+
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'article.dart' show Article;
 import 'calendar_event.dart' show CalendarEvent;
@@ -14,7 +17,7 @@ Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
   var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
   var path = config.api_host + _lang + config.api_path + '/posts';
-  var filters = [];
+  var filters = ['_embed'];
   if (since != null) filters.add('after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
@@ -23,44 +26,71 @@ Future<List<Article>> get_posts_from_wp(
   var url = Uri.parse(path);
   var articles = <Article>[];
 
+  List<dynamic> postList = [];
+ 
+  var client = RetryClient(http.Client(),
+      whenError: (_o, _s) => true,
+      retries: 3,
+      onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
   try {
-    var response = await http.read(url).timeout(const Duration(seconds: 30));
+    var response = await client.read(url).timeout(const Duration(seconds: 60));
     print("got api response");
-    List<dynamic> postList = json.decode(response);
-
-    for (final p in postList) {
-      final img = p['featured_media'] == 0 ? '' : p['featured_image_urls']['thumbnail'].first;
-      articles.add(Article(
-              id: p['id'],
-              title: p['title']['rendered'],
-              content: p['content']['rendered'],
-              img: img,
-              date: DateTime.parse(p['date']),
-              read: false)
-          );
-    }
+    postList = json.decode(response);
   } catch(err) {
+    // TODO throw ?
     print("network error while fetching articles: '$err'");
+    Fluttertoast.showToast(
+        msg: "Failed to fetch articles",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 2,
+        fontSize: 16.0
+    );
+  } finally { client.close(); }
+
+  for (final p in postList) {
+    final img =  (p['_embedded']['wp:featuredmedia'] != null)
+        ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['thumbnail']['source_url']
+        : '';
+    articles.add(Article(
+            id: p['id'],
+            title: p['title']['rendered'],
+            content: p['content']['rendered'],
+            img: img,
+            date: DateTime.parse(p['date']),
+            read: false)
+    );
   }
 
   return articles;
 }
 
-Future<List<CalendarEvent>> get_events_from_google() async {
+/// Download calendar from an ICS URL and parse it into
+/// [CalendarEvent] array
+Future<List<CalendarEvent>> get_events_from_ics() async {
   List<CalendarEvent> event_list = [];
 
   for (String cal in config.calendars.keys) {
     print("http GET '$cal': '${config.calendars[cal]}");
+    var client = RetryClient(http.Client());
     try {
-      String raw_ical = await http.read(Uri.parse(config.calendars[cal]!['url'].toString()));
+      String raw_ical = await client.read(Uri.parse(config.calendars[cal]!['url'].toString()));
       var json = ICal.toJson(raw_ical);
       var json_events = json['VEVENT'];
       for (var event in json_events) {
         event_list.add(CalendarEvent.fromICalJson(event, cal));
       }
     } catch(err) {
+      // TODO throw 
       print("network error while fetching calendar $cal: '$err'");
-    }
+      Fluttertoast.showToast(
+          msg: "Failed to fetch calendar events",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 2,
+          fontSize: 16.0
+      );
+    } finally { client.close(); }
   }
   return event_list;
 }

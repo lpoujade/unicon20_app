@@ -89,12 +89,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   late String lang;
 
-  /// The drawing of the first screen we draw.
-  ///
-  /// Taking care of the 3 different 'pages' in the page :
-  ///   - The home one.
-  ///   - The planning one.
-  ///   - not existing one ( todo : transform to map )
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,15 +99,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       body: TabBarView(
           controller: _principalController,
           children: [
-            // Drawing the content of the first 'page'
-              ui_components.news_page(
-                  home_articles, notifier, openArticle)
-          ,
-
-          /// The second 'page' of the biggest controller.
-          Column(children: [
-            Expanded(child: ui_components.calendar_page(events, context)),
-          ])
+          ui_components.news_page(home_articles, notifier, openArticle),
+          ui_components.calendar_page(events, context)
           ]
       ),
 

@@ -17,12 +17,12 @@ class Article {
   late final DateTime date;
 
   Article(
-      {required this.id,
-      required this.title,
-      required this.content,
-      required this.img,
-      required this.date,
-      required this.read});
+      {required int this.id,
+      required String this.title,
+      required String this.content,
+      required String this.img,
+      required DateTime this.date,
+      required bool this.read});
 
   Map<String, dynamic> toSqlMap() {
     return {
@@ -51,7 +51,7 @@ class ArticleList {
 
   bool waiting_network = false;
 
-  ArticleList({required db}) {
+  ArticleList({required Database db}) {
     _db = db;
   }
 
@@ -73,6 +73,7 @@ class ArticleList {
 
   /// Read articles from db then from wordpress
   get_articles() async {
+    await _db.delete('article');
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });

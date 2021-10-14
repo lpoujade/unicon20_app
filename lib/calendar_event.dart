@@ -53,7 +53,7 @@ class CalendarEvent {
 
 /// Hold a [CalendarEvent] list, a connection
 /// to [Database] and functions to read from
-/// google ics
+/// an ICS URL
 class EventList {
   late Database _db;
   final events = ValueNotifier<List<CalendarEvent>>([]);
@@ -62,26 +62,26 @@ class EventList {
     _db = db;
   }
 
-  /// Get events from db and from google calendar
+  /// Get events from db and from ics calendar
   get_events() async {
     await get_events_from_db()
         .then((e) {
           events.value += e;
         });
     if (events.value.isEmpty) {
-      await get_events_from_google();
+      await get_events_from_ics();
     }
   }
 
-  /// Clear and refresh events from db & google
+  /// Clear and refresh events from db & ics
   refresh() async {
     events.value = [];
     get_events();
   }
 
   /// Download new events
-  get_events_from_google() {
-    var new_events_list = api.get_events_from_google();
+  get_events_from_ics() {
+    var new_events_list = api.get_events_from_ics();
     new_events_list.then((new_event) {
       events.value += new_event;
       new_event.forEach(save_event);
