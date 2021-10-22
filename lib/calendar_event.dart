@@ -9,8 +9,8 @@ import 'api.dart' as api;
 class CalendarEvent {
   final String uid;
   final String title;
-  final DateTime start;
-  final DateTime end;
+  DateTime start;
+  DateTime end;
   final String location;
   final String type;
   final String description;

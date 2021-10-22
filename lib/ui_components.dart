@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 
+import 'utils.dart';
 import 'centered_circular_progress_indicator.dart';
 import 'text_page.dart';
 import 'notifications.dart';
@@ -28,7 +28,7 @@ var appBar = AppBar(
               ),
               const Text(
                   config.Strings.DrawTitle,
-                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Futura', fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Futura', fontWeight: FontWeight.bold)
               ),
               const SizedBox(width: 75)
             ]
@@ -38,18 +38,18 @@ var appBar = AppBar(
 /// News page (first app screen)
 ValueListenableBuilder<List<Article>?> news_page(ArticleList home_articles, Notifications notifier, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.articles,
-      builder: (context, value, Widget? unused_child) {
-        if (value == null) {
-          print("allow to refresh");
-        }
-        List<Article> articles = value!;
-        if (articles.isEmpty) {
-          return const CenteredCircularProgressIndicator();
-        }
+      builder: (context, articles, Widget? unused_child) {
         Widget child;
-        articles.sort((a, b) => b.date.compareTo(a.date));
-        child = ListView(children:
-            articles.map((e) => build_card(e, clicked_card_callback)).toList());
+        if (articles == null) {
+          child = ListView(children: [Text("Failed to load articles from '${config.api_host}'. Please check your internet connection and try again")]);
+        }
+        else if (articles.isEmpty) {
+          child = ListView(children: [const CenteredCircularProgressIndicator()]);
+        } else {
+          articles.sort((a, b) => b.date.compareTo(a.date));
+          child = ListView(children:
+              articles.map((e) => build_card(e, clicked_card_callback)).toList());
+        }
         return RefreshIndicator(
             onRefresh: () async {
               var new_articles = await home_articles.refresh();
@@ -63,17 +63,19 @@ ValueListenableBuilder<List<Article>?> news_page(ArticleList home_articles, Noti
 }
 
 /// Calendar page
-ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, BuildContext context) {
+ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events) {
   return ValueListenableBuilder<List<CalendarEvent>>(
       valueListenable: events.events,
       builder: (context, events, Widget? unused_child) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();
         }
-        var min_time = HourMinute(hour: events.first.start.hour, minute: events.first.start.minute);
-        var max_time = HourMinute(hour: events.first.end.hour, minute: events.first.end.minute);
+        var min_time = const HourMinute(hour: 12);
+        var max_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
         for (var e in events) {
+          e.start = fit_date_to_cal(e.start);
+          e.end = fit_date_to_cal(e.end);
           var day = DateTime(e.start.year, e.start.month, e.start.day);
           if (day.year != 2022) continue; // TODO remove once fixed on calendar
           if (!dates.contains(day)) dates.add(day);
@@ -83,8 +85,8 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
           if (min_time > ev_start) min_time = ev_start;
           if (max_time < ev_end) max_time = ev_end;
         }
-        min_time = min_time.subtract(HourMinute(minute: 30));
-        max_time = max_time.add(HourMinute(minute: 30));
+        min_time = min_time.subtract(const HourMinute(minute: 30));
+        max_time = max_time.add(const HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
         var wk = WeekView(
             dates: dates,
@@ -102,7 +104,10 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events, Buil
                   + ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(date);
             }),
             events: events.map((e) => get_wkview_event(context, e)).toList(),
-            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
+            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5),
+            hoursColumnTimeBuilder: (style, hm) {
+              return Text(hm.hour == 24 ? '00' : hm.hour.toString());
+            }
         );
         wk.controller.changeZoomFactor(.59);
         return wk;
@@ -154,13 +159,14 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
               var url = (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(event.location))
                   ? Uri(scheme: 'geo', host: event.location).toString()
                   : Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString();
-              // TODO toast ?
-              await canLaunch(url) ? await launch(url) : print("can't launch url '$url'");
+              launch_url(url);
             }
     ));
   }
+
   var start_hour = DateFormat.Hm().format(event.start);
   var end_hour = DateFormat.Hm().format(event.end);
+
   Alert(
       context: context,
       style: AlertStyle(
@@ -182,7 +188,7 @@ void show_event_popup(CalendarEvent event, BuildContext context) {
             Text(event.summary),
             Html(
                 data: event.description.replaceAll('\\n', '<br />'),
-                onLinkTap: (s, u1, u2, u3) { launch(s.toString()); },
+                onLinkTap: (s, u1, u2, u3) { launch_url(s.toString()); },
                 style: { 'a': Style(color: const Color(config.AppColors.dark_blue)) }
             )
           ])
@@ -203,11 +209,7 @@ Widget build_card(Article article, var action) {
       */
   return Card(
       child: ListTile(
-          title: Html(
-              data: "<p>${article.title}</p>",
-              shrinkWrap: true,
-              style: {"p": Style(fontSize: FontSize(15), color: (article.read ? Colors.grey : Colors.black))}
-          ),
+          title: Text(article.title, style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
           // leading: SizedBox(width: 80, height: 80, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }

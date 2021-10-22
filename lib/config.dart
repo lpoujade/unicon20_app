@@ -4,14 +4,9 @@ import 'package:flutter/material.dart';
 
 
 class Strings {
-  static const String Title = "Unicon 20";
+  static const String Title = 'Unicon 20';
   static const String DrawTitle = 'Unicon';
 }
-
-/*
-   green 006A34
-   blue 1D2B5A
-   */
 
 class AppColors {
   static const green = 0xff006A34;
@@ -64,3 +59,4 @@ const Map<String, Map<String, dynamic>> calendars = {
 };
 
 const notif_titles_separator = ' | ';
+const calendar_utc_offset = {'hour': 2, 'minute': 0};

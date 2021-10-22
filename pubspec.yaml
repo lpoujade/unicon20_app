@@ -26,6 +26,7 @@ dependencies:
   fluttertoast:
   http_retry:
 
+  html_unescape:
   flutter_html: ^2.1.1
   flutter_week_view: ^1.1.0
 

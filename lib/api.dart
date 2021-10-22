@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
 import 'package:ical_parser/ical_parser.dart';
 
+import 'package:html_unescape/html_unescape.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'article.dart' show Article;
@@ -37,8 +38,6 @@ Future<List<Article>> get_posts_from_wp(
     print("got api response");
     postList = json.decode(response);
   } catch(err) {
-    // TODO throw ?
-    print("network error while fetching articles: '$err'");
     Fluttertoast.showToast(
         msg: "Failed to fetch articles",
         toastLength: Toast.LENGTH_SHORT,
@@ -46,6 +45,7 @@ Future<List<Article>> get_posts_from_wp(
         timeInSecForIosWeb: 2,
         fontSize: 16.0
     );
+    rethrow;
   } finally { client.close(); }
 
   for (final p in postList) {
@@ -54,7 +54,7 @@ Future<List<Article>> get_posts_from_wp(
         : '';
     articles.add(Article(
             id: p['id'],
-            title: p['title']['rendered'],
+            title: HtmlUnescape().convert(p['title']['rendered']),
             content: p['content']['rendered'],
             img: img,
             date: DateTime.parse(p['date']),
@@ -81,8 +81,6 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
         event_list.add(CalendarEvent.fromICalJson(event, cal));
       }
     } catch(err) {
-      // TODO throw 
-      print("network error while fetching calendar $cal: '$err'");
       Fluttertoast.showToast(
           msg: "Failed to fetch calendar events",
           toastLength: Toast.LENGTH_SHORT,
@@ -90,6 +88,7 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
           timeInSecForIosWeb: 2,
           fontSize: 16.0
       );
+      rethrow;
     } finally { client.close(); }
   }
   return event_list;

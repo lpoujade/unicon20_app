@@ -5,6 +5,8 @@ import 'package:sqflite/sqflite.dart';
 
 import 'api.dart' as api;
 import 'db.dart' as db;
+import 'utils.dart';
+
 
 /// Article infos
 class Article {
@@ -17,12 +19,12 @@ class Article {
   late final DateTime date;
 
   Article(
-      {required int this.id,
-      required String this.title,
-      required String this.content,
-      required String this.img,
-      required DateTime this.date,
-      required bool this.read});
+      {required this.id,
+      required this.title,
+      required this.content,
+      required this.img,
+      required this.date,
+      required this.read});
 
   Map<String, dynamic> toSqlMap() {
     return {
@@ -46,10 +48,10 @@ class Article {
 class ArticleList {
   late Database _db;
   String? _lang;
+  bool _waiting_network = false;
 
   final articles = ValueNotifier<List<Article>>([]);
-
-  bool waiting_network = false;
+  var result = ResultWrapper<List<Article>>();
 
   ArticleList({required Database db}) {
     _db = db;
@@ -60,11 +62,14 @@ class ArticleList {
     _lang = await db.get_locale(_db);
   }
 
+  get waiting_network { return _waiting_network; }
+
   updateLang(l) async {
     print("update lang to '$l'");
     _lang = l;
     await db.save_locale(_db, l);
     articles.value = [];
+    result.data = [];
     await _db.delete('article');
     await get_articles();
   }
@@ -88,9 +93,16 @@ class ArticleList {
   /// Download and save new articles
   Future<List<Article>> _get_articles_from_wp() async {
     if (_lang == null) await init_lang();
-    List<Article> wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
-    await save_articles(wp_articles);
-    articles.value += wp_articles;
+    List<Article> wp_articles = [];
+    try {
+      _waiting_network = true;
+      wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
+      await save_articles(wp_articles);
+      articles.value += wp_articles;
+    } catch (err) {
+    } finally {
+      _waiting_network = false;
+    }
     return wp_articles;
   }
 

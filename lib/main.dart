@@ -100,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           controller: _principalController,
           children: [
           ui_components.news_page(home_articles, notifier, openArticle),
-          ui_components.calendar_page(events, context)
+          ui_components.calendar_page(events)
           ]
       ),
 
