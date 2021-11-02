@@ -5,7 +5,7 @@ import 'config.dart' as config;
 /// Open an URL in an external app if possible,
 /// else show a toast to notify user about error
 launch_url(String url) async {
-  if (canLaunch(url) != false) {
+  if ((await canLaunch(url)) != false) {
     await launch(url);
     return;
   }

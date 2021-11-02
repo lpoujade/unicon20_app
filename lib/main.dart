@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 import 'article.dart';
 import 'calendar_event.dart';
@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       body: TabBarView(
           controller: _principalController,
           children: [
-          ui_components.news_page(home_articles, notifier, openArticle),
+          ui_components.news_page(home_articles, openArticle),
           ui_components.calendar_page(events)
           ]
       ),
@@ -174,13 +174,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       await events.refresh();
       setState(() {
         if (new_articles.isNotEmpty) {
-          var articles_titles = new_articles.map((a) {
-            return a.title;
-          });
-          String payload =
-              new_articles.length == 1 ? new_articles.first.id.toString() : '';
-          notifier.show('Fresh informations available !',
-              articles_titles.join(' | '), payload);
+          var articles_titles = new_articles.map((a) => a.title);
+          String payload = '';
+          String text = '';
+          if (new_articles.length > 1) {
+            text = articles_titles.toList().sublist(1).join(config.notif_titles_separator);
+            payload = '';
+          } else if (new_articles.length == 1) {
+            payload = new_articles.first.id.toString();
+            text = HtmlUnescape().convert(new_articles.first.content.substring(0, 100));
+          }
+          notifier.show(new_articles.first.title, text, payload);
         }
       });
       BackgroundFetch.finish(taskId);

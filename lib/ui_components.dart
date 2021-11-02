@@ -10,7 +10,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'utils.dart';
 import 'centered_circular_progress_indicator.dart';
 import 'text_page.dart';
-import 'notifications.dart';
 import 'calendar_event.dart';
 import 'article.dart';
 import 'config.dart' as config;
@@ -36,29 +35,18 @@ var appBar = AppBar(
       );
 
 /// News page (first app screen)
-ValueListenableBuilder<List<Article>?> news_page(ArticleList home_articles, Notifications notifier, var clicked_card_callback) {
+ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.articles,
-      builder: (context, articles, Widget? unused_child) {
-        Widget child;
-        if (articles == null) {
-          child = ListView(children: [Text("Failed to load articles from '${config.api_host}'. Please check your internet connection and try again")]);
-        }
-        else if (articles.isEmpty) {
-          child = ListView(children: [const CenteredCircularProgressIndicator()]);
-        } else {
+      builder: (context, articles, Widget? _child) {
+        Widget child = ListView();
+        if (articles.isNotEmpty) {
           articles.sort((a, b) => b.date.compareTo(a.date));
           child = ListView(children:
               articles.map((e) => build_card(e, clicked_card_callback)).toList());
         }
-        return RefreshIndicator(
-            onRefresh: () async {
-              var new_articles = await home_articles.refresh();
-              if (new_articles.isNotEmpty) {
-                var articles_titles = new_articles.map((a) => a.title);
-                String payload = new_articles.length == 1 ? new_articles.first.id.toString() : '';
-                notifier.show(new_articles.first.title, articles_titles.join(config.notif_titles_separator), payload);
-              }
-            }, child: child);
+        var refresh_indicator = RefreshIndicator(
+            onRefresh: home_articles.refresh, child: child);
+        return refresh_indicator;
       });
 }
 

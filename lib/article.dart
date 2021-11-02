@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'api.dart' as api;
 import 'db.dart' as db;
-import 'utils.dart';
 
 
 /// Article infos
@@ -50,8 +47,8 @@ class ArticleList {
   String? _lang;
   bool _waiting_network = false;
 
+  final network_error = ValueNotifier<bool>(false);
   final articles = ValueNotifier<List<Article>>([]);
-  var result = ResultWrapper<List<Article>>();
 
   ArticleList({required Database db}) {
     _db = db;
@@ -69,7 +66,6 @@ class ArticleList {
     _lang = l;
     await db.save_locale(_db, l);
     articles.value = [];
-    result.data = [];
     await _db.delete('article');
     await get_articles();
   }
@@ -78,7 +74,6 @@ class ArticleList {
 
   /// Read articles from db then from wordpress
   get_articles() async {
-    await _db.delete('article');
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });
@@ -99,7 +94,9 @@ class ArticleList {
       wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
       await save_articles(wp_articles);
       articles.value += wp_articles;
+      network_error.value = false;
     } catch (err) {
+      network_error.value = true;
     } finally {
       _waiting_network = false;
     }
