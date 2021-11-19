@@ -27,6 +27,16 @@ class CalendarEvent {
     required this.summary
   });
 
+  CalendarEvent.from(CalendarEvent e)
+      : uid = e.uid,
+      title = e.title,
+      start = e.start,
+      end = e.end,
+      location = e.location,
+      type = e.type,
+      description = e.description,
+      summary = e.summary;
+
   CalendarEvent.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
       title = clean_ics_text_fields(json['SUMMARY']),

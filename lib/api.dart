@@ -78,7 +78,8 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
       var json = ICal.toJson(raw_ical);
       var json_events = json['VEVENT'];
       for (var event in json_events) {
-        event_list.add(CalendarEvent.fromICalJson(event, cal));
+        var e = CalendarEvent.fromICalJson(event, cal);
+        event_list.add(e);
       }
     } catch(err) {
       Fluttertoast.showToast(

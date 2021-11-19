@@ -59,4 +59,5 @@ const Map<String, Map<String, dynamic>> calendars = {
 };
 
 const notif_titles_separator = ' | ';
-const calendar_utc_offset = {'hour': 2, 'minute': 0};
+const calendar_utc_offset = {'hour': 1, 'minute': 0};
+const event_year = 2022;

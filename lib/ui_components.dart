@@ -58,29 +58,27 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();
         }
+        List<CalendarEvent> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
-        var max_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
         for (var e in events) {
-          e.start = fit_date_to_cal(e.start);
-          e.end = fit_date_to_cal(e.end);
-          var day = DateTime(e.start.year, e.start.month, e.start.day);
-          if (day.year != 2022) continue; // TODO remove once fixed on calendar
+          CalendarEvent tmp = CalendarEvent.from(e);
+          tmp.start = fit_date_to_cal(e.start);
+          tmp.end = fit_date_to_cal(e.end);
+          var day = DateTime(tmp.start.year, tmp.start.month, tmp.start.day);
           if (!dates.contains(day)) dates.add(day);
 
-          var ev_start = HourMinute(hour: e.start.hour, minute: e.start.minute);
-          var ev_end = HourMinute(hour: e.end.hour, minute: e.end.minute);
+          fitted_events.add(tmp);
+
+          var ev_start = HourMinute(hour: tmp.start.hour, minute: tmp.start.minute);
           if (min_time > ev_start) min_time = ev_start;
-          if (max_time < ev_end) max_time = ev_end;
         }
         min_time = min_time.subtract(const HourMinute(minute: 30));
-        max_time = max_time.add(const HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
         var wk = WeekView(
             dates: dates,
             initialTime: DateTime.now(),
             minimumTime: min_time,
-            maximumTime: max_time,
             hoursColumnStyle: HoursColumnStyle(
                 width: 25,
                 textAlignment: Alignment.centerRight,
@@ -88,14 +86,15 @@ ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events) {
             ),
             dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
               var date = DateTime(year, month, day);
-              return DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
-                  + ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(date);
+              var year_str = (year == config.event_year
+                  ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
+                  : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
+              var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
+                  + ' ' + year_str;
+              return str;
             }),
-            events: events.map((e) => get_wkview_event(context, e)).toList(),
-            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5),
-            hoursColumnTimeBuilder: (style, hm) {
-              return Text(hm.hour == 24 ? '00' : hm.hour.toString());
-            }
+            events: fitted_events.map((e) => get_wkview_event(context, e)).toList(),
+            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
         );
         wk.controller.changeZoomFactor(.59);
         return wk;
