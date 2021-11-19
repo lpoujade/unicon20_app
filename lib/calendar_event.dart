@@ -40,8 +40,8 @@ class CalendarEvent {
   CalendarEvent.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
       title = clean_ics_text_fields(json['SUMMARY']),
-      start = DateTime.parse(json['DTSTART']),
-      end = DateTime.parse(json['DTEND']),
+      start = DateTime.parse(json['DTSTART']).toLocal(),
+      end = DateTime.parse(json['DTEND']).toLocal(),
       location = clean_ics_text_fields(json['LOCATION']),
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
@@ -58,6 +58,10 @@ class CalendarEvent {
       'description': description,
       'summary': summary
     };
+  }
+
+  String toString() {
+    return "$title $start $end (start is utc: ${start.isUtc})";
   }
 }
 

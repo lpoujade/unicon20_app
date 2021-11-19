@@ -171,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             requiredNetworkType: NetworkType.UNMETERED), (String taskId) async {
       log("background fetch fired");
       var new_articles = await home_articles.refresh();
-      await events.refresh();
+      // await events.refresh();
       setState(() {
         if (new_articles.isNotEmpty) {
           var articles_titles = new_articles.map((a) => a.title);
