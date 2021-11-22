@@ -1,0 +1,3 @@
+- fetch articles from unicon20.fr Wordpress instance
+- periodically fetch newer articles and notify user if needed
+- retrieve events from a set of ICS URLs
