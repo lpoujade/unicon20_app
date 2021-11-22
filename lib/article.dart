@@ -62,7 +62,7 @@ class ArticleList {
   get waiting_network { return _waiting_network; }
 
   updateLang(l) async {
-    print("update lang to '$l'");
+    // print("update lang to '$l'");
     _lang = l;
     await db.save_locale(_db, l);
     articles.value = [];
@@ -110,7 +110,7 @@ class ArticleList {
     try {
       batch.commit(noResult: true);
     } catch (e) {
-      print("failed to insert some articles from '$articles': '$e'");
+      // print("failed to insert some articles from '$articles': '$e'");
     }
   }
 
@@ -121,7 +121,7 @@ class ArticleList {
           conflictAlgorithm: ConflictAlgorithm.fail);
       articles.value = articles.value + [article];
     } catch (e) {
-      print("failed to save article '$article': '$e'");
+      // print("failed to save article '$article': '$e'");
     }
   }
 

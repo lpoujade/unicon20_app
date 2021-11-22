@@ -23,7 +23,7 @@ Future<List<Article>> get_posts_from_wp(
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
-  print("http GET '$path'");
+  // print("http GET '$path'");
   var url = Uri.parse(path);
   var articles = <Article>[];
 
@@ -31,11 +31,11 @@ Future<List<Article>> get_posts_from_wp(
  
   var client = RetryClient(http.Client(),
       whenError: (_o, _s) => true,
-      retries: 3,
-      onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
+      retries: 3);
+      //onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
   try {
     var response = await client.read(url).timeout(const Duration(seconds: 60));
-    print("got api response");
+    // print("got api response");
     postList = json.decode(response);
   } catch(err) {
     Fluttertoast.showToast(
@@ -71,7 +71,7 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
   List<CalendarEvent> event_list = [];
 
   for (String cal in config.calendars.keys) {
-    print("http GET '$cal': '${config.calendars[cal]}");
+    // print("http GET '$cal': '${config.calendars[cal]}");
     var client = RetryClient(http.Client());
     try {
       String raw_ical = await client.read(Uri.parse(config.calendars[cal]!['url'].toString()));

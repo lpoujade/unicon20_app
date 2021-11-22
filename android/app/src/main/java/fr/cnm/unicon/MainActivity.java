@@ -1,4 +1,4 @@
-package fr.mordroreur.unicons;
+package fr.cnm.unicon;
 
 import io.flutter.embedding.android.FlutterActivity;
 

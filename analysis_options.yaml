@@ -7,8 +7,6 @@ linter:
     non_constant_identifier_names: false
     constant_identifier_names: false
     curly_braces_in_flow_control_structures: false
-    # TODO remove for prod
-    avoid_print: false
 
 # https://dart.dev/guides/language/analysis-options
 # https://dart-lang.github.io/linter/lints/index.html.

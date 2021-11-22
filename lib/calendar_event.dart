@@ -60,6 +60,7 @@ class CalendarEvent {
     };
   }
 
+  @override
   String toString() {
     return "$title $start $end (start is utc: ${start.isUtc})";
   }

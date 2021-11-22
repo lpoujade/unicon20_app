@@ -40,6 +40,7 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
       builder: (context, articles, Widget? _child) {
         Widget child = ListView();
         if (articles.isNotEmpty) {
+          articles.removeWhere((article) => (article.date.isBefore(DateTime(2020, 12, 21))));
           articles.sort((a, b) => b.date.compareTo(a.date));
           child = ListView(children:
               articles.map((e) => build_card(e, clicked_card_callback)).toList());

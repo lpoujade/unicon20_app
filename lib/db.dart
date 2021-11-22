@@ -38,7 +38,7 @@ Future<DateTime?> get_last_sync_date(db) async {
 
 Future<String?> get_locale(db) async {
   List<Map<String, Object?>> res = await db.rawQuery('select locale from app_config');
-  print("saved locale: '$res'");
+  // print("saved locale: '$res'");
   if (res.isNotEmpty) {
     return res.first['locale'].toString();
   }
@@ -46,7 +46,7 @@ Future<String?> get_locale(db) async {
 }
 
 save_locale(db, String locale) async {
-  print("saving locale '$locale'");
+  // print("saving locale '$locale'");
   await db.insert('app_config', {'locale': locale, 'appid': appid},
       conflictAlgorithm: ConflictAlgorithm.replace);
 }
