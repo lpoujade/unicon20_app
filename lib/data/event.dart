@@ -1,7 +1,8 @@
 import '../tools/utils.dart';
+import 'abstract.dart';
 
 /// Event data
-class CalendarEvent {
+class CalendarEvent extends AData {
   final String uid;
   final String title;
   DateTime start;
@@ -41,6 +42,8 @@ class CalendarEvent {
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
       summary = clean_ics_text_fields(json['SUMMARY']);
+
+  get id return uid;
 
   Map<String, dynamic> toSqlMap() {
     return {

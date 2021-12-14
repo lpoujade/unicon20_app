@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:unicon/tools/list.dart';
 
 import '../data/article.dart';
 import '../tools/api.dart' as api;
@@ -9,18 +10,19 @@ import 'database.dart';
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
-class ArticleList {
-  late DBInstance _db;
+class ArticleList extends ItemList {
   String? _lang;
 
   final network_error = ValueNotifier<bool>(false);
   final articles = ValueNotifier<List<Article>>([]);
 
-  ArticleList({required DBInstance db}) { _db = db; }
+  ArticleList({required DBInstance db})
+    : super(db: db, db_table: 'article') {
+  }
 
   // Read current language from db
   init_lang() async {
-    _lang = await _db.get_locale();
+    _lang = await db.get_locale();
   }
 
   /// Update language
@@ -28,10 +30,10 @@ class ArticleList {
   update_lang(l) async {
     // print("update lang to '$l'");
     _lang = l;
-    await _db.save_locale(l);
+    await db.save_locale(l);
     articles.value = [];
-    Database db = await _db.db;
-    await db.delete('article');
+    Database dbi = await db.db;
+    await dbi.delete('article');
     await get_articles();
   }
 
@@ -56,7 +58,7 @@ class ArticleList {
     try {
       print('get_posts_from_wp');
       wp_articles = await api.get_posts_from_wp(
-          since: await _db.get_last_sync_date(),
+          since: await db.get_last_sync_date(),
           lang: _lang
       );
       await save_articles(wp_articles);
@@ -71,8 +73,8 @@ class ArticleList {
   /// Insert a list of [Article] using [Batch]
   save_articles(List<Article> articles) async {
     // save_categories(articles)
-    Database db = await _db.db;
-    var batch = db.batch();
+    Database dbi = await db.db;
+    var batch = dbi.batch();
     for (var a in articles) batch.insert('article', a.toSqlMap());
     try {
       batch.commit(noResult: true);
@@ -81,6 +83,7 @@ class ArticleList {
     }
   }
 
+  /*
   /// Insert a new article in db
   save_article(Article article) async {
     try {
@@ -92,18 +95,19 @@ class ArticleList {
       log("failed to save article '$article': '$e'");
     }
   }
+    */
 
   /// Update an existing article
   update_article(Article article) async {
-    Database db = await _db.db;
-    db.update('article', article.toSqlMap(),
-    where: 'id = ?', whereArgs: [article.id]);
+    Database dbi = await db.db;
+    dbi.update('article', article.toSqlMap(),
+        where: 'id = ?', whereArgs: [article.id]);
   }
 
   /// Read articles from db
   Future<List<Article>> get_from_db() async {
-    Database db = await _db.db;
-    var raw_articles = await db.query('article');
+    Database dbi = await db.db;
+    var raw_articles = await dbi.query('article');
 
     return raw_articles.map((a) {
       dynamic date = a['date'];

@@ -1,12 +1,17 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'config.dart' as config;
 import 'homepage.dart';
+import 'tools/headless_background_service.dart';
 
 /// Launching of the programme.
-main() async { runApp(const UniconApp()); }
+main() async {
+  runApp(const UniconApp());
+  BackgroundFetch.registerHeadlessTask(headless_task);
+}
 
 /// First creating page of the application.
 class UniconApp extends StatelessWidget {

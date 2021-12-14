@@ -70,7 +70,8 @@ class DBInstance {
 	/// Save the locale to database
 	save_locale(String locale) async {
 		log("saving locale '$locale'");
-		db.insert('app_config', {'locale': locale, 'appid': appid},
+    await _dbi();
+		_db!.insert('app_config', {'locale': locale, 'appid': appid},
 				conflictAlgorithm: ConflictAlgorithm.replace);
 	}
 

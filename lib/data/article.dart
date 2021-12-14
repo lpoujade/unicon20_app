@@ -1,7 +1,7 @@
-
+import 'abstract.dart';
 
 /// Article data & serializations functions
-class Article {
+class Article extends AData  {
   final int id;
   final String title;
   final String content;
@@ -18,7 +18,8 @@ class Article {
       required this.img,
       required this.date,
       required this.read,
-      required this.categories});
+      required this.categories})
+      : super(db_id_field: 'id');
 
   Map<String, dynamic> toSqlMap() {
     return {

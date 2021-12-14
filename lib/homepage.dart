@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -14,6 +12,7 @@ import 'ui/text_page.dart';
 import 'screen/calendar.dart';
 import 'screen/news.dart';
 import 'config.dart' as config;
+import 'tools/background_service.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -25,14 +24,10 @@ class MyHomePage extends StatefulWidget {
   late final articles = ArticleList(db: db);
   late final events = EventList(db: db);
 
-  // initBackgroundService().then((e) => BackgroundFetch.start());
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 
   background_task() async {
-    print("i'm running in background & headless !");
-    print("still allocated ? $articles");
     var new_articles = await articles.refresh();
     if (new_articles.isNotEmpty) {
       var articles_titles = new_articles.map((a) => a.title);
@@ -47,44 +42,6 @@ class MyHomePage extends StatefulWidget {
       }
       notifier.show(new_articles.first.title, text, payload);
     }
-  }
-
-  /// Initialize the background service used to fetch new event/posts
-  /// and show notifications
-  Future<void> initBackgroundService() async {
-    await BackgroundFetch.configure(
-        BackgroundFetchConfig(
-          minimumFetchInterval: 15,
-          stopOnTerminate: false,
-          startOnBoot: true,
-          enableHeadless: true,
-          requiresBatteryNotLow: true,
-          requiresCharging: false,
-          requiresStorageNotLow: false,
-          requiresDeviceIdle: false,
-          requiredNetworkType: NetworkType.UNMETERED), (String taskId) async {
-        log("background fetch fired");
-        background_task();
-        // setState ?
-        BackgroundFetch.finish(taskId);
-        }, (String taskId) async {
-          log("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
-          BackgroundFetch.finish(taskId);
-        });
-    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  }
-
-  void backgroundFetchHeadlessTask(HeadlessTask task) async {
-    String taskId = task.taskId;
-    bool isTimeout = task.timeout;
-    if (isTimeout) {
-      print("[BackgroundFetch] Headless task timed-out: $taskId");
-      BackgroundFetch.finish(taskId);
-      return;
-    }
-    background_task();
-    print("headless background task fired");
-    BackgroundFetch.finish(taskId);
   }
 }
 
@@ -128,7 +85,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     initState() {
       super.initState();
       widget.events.get_events();
-      // widget.initBackgroundService();
+      initBackgroundService(widget.background_task)
+        .then((e) => BackgroundFetch.start());
     }
 
   @override
