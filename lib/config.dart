@@ -17,7 +17,7 @@ class AppColors {
 }
 
 /// WordPress base URL (fetched from env to ease development)
-const api_host = String.fromEnvironment('API_HOST', defaultValue: 'https://unicon20.fr');
+const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'https://unicon20.fr');
 
 /// Base endpoint
 const api_path = '/wp-json/wp/v2';

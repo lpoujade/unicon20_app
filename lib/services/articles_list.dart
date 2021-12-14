@@ -1,36 +1,37 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/article.dart';
 import '../tools/api.dart' as api;
-import '../tools/db.dart' as db;
+import 'database.dart';
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
 class ArticleList {
-  late Database _db;
+  late DBInstance _db;
   String? _lang;
 
   final network_error = ValueNotifier<bool>(false);
   final articles = ValueNotifier<List<Article>>([]);
 
-  ArticleList({required Database db}) {
-    _db = db;
-  }
+  ArticleList({required DBInstance db}) { _db = db; }
 
   // Read current language from db
   init_lang() async {
-    _lang = await db.get_locale(_db);
+    _lang = await _db.get_locale();
   }
 
   /// Update language
   /// Trigger a delete/download of all articles
-  updateLang(l) async {
+  update_lang(l) async {
     // print("update lang to '$l'");
     _lang = l;
-    await db.save_locale(_db, l);
+    await _db.save_locale(l);
     articles.value = [];
-    await _db.delete('article');
+    Database db = await _db.db;
+    await db.delete('article');
     await get_articles();
   }
 
@@ -38,14 +39,12 @@ class ArticleList {
 
   /// Read articles from db then from wordpress
   get_articles() async {
-    // await _db.delete('article'); // TODO REMOVE
-    await get_from_db().then((local_articles) {
-      articles.value += local_articles;
-    });
-    await _get_articles_from_wp();
+    var local_articles = await get_from_db();
+    articles.value = local_articles;
+    _get_articles_from_wp();
   }
 
-  /// Get new articles
+  /// Get new articles from wordpress
   Future<List<Article>> refresh() async {
     return await _get_articles_from_wp();
   }
@@ -55,7 +54,11 @@ class ArticleList {
     if (_lang == null) await init_lang();
     List<Article> wp_articles = [];
     try {
-      wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
+      print('get_posts_from_wp');
+      wp_articles = await api.get_posts_from_wp(
+          since: await _db.get_last_sync_date(),
+          lang: _lang
+      );
       await save_articles(wp_articles);
       articles.value += wp_articles;
       network_error.value = false;
@@ -68,7 +71,8 @@ class ArticleList {
   /// Insert a list of [Article] using [Batch]
   save_articles(List<Article> articles) async {
     // save_categories(articles)
-    var batch = _db.batch();
+    Database db = await _db.db;
+    var batch = db.batch();
     for (var a in articles) batch.insert('article', a.toSqlMap());
     try {
       batch.commit(noResult: true);
@@ -80,23 +84,26 @@ class ArticleList {
   /// Insert a new article in db
   save_article(Article article) async {
     try {
-      await _db.insert('article', article.toSqlMap(),
+      Database db = await _db.db;
+      await db.insert('article', article.toSqlMap(),
           conflictAlgorithm: ConflictAlgorithm.fail);
       articles.value = articles.value + [article];
     } catch (e) {
-      // print("failed to save article '$article': '$e'");
+      log("failed to save article '$article': '$e'");
     }
   }
 
   /// Update an existing article
   update_article(Article article) async {
-    _db.update('article', article.toSqlMap(),
+    Database db = await _db.db;
+    db.update('article', article.toSqlMap(),
     where: 'id = ?', whereArgs: [article.id]);
   }
 
   /// Read articles from db
   Future<List<Article>> get_from_db() async {
-    var raw_articles = await _db.query('article');
+    Database db = await _db.db;
+    var raw_articles = await db.query('article');
 
     return raw_articles.map((a) {
       dynamic date = a['date'];

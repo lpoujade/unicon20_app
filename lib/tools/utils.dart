@@ -1,6 +1,6 @@
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'config.dart' as config;
+import '../config.dart' as config;
 
 /// Open an URL in an external app if possible,
 /// else show a toast to notify user about error

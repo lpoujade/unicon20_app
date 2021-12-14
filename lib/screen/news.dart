@@ -9,10 +9,17 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
       builder: (context, articles, Widget? _child) {
         Widget child = ListView();
         if (articles.isNotEmpty) {
+          // specific to unicon20.fr wordpress
           articles.removeWhere((article) => (article.date.isBefore(DateTime(2020, 12, 21))));
           articles.sort((a, b) => b.date.compareTo(a.date));
           child = ListView(children:
-              articles.map((e) => build_card(e, clicked_card_callback)).toList());
+              articles.map((e) => build_card(e, (article) {
+                if (!article.read) {
+                  article.read = true;
+                  home_articles.update_article(article);
+                }
+                clicked_card_callback(article);
+              })).toList());
         }
         var refresh_indicator = RefreshIndicator(
             onRefresh: home_articles.refresh, child: child);

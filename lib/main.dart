@@ -1,16 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'app.dart';
-import 'tools/db.dart' as db;
-
-late final Database database_instance;
+import 'config.dart' as config;
+import 'homepage.dart';
 
 /// Launching of the programme.
-main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  database_instance = await db.init_database();
-  runApp(UniconApp(db: database_instance));
-}
+main() async { runApp(const UniconApp()); }
 
+/// First creating page of the application.
+class UniconApp extends StatelessWidget {
+  const UniconApp({Key? key}) : super(key: key);
+
+  /// The information of the first page we draw to screen.
+  ///
+  /// This create the main core of the application, here it create the mores basics information
+  /// and call 'MyHomePage' class which contain all the others information.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(),
+      title: config.Strings.Title,
+      theme: ThemeData(
+          primaryColor: const Color(config.AppColors.green),
+          fontFamily: 'Tahoma',
+          appBarTheme: const AppBarTheme(color: Color(config.AppColors.green))
+          ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+      ],
+      supportedLocales: config.supported_locales.map((l) => Locale(l[0], l[1]))
+    );
+  }
+}

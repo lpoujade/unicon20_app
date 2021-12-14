@@ -1,9 +1,9 @@
-import 'dart:convert' show json;
+import 'dart:developer';
 
+import 'dart:convert' show json;
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
 import 'package:ical_parser/ical_parser.dart';
-
 import 'package:html_unescape/html_unescape.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -16,14 +16,16 @@ import '../config.dart' as config;
 /// return a list of [Article]
 Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
+
+  print('api using lang $lang');
   var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
-  var path = config.api_host + _lang + config.api_path + '/posts';
+  var path = config.wordpress_host + _lang + config.api_path + '/posts';
   var filters = ['_embed'];
   if (since != null) filters.add('after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
-  // print("http GET '$path'");
+  print("http GET '$path'");
   var url = Uri.parse(path);
   var articles = <Article>[];
 
@@ -34,8 +36,9 @@ Future<List<Article>> get_posts_from_wp(
       retries: 3);
       //onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
   try {
+    print('get $url');
     var response = await client.read(url).timeout(const Duration(seconds: 60));
-    // print("got api response");
+    print("got api response");
     postList = json.decode(response);
   } catch(err) {
     Fluttertoast.showToast(
@@ -80,7 +83,7 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
   List<CalendarEvent> event_list = [];
 
   for (String cal in config.calendars.keys) {
-    // print("http GET '$cal': '${config.calendars[cal]}");
+    print("http GET '$cal': '${config.calendars[cal]}");
     var client = RetryClient(http.Client());
     try {
       String raw_ical = await client.read(Uri.parse(config.calendars[cal]!['url'].toString()));

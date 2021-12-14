@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import '../services/events_list.dart';
 import '../data/event.dart';
 import '../ui/centered_circular_progress_indicator.dart';
-import '../utils.dart';
+import '../tools/utils.dart';
 import '../config.dart' as config;
 
 /// Calendar page
