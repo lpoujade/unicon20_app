@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
-import 'article.dart';
-import 'config.dart' as config;
+import '../config.dart' as config;
 
 
 /// Function that create for every article a new page when the user click on it.
@@ -13,9 +12,12 @@ import 'config.dart' as config;
 /// It does create a top bar and the text in the body of the app.
 class TextPage extends StatelessWidget {
 
-  const TextPage({Key? key, required this.article})
+  const TextPage({Key? key, required this.title, required this.content, required this.date})
       : super(key: key);
-  final Article article;
+
+  final DateTime date;
+  final String content;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class TextPage extends StatelessWidget {
                         onPressed: () { Navigator.pop(context); },
                         child: const Icon(Icons.arrow_back, size: 25, color: Colors.white)
                     ),
-                    Expanded(child: Text(article.title))
+                    Expanded(child: Text(title))
                   ],
               ),
           ),
@@ -46,11 +48,11 @@ class TextPage extends StatelessWidget {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(DateFormat.yMd(Localizations.localeOf(context).languageCode).format(article.date),
+                            Text(DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date),
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(fontSize: 12))
                           ]),
-                      Html(data: article.content, onLinkTap: (s, u1, u2, u3) => launch(s.toString()))
+                      Html(data: content, onLinkTap: (s, u1, u2, u3) => launch(s.toString()))
                     ])
             )
         )

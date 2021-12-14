@@ -7,9 +7,9 @@ import 'package:ical_parser/ical_parser.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'article.dart' show Article;
-import 'calendar_event.dart' show CalendarEvent;
-import 'config.dart' as config;
+import '../data/article.dart' show Article;
+import '../data/event.dart' show CalendarEvent;
+import '../config.dart' as config;
 
 /// get posts from wordpress API
 ///
@@ -52,13 +52,22 @@ Future<List<Article>> get_posts_from_wp(
     final img =  (p['_embedded']['wp:featuredmedia'] != null)
         ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['thumbnail']['source_url']
         : '';
+
+    List<String> categories = [];
+    print('categories for ${p['title']['rendered']}');
+    for (List category in p['_embedded']['wp:term']) {
+      if (category.isEmpty) continue;
+      categories.add(category[0]['slug']);
+      print('added ${category[0]['slug']}');
+    }
     articles.add(Article(
             id: p['id'],
             title: HtmlUnescape().convert(p['title']['rendered']),
             content: p['content']['rendered'],
             img: img,
             date: DateTime.parse(p['date']),
-            read: false)
+            read: false,
+            categories: categories)
     );
   }
 

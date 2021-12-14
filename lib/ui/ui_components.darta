@@ -1,0 +1,56 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:intl/intl.dart';
+import 'dart:ui';
+import 'package:auto_size_text/auto_size_text.dart';
+
+import 'utils.dart';
+import 'centered_circular_progress_indicator.dart';
+import 'text_page.dart';
+import 'calendar_event.dart';
+import 'article.dart';
+import 'config.dart' as config;
+
+/// Top bar
+var appBar = AppBar(
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset(
+                  'res/topLogo.png',
+                  width: 75,
+                  height: 75,
+                  color: Colors.black
+              ),
+              const Text(
+                  config.Strings.DrawTitle,
+                  style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Futura', fontWeight: FontWeight.bold)
+              ),
+              const SizedBox(width: 75)
+            ]
+        )
+      );
+
+/// Create a [Card] widget from an [Article]
+/// Expand to a [TextPage]
+Widget build_card(Article article, var action) {
+  /*
+  final img = article.img.isEmpty ? null
+      : FadeInImage(
+          placeholder: AssetImage('res/topLogo.png'),
+          image: NetworkImage(article.img),
+          alignment: Alignment.centerLeft,
+          excludeFromSemantics: true
+      );
+      */
+  return Card(
+      child: ListTile(
+          title: Text(article.title, style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
+          // leading: SizedBox(width: 80, height: 80, child: img),
+          trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
+          onTap: () { action(article); }
+      ));
+}

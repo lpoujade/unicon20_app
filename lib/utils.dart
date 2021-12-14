@@ -46,22 +46,3 @@ String clean_ics_text_fields(String text) {
       .replaceAll('\\N', '\\n');
   return result;
 }
-
-class ResultWrapper<T> {
-  ResultWrapper.success(this.data) : failure = null;
-  ResultWrapper.failure(this.failure) : data = null;
-
-  T? data;
-  Failure? failure;
-
-  ResultWrapper()
-      :data = null, failure = null;
-
-  bool get dataExists  => data != null;
-  bool get failed => failure == null;
-}
-
-class Failure {
-  final String message;
-  Failure({required this.message});
-}

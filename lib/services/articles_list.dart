@@ -1,51 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'api.dart' as api;
-import 'db.dart' as db;
-
-
-/// Article infos
-class Article {
-  final int id;
-  final String title;
-  final String content;
-  final String img;
-  final bool important = false;
-  bool read = false;
-  late final DateTime date;
-
-  Article(
-      {required this.id,
-      required this.title,
-      required this.content,
-      required this.img,
-      required this.date,
-      required this.read});
-
-  Map<String, dynamic> toSqlMap() {
-    return {
-      'id': id,
-      'title': title,
-      'content': content,
-      'img': img,
-      'date': date.millisecondsSinceEpoch,
-      'read': (read ? 1 : 0)
-    };
-  }
-
-  @override
-  String toString() {
-    return "Article('$id', '$title')";
-  }
-}
+import '../data/article.dart';
+import '../tools/api.dart' as api;
+import '../tools/db.dart' as db;
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
 class ArticleList {
   late Database _db;
   String? _lang;
-  bool _waiting_network = false;
 
   final network_error = ValueNotifier<bool>(false);
   final articles = ValueNotifier<List<Article>>([]);
@@ -54,13 +18,13 @@ class ArticleList {
     _db = db;
   }
 
-  /// Update lang trigger a clear/download
+  // Read current language from db
   init_lang() async {
     _lang = await db.get_locale(_db);
   }
 
-  get waiting_network { return _waiting_network; }
-
+  /// Update language
+  /// Trigger a delete/download of all articles
   updateLang(l) async {
     // print("update lang to '$l'");
     _lang = l;
@@ -74,6 +38,7 @@ class ArticleList {
 
   /// Read articles from db then from wordpress
   get_articles() async {
+    // await _db.delete('article'); // TODO REMOVE
     await get_from_db().then((local_articles) {
       articles.value += local_articles;
     });
@@ -90,21 +55,19 @@ class ArticleList {
     if (_lang == null) await init_lang();
     List<Article> wp_articles = [];
     try {
-      _waiting_network = true;
       wp_articles = await api.get_posts_from_wp(since: await db.get_last_sync_date(_db), lang: _lang);
       await save_articles(wp_articles);
       articles.value += wp_articles;
       network_error.value = false;
     } catch (err) {
       network_error.value = true;
-    } finally {
-      _waiting_network = false;
     }
     return wp_articles;
   }
 
   /// Insert a list of [Article] using [Batch]
   save_articles(List<Article> articles) async {
+    // save_categories(articles)
     var batch = _db.batch();
     for (var a in articles) batch.insert('article', a.toSqlMap());
     try {
@@ -144,7 +107,8 @@ class ArticleList {
           content: a['content'].toString(),
           img: a['img'].toString(),
           date: DateTime.fromMillisecondsSinceEpoch(date),
-          read: (a['read'] == 1));
+          read: (a['read'] == 1),
+          categories: []);
     }).toList();
   }
 }

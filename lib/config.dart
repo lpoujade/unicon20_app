@@ -58,6 +58,18 @@ const Map<String, Map<String, dynamic>> calendars = {
   }
 };
 
+/// Locales used in wordpress translation
+/// first is locale, second country code
+const supported_locales = [
+  ['en', 'US'],
+  ['fr', 'FR'],
+  ['de', 'DE'],
+  ['ja', 'JP'],
+  ['ko', 'KR'],
+  ['es', 'ES'],
+  ['it', 'IT']
+];
+
 const notif_titles_separator = ' | ';
 const calendar_utc_offset = {'hour': 1, 'minute': 0};
 const event_year = 2022;

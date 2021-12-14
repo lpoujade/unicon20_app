@@ -37,32 +37,4 @@ class Notifications {
         0, title, text, platformChannelSpecifics,
         payload: payload);
   }
-
-/* TODO ios
-Future onDidReceiveLocalNotification(
-    int id, String? title, String? body, String? payload) async {
-  // display a dialog with the notification details, tap ok to go to another page
-  showDialog(
-    context: null,
-    builder: (BuildContext context) => CupertinoAlertDialog(
-      title: Text(title.toString()),
-      content: Text(body.toString()),
-      actions: [
-        CupertinoDialogAction(
-          isDefaultAction: true,
-          child: Text('Ok'),
-          onPressed: () async {
-            Navigator.of(context, rootNavigator: true).pop();
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MyApp(),
-              ),
-            );
-          },
-        )
-      ],
-    ),
-  );
-*/
 }
