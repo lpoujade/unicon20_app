@@ -2,6 +2,7 @@ import 'abstract.dart';
 
 /// Article data & serializations functions
 class Article extends AData  {
+  @override
   final int id;
   final String title;
   final String content;
@@ -21,6 +22,7 @@ class Article extends AData  {
       required this.categories})
       : super(db_id_field: 'id');
 
+  @override
   Map<String, dynamic> toSqlMap() {
     return {
       'id': id,

@@ -25,9 +25,9 @@ class Notifications {
   /// payload is only used to pass data to the notification
   /// tap handler
   Future<void> show(String title, String? text, String? payload) async {
-    // TODO channel ?
+    // TODO channel to conf
     const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'news', 'News', 'Notifications about new articles',
+        'unicon_news', 'Unicon News', 'Notifications about UNICON20',
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker');

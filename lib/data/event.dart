@@ -21,7 +21,7 @@ class CalendarEvent extends AData {
     required this.type,
     required this.description,
     required this.summary
-  });
+  }) : super(db_id_field:'uid');
 
   CalendarEvent.from(CalendarEvent e)
       : uid = e.uid,
@@ -31,7 +31,8 @@ class CalendarEvent extends AData {
       location = e.location,
       type = e.type,
       description = e.description,
-      summary = e.summary;
+      summary = e.summary,
+      super(db_id_field: 'uid');
 
   CalendarEvent.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
@@ -41,10 +42,13 @@ class CalendarEvent extends AData {
       location = clean_ics_text_fields(json['LOCATION']),
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
-      summary = clean_ics_text_fields(json['SUMMARY']);
+      summary = clean_ics_text_fields(json['SUMMARY']),
+      super(db_id_field: 'uid');
 
-  get id return uid;
+  @override
+  get id { return uid; }
 
+  @override
   Map<String, dynamic> toSqlMap() {
     return {
       'uid': uid,

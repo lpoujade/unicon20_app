@@ -1,57 +1,47 @@
 import 'dart:developer';
-import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/event.dart';
 import '../tools/api.dart' as api;
+import '../tools/list.dart';
 import 'database.dart';
 
 /// Hold a [CalendarEvent] list, a connection
 /// to [Database] and functions to read from
 /// an ICS URL
-class EventList {
-  late DBInstance _db;
-  final events = ValueNotifier<List<CalendarEvent>>([]);
-
-  EventList({required db}) { _db = db; }
+class EventList extends ItemList {
+  EventList({required DBInstance db}): super(db: db, db_table: 'events');
 
   /// Get events from db and from ics calendar
-  get_events() async {
+  @override
+  fill() async {
     var local_events = await get_events_from_db();
-    events.value += local_events;
-    if (events.value.isEmpty) {
+    items.value += local_events;
+    if (items.value.isEmpty) {
       await get_events_from_ics();
     }
   }
 
   /// Clear and refresh events from db & ics
+  @override
   refresh() async {
-    events.value = [];
-    get_events();
+    get_events_from_ics();
   }
 
   /// Download new events
   get_events_from_ics() {
      api.get_events_from_ics()
-     .then((new_event) {
-      events.value += new_event;
-      new_event.forEach(save_event);
+       .then((new_events) {
+         save_list(new_events);
     }).catchError((error) {
-      log('error while downloading new articles: $error');
+      log('error while downloading events: $error');
     });
-  }
-
-  /// Save a new [CalendarEvent]
-  save_event(CalendarEvent event) async {
-    Database db = await _db.db;
-    db.insert('events', event.toSqlMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   /// Read events from db
   Future<List<CalendarEvent>> get_events_from_db() async {
-    Database db = await _db.db;
-    var raw_events = await db.query('events');
+    Database dbi = await db.db;
+    var raw_events = await dbi.query('events');
 
     return raw_events.map((e) {
       dynamic start = e['start'];

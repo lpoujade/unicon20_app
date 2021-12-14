@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
     initState() {
       super.initState();
-      widget.events.get_events();
+      widget.events.fill();
       initBackgroundService(widget.background_task)
         .then((e) => BackgroundFetch.start());
     }
@@ -98,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       if (widget.articles.lang != cur_lang) {
         widget.articles.update_lang(cur_lang);
       }
-      else if (widget.articles.articles.value.isEmpty) {
-        widget.articles.get_articles();
+      else if (widget.articles.items.value.isEmpty) {
+        widget.articles.fill();
       }
       super.didChangeDependencies();
     }

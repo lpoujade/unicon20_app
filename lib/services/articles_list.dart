@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:unicon/tools/list.dart';
@@ -14,13 +12,11 @@ class ArticleList extends ItemList {
   String? _lang;
 
   final network_error = ValueNotifier<bool>(false);
-  final articles = ValueNotifier<List<Article>>([]);
 
   ArticleList({required DBInstance db})
-    : super(db: db, db_table: 'article') {
-  }
+    : super(db: db, db_table: 'article');
 
-  // Read current language from db
+  /// Read current language from db
   init_lang() async {
     _lang = await db.get_locale();
   }
@@ -31,22 +27,24 @@ class ArticleList extends ItemList {
     // print("update lang to '$l'");
     _lang = l;
     await db.save_locale(l);
-    articles.value = [];
+    items.value = [];
     Database dbi = await db.db;
     await dbi.delete('article');
-    await get_articles();
+    await fill();
   }
 
   get lang { return _lang; }
 
   /// Read articles from db then from wordpress
-  get_articles() async {
+  @override
+  fill() async {
     var local_articles = await get_from_db();
-    articles.value = local_articles;
+    items.value = local_articles;
     _get_articles_from_wp();
   }
 
   /// Get new articles from wordpress
+  @override
   Future<List<Article>> refresh() async {
     return await _get_articles_from_wp();
   }
@@ -61,47 +59,13 @@ class ArticleList extends ItemList {
           since: await db.get_last_sync_date(),
           lang: _lang
       );
-      await save_articles(wp_articles);
-      articles.value += wp_articles;
+      await save_list(wp_articles);
+      items.value += wp_articles;
       network_error.value = false;
     } catch (err) {
       network_error.value = true;
     }
     return wp_articles;
-  }
-
-  /// Insert a list of [Article] using [Batch]
-  save_articles(List<Article> articles) async {
-    // save_categories(articles)
-    Database dbi = await db.db;
-    var batch = dbi.batch();
-    for (var a in articles) batch.insert('article', a.toSqlMap());
-    try {
-      batch.commit(noResult: true);
-    } catch (e) {
-      // print("failed to insert some articles from '$articles': '$e'");
-    }
-  }
-
-  /*
-  /// Insert a new article in db
-  save_article(Article article) async {
-    try {
-      Database db = await _db.db;
-      await db.insert('article', article.toSqlMap(),
-          conflictAlgorithm: ConflictAlgorithm.fail);
-      articles.value = articles.value + [article];
-    } catch (e) {
-      log("failed to save article '$article': '$e'");
-    }
-  }
-    */
-
-  /// Update an existing article
-  update_article(Article article) async {
-    Database dbi = await db.db;
-    dbi.update('article', article.toSqlMap(),
-        where: 'id = ?', whereArgs: [article.id]);
   }
 
   /// Read articles from db

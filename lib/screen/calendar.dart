@@ -12,9 +12,9 @@ import '../tools/utils.dart';
 import '../config.dart' as config;
 
 /// Calendar page
-ValueListenableBuilder<List<CalendarEvent>> calendar_page(EventList events) {
-  return ValueListenableBuilder<List<CalendarEvent>>(
-      valueListenable: events.events,
+ValueListenableBuilder<List<dynamic>> calendar_page(EventList events) {
+  return ValueListenableBuilder(
+      valueListenable: events.items,
       builder: (context, events, Widget? unused_child) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();

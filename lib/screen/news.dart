@@ -4,8 +4,8 @@ import '../services/articles_list.dart';
 import '../data/article.dart';
 
 /// News page (first app screen)
-ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
-  return ValueListenableBuilder(valueListenable: home_articles.articles,
+ValueListenableBuilder<List<dynamic>> news_page(ArticleList home_articles, var clicked_card_callback) {
+  return ValueListenableBuilder(valueListenable: home_articles.items,
       builder: (context, articles, Widget? _child) {
         Widget child = ListView();
         if (articles.isNotEmpty) {
@@ -16,7 +16,7 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
               articles.map((e) => build_card(e, (article) {
                 if (!article.read) {
                   article.read = true;
-                  home_articles.update_article(article);
+                  home_articles.update_item(article);
                 }
                 clicked_card_callback(article);
               })).toList());

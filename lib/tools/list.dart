@@ -25,12 +25,24 @@ abstract class ItemList<T extends AData> {
     }
   }
 
-  update_item(id, T item) async {
+  save_list(List<T> item_list) async {
     Database dbi = await db.db;
-    dbi.update(db_table, item.toSqlMap(),
-        where: '${item.db_id_field} = ?', whereArgs: [id]);
+    var batch = dbi.batch();
+    for (var a in item_list) batch.insert(db_table, a.toSqlMap());
+    try {
+      batch.commit(noResult: true);
+    } catch (e) {
+      print("failed to insert into '$db_table' from '$item_list': '$e'");
+    }
   }
 
+  update_item(T item) async {
+    Database dbi = await db.db;
+    dbi.update(db_table, item.toSqlMap(),
+        where: '${item.db_id_field} = ?', whereArgs: [item.id]);
+  }
+
+/*
    _get_from_db() async {
     Database dbi = await db.db;
     var raw_items = await dbi.query(db_table);
@@ -39,4 +51,5 @@ abstract class ItemList<T extends AData> {
       (i) => T.from_db(i)
     ));
     }
+    */
 }

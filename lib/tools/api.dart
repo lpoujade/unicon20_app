@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'dart:convert' show json;
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
