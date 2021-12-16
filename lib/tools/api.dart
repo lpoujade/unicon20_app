@@ -6,7 +6,7 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../data/article.dart' show Article;
-import '../data/event.dart' show CalendarEvent;
+import '../data/event.dart' show Event;
 import '../config.dart' as config;
 
 /// get posts from wordpress API
@@ -76,9 +76,9 @@ Future<List<Article>> get_posts_from_wp(
 }
 
 /// Download calendar from an ICS URL and parse it into
-/// [CalendarEvent] array
-Future<List<CalendarEvent>> get_events_from_ics() async {
-  List<CalendarEvent> event_list = [];
+/// [Event] array
+Future<List<Event>> get_events_from_ics() async {
+  List<Event> event_list = [];
 
   for (String cal in config.calendars.keys) {
     print("http GET '$cal': '${config.calendars[cal]}");
@@ -88,7 +88,7 @@ Future<List<CalendarEvent>> get_events_from_ics() async {
       var json = ICal.toJson(raw_ical);
       var json_events = json['VEVENT'];
       for (var event in json_events) {
-        var e = CalendarEvent.fromICalJson(event, cal);
+        var e = Event.fromICalJson(event, cal);
         event_list.add(e);
       }
     } catch(err) {

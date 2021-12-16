@@ -11,23 +11,27 @@ abstract class ItemList<T extends AData> {
 
   ItemList({required this.db, required this.db_table});
 
-  fill();
-  refresh();
+  /// Populate items list from db and from network source
+  Future<void> fill();
 
+  /// Fetch new items from network source
+  Future<List<T>> refresh();
+
+  /// Save an item to local database & to current list
   save_item(T item) async {
     try {
-      Database dbi = await db.db;
-      await dbi.insert(db_table, item.toSqlMap(),
+      await (await db.db).insert(db_table, item.toSqlMap(),
           conflictAlgorithm: ConflictAlgorithm.fail);
-      items.value.add(item);
+      items.value += [item];
     } catch (e) {
       log("failed to save article '$item': '$e'");
     }
   }
 
+  /// Save a list of item to local database & to current list
   save_list(List<T> item_list) async {
-    Database dbi = await db.db;
-    var batch = dbi.batch();
+    items.value += item_list;
+    var batch = (await db.db).batch();
     for (var a in item_list) batch.insert(db_table, a.toSqlMap());
     try {
       batch.commit(noResult: true);
@@ -36,20 +40,14 @@ abstract class ItemList<T extends AData> {
     }
   }
 
+  /// Update an item in local database
   update_item(T item) async {
-    Database dbi = await db.db;
-    dbi.update(db_table, item.toSqlMap(),
+    (await db.db).update(db_table, item.toSqlMap(),
         where: '${item.db_id_field} = ?', whereArgs: [item.id]);
   }
 
-/*
-   _get_from_db() async {
-    Database dbi = await db.db;
-    var raw_items = await dbi.query(db_table);
-
-    items.value.addAll(raw_items.map(
-      (i) => T.from_db(i)
-    ));
-    }
-    */
+  /// Read items from local database
+  Future<List<Map<String, Object?>>> get_from_db() async {
+    return (await db.db).query(db_table);
+  }
 }

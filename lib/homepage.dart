@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -38,7 +40,8 @@ class MyHomePage extends StatefulWidget {
         payload = '';
       } else if (new_articles.length == 1) {
         payload = new_articles.first.id.toString();
-        text = HtmlUnescape().convert(new_articles.first.content.substring(0, 100));
+        text = HtmlUnescape().convert(new_articles.first.content.substring(0,
+              min(100, new_articles.first.content.length)));
       }
       notifier.show(new_articles.first.title, text, payload);
     }

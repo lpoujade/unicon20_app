@@ -8,7 +8,7 @@ import 'database.dart';
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
-class ArticleList extends ItemList {
+class ArticleList extends ItemList<Article> {
   String? _lang;
 
   final network_error = ValueNotifier<bool>(false);
@@ -28,62 +28,48 @@ class ArticleList extends ItemList {
     _lang = l;
     await db.save_locale(l);
     items.value = [];
-    Database dbi = await db.db;
-    await dbi.delete('article');
-    await fill();
+    (await db.db).delete('article');
+    fill();
   }
 
   get lang { return _lang; }
 
   /// Read articles from db then from wordpress
   @override
-  fill() async {
-    var local_articles = await get_from_db();
-    items.value = local_articles;
-    _get_articles_from_wp();
-  }
+    fill() async {
+    print("fill articles");
+      var raw_articles = await super.get_from_db(); 
+      items.value = raw_articles.map((a) {
+            dynamic date = a['date'];
+            dynamic id = a['id'];
+            return Article(
+                id: id,
+                title: a['title'].toString(),
+                content: a['content'].toString(),
+                img: a['img'].toString(),
+                date: DateTime.fromMillisecondsSinceEpoch(date),
+                read: (a['read'] == 1),
+                categories: []);
+            }).toList();
+      refresh();
+    }
 
   /// Get new articles from wordpress
   @override
-  Future<List<Article>> refresh() async {
-    return await _get_articles_from_wp();
-  }
-
-  /// Download and save new articles
-  Future<List<Article>> _get_articles_from_wp() async {
-    if (_lang == null) await init_lang();
-    List<Article> wp_articles = [];
-    try {
-      print('get_posts_from_wp');
-      wp_articles = await api.get_posts_from_wp(
-          since: await db.get_last_sync_date(),
-          lang: _lang
-      );
-      await save_list(wp_articles);
-      items.value += wp_articles;
-      network_error.value = false;
-    } catch (err) {
-      network_error.value = true;
+    Future<List<Article>> refresh() async {
+      if (_lang == null) await init_lang();
+      List<Article> wp_articles = [];
+      try {
+        print('get_posts_from_wp');
+        wp_articles = await api.get_posts_from_wp(
+            since: await db.get_last_sync_date(),
+            lang: _lang
+            );
+        await save_list(wp_articles);
+        network_error.value = false;
+      } catch (err) {
+        network_error.value = true;
+      }
+      return wp_articles;
     }
-    return wp_articles;
-  }
-
-  /// Read articles from db
-  Future<List<Article>> get_from_db() async {
-    Database dbi = await db.db;
-    var raw_articles = await dbi.query('article');
-
-    return raw_articles.map((a) {
-      dynamic date = a['date'];
-      dynamic id = a['id'];
-      return Article(
-          id: id,
-          title: a['title'].toString(),
-          content: a['content'].toString(),
-          img: a['img'].toString(),
-          date: DateTime.fromMillisecondsSinceEpoch(date),
-          read: (a['read'] == 1),
-          categories: []);
-    }).toList();
-  }
 }

@@ -12,18 +12,18 @@ import '../tools/utils.dart';
 import '../config.dart' as config;
 
 /// Calendar page
-ValueListenableBuilder<List<dynamic>> calendar_page(EventList events) {
+ValueListenableBuilder<List<Event>> calendar_page(EventList events) {
   return ValueListenableBuilder(
       valueListenable: events.items,
       builder: (context, events, Widget? unused_child) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();
         }
-        List<CalendarEvent> fitted_events = [];
+        List<Event> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
         for (var e in events) {
-          CalendarEvent tmp = CalendarEvent.from(e);
+          Event tmp = Event.from(e);
           tmp.start = fit_date_to_cal(e.start);
           tmp.end = fit_date_to_cal(e.end);
           var day = DateTime(tmp.start.year, tmp.start.month, tmp.start.day);
@@ -63,7 +63,7 @@ ValueListenableBuilder<List<dynamic>> calendar_page(EventList events) {
   );
 }
 
-/// Create a [FlutterWeekViewEvent] from a [CalendarEvent]
+/// Create a [FlutterWeekViewEvent] from a [Event]
 FlutterWeekViewEvent get_wkview_event(context, calendar_event) {
   return FlutterWeekViewEvent(
       eventTextBuilder: (event, context, dayView, h, w) {
@@ -88,8 +88,8 @@ FlutterWeekViewEvent get_wkview_event(context, calendar_event) {
   );
 }
 
-/// Create and open an [Alert] popup to show [CalendarEvent] info
-void show_event_popup(CalendarEvent event, BuildContext context) {
+/// Create and open an [Alert] popup to show [Event] info
+void show_event_popup(Event event, BuildContext context) {
   List<DialogButton> buttons = [];
   if (event.location.isNotEmpty && event.location != 'TBD') { // TODO remove once calendar fixed
     buttons.add(

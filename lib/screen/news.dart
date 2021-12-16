@@ -4,7 +4,7 @@ import '../services/articles_list.dart';
 import '../data/article.dart';
 
 /// News page (first app screen)
-ValueListenableBuilder<List<dynamic>> news_page(ArticleList home_articles, var clicked_card_callback) {
+ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.items,
       builder: (context, articles, Widget? _child) {
         Widget child = ListView();

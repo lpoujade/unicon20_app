@@ -2,7 +2,7 @@ import '../tools/utils.dart';
 import 'abstract.dart';
 
 /// Event data
-class CalendarEvent extends AData {
+class Event extends AData {
   final String uid;
   final String title;
   DateTime start;
@@ -12,7 +12,7 @@ class CalendarEvent extends AData {
   final String description;
   final String summary;
 
-  CalendarEvent({
+  Event({
     required this.uid,
     required this.title,
     required this.start,
@@ -23,7 +23,7 @@ class CalendarEvent extends AData {
     required this.summary
   }) : super(db_id_field:'uid');
 
-  CalendarEvent.from(CalendarEvent e)
+  Event.from(Event e)
       : uid = e.uid,
       title = e.title,
       start = e.start,
@@ -34,7 +34,7 @@ class CalendarEvent extends AData {
       summary = e.summary,
       super(db_id_field: 'uid');
 
-  CalendarEvent.fromICalJson(json, String calendar)
+  Event.fromICalJson(json, String calendar)
       : uid = json['UID'].toString(),
       title = clean_ics_text_fields(json['SUMMARY']),
       start = DateTime.parse(json['DTSTART']).toLocal(),
