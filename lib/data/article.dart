@@ -1,3 +1,5 @@
+import 'package:unicon/services/categories_list.dart';
+
 import 'abstract.dart';
 
 /// Article data & serializations functions
@@ -10,7 +12,8 @@ class Article extends AData  {
   final bool important = false;
   bool read = false;
   late final DateTime date;
-  late final List<String> categories;
+  // late final List<String> categories;
+  late final CategoriesList categories;
 
   Article(
       {required this.id,
@@ -36,6 +39,6 @@ class Article extends AData  {
 
   @override
   String toString() {
-    return "Article('$id', '$title')";
+    return "Article('$id', '$title', '$categories')";
   }
 }

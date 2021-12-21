@@ -13,8 +13,8 @@ const init_sql = [
 // key is the target version
 const migrations = {
 	2: [
-       'create table categories (id integer primary key, title text)',
-     'create table articles_categories (category references categories(id), article references article(id))'
+       'create table categories (id integer primary key, slug text, name slug)',
+     'create table articles_categories (article references article(id), category references categories(id), unique(category, article) on conflict ignore)'
   ]
 };
 
@@ -23,16 +23,12 @@ class DBInstance {
 	static const db_name = 'unicon_db.db';
 	static const db_version = 2;
 
-	static bool exist = false;
+  static int instance_count = 0;
 
   Database? _db;
 
 	DBInstance() {
-		if (exist) {
-			print("ERROR database already instanciated");
-			// throw(Exception("database initialized twice"));
-		}
-		exist = true;
+    instance_count++;
 	}
 
 	get db async {

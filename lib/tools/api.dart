@@ -7,6 +7,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../data/article.dart' show Article;
 import '../data/event.dart' show Event;
+import '../data/category.dart';
+import '../services/categories_list.dart';
+import '../services/database.dart';
 import '../config.dart' as config;
 
 /// get posts from wordpress API
@@ -54,12 +57,15 @@ Future<List<Article>> get_posts_from_wp(
         ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['thumbnail']['source_url']
         : '';
 
-    List<String> categories = [];
-    print('categories for ${p['title']['rendered']}');
-    for (List category in p['_embedded']['wp:term']) {
-      if (category.isEmpty) continue;
-      categories.add(category[0]['slug']);
-      print('added ${category[0]['slug']}');
+    // TODO db multiple instance ?
+    var categories = CategoriesList(db: DBInstance(), parent_id: p['id']);
+    for (var category in p['_embedded']['wp:term'][0]) {
+        var cat = Category(
+            id: category['id'],
+            slug: category['slug'],
+            name: category['name']
+            );
+        categories.items.value.add(cat);
     }
     articles.add(Article(
             id: p['id'],

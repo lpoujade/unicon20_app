@@ -39,9 +39,11 @@ Widget build_card(Article article, var action) {
           excludeFromSemantics: true
       );
       */
+  var cat_name = article.categories.get_first()?.name;
   return Card(
       child: ListTile(
           title: Text(article.title, style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
+          subtitle: cat_name != null ? Text(cat_name) : null,
           // leading: SizedBox(width: 80, height: 80, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }

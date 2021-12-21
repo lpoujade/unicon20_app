@@ -14,8 +14,8 @@ abstract class ItemList<T extends AData> {
   /// Populate items list from db and from network source
   Future<void> fill();
 
-  /// Fetch new items from network source
-  Future<List<T>> refresh();
+  // Fetch new items from network source
+  // Future<List<T>> refresh();
 
   /// Save an item to local database & to current list
   save_item(T item) async {
@@ -28,15 +28,14 @@ abstract class ItemList<T extends AData> {
     }
   }
 
-  /// Save a list of item to local database & to current list
-  save_list(List<T> item_list) async {
-    items.value += item_list;
+  /// Save the current items list to database
+  save_list() async {
     var batch = (await db.db).batch();
-    for (var a in item_list) batch.insert(db_table, a.toSqlMap());
+    for (var a in items.value) batch.insert(db_table, a.toSqlMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     try {
       batch.commit(noResult: true);
     } catch (e) {
-      print("failed to insert into '$db_table' from '$item_list': '$e'");
+      print("failed to insert into '$db_table' from '${items.value}': '$e'");
     }
   }
 

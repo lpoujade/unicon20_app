@@ -70,6 +70,13 @@ const supported_locales = [
   ['it', 'IT']
 ];
 
-const notif_titles_separator = ' | ';
 const calendar_utc_offset = {'hour': 1, 'minute': 0};
 const event_year = 2022;
+
+const default_notif_channel_slug = 'unicon20';
+const default_notif_channel_name = 'UNICON20';
+
+const categories_weight = {
+  'important': 10,
+  'information': 5
+};

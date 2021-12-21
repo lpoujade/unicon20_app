@@ -36,10 +36,9 @@ class EventList extends ItemList<Event> {
   }
 
   /// Download [Events] from ICS URLs
-  @override
+  // @override
   refresh() async {
-    var ev = await api.get_events_from_ics();
-    save_list(ev);
-    return ev;
+    items.value += await api.get_events_from_ics();
+    save_list();
   }
 }

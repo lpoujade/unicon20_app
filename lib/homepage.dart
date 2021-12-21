@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'dart:math';
 
 import 'services/articles_list.dart';
 import 'services/database.dart';
@@ -21,7 +20,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key}) : super(key: key);
 
   final db = DBInstance();
-  final notifier = Notifications();
+  late final notifier = Notifications();
 
   late final articles = ArticleList(db: db);
   late final events = EventList(db: db);
@@ -31,19 +30,15 @@ class MyHomePage extends StatefulWidget {
 
   background_task() async {
     var new_articles = await articles.refresh();
-    if (new_articles.isNotEmpty) {
-      var articles_titles = new_articles.map((a) => a.title);
-      String payload = '';
-      String text = '';
-      if (new_articles.length > 1) {
-        text = articles_titles.toList().sublist(1).join(config.notif_titles_separator);
-        payload = '';
-      } else if (new_articles.length == 1) {
-        payload = new_articles.first.id.toString();
-        text = HtmlUnescape().convert(new_articles.first.content.substring(0,
-              min(100, new_articles.first.content.length)));
-      }
-      notifier.show(new_articles.first.title, text, payload);
+    for (var article in new_articles) {
+      notifier.show(
+          article.title,
+          HtmlUnescape().convert(article.content.substring(0,
+              min(100, article.content.length))),
+          '${article.id}',
+          article.categories.get_first()?.slug,
+          article.categories.get_first()?.name
+          );
     }
   }
 }

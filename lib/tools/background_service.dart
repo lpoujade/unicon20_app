@@ -29,20 +29,6 @@ Future<void> initBackgroundService(callback) async {
         log("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
         BackgroundFetch.finish(taskId);
   });
-  /*
-  BackgroundFetch.registerHeadlessTask((HeadlessTask task) async {
-      String taskId = task.taskId;
-      bool isTimeout = task.timeout;
-      if (isTimeout) {
-        print("[BackgroundFetch] Headless task timed-out: $taskId");
-        BackgroundFetch.finish(taskId);
-        return;
-      }
-      print("headless background task fired");
-      callback();
-      BackgroundFetch.finish(taskId);
-  });
-  */
 }
 
 

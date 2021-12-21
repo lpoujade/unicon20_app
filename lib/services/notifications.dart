@@ -1,14 +1,17 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../config.dart' as config;
 
 /// Wrapper for [FlutterLocalNotificationsPlugin]
 class Notifications {
   final notifier = FlutterLocalNotificationsPlugin();
 
-  Notifications();
+  Notifications({Future<dynamic> Function(String?)? callback}) {
+    initialize(callback);
+  }
 
   /// Initialize plugin and attach callback to handle
   /// notifications tap
-  initialize(Future<dynamic> Function(String?) notif_callback) async {
+  initialize(Future<dynamic> Function(String?)? notif_callback) async {
     // app_icon from android/app/src/main/res/drawable
     const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
     const initializationSettingsIOS = IOSInitializationSettings();
@@ -24,15 +27,14 @@ class Notifications {
   /// Show notification
   /// payload is only used to pass data to the notification
   /// tap handler
-  Future<void> show(String title, String? text, String? payload) async {
-    // TODO channel = category
-    // TODO channel to conf
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'unicon_news', 'Unicon News', 'Notifications about UNICON20',
+  Future<void> show(String title, String text, String payload, String? channel_slug, String? channel_name) async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        channel_slug ?? config.default_notif_channel_slug,
+        channel_name ?? config.default_notif_channel_name,
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker');
-    const platformChannelSpecifics = NotificationDetails(
+    var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics);
     print("notif: $title $text $payload");
     await notifier.show(
