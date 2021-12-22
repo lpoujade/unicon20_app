@@ -29,6 +29,8 @@ class DBInstance {
 
 	DBInstance() {
     instance_count++;
+    print("database instance count: $instance_count");
+    log("database instance count: $instance_count");
 	}
 
 	get db async {
@@ -40,6 +42,10 @@ class DBInstance {
 		if (_db == null)
 			await _init_database();
 	}
+
+  close() {
+    if (_db != null) _db!.close();
+  }
 
 	/// Read date of the most recent article in local database,
 	/// if any

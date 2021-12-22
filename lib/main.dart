@@ -1,11 +1,12 @@
 import 'package:background_fetch/background_fetch.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'config.dart' as config;
 import 'homepage.dart';
 import 'tools/headless_background_service.dart';
+
+// DBInstance db_instance;
 
 /// Launching of the programme.
 main() async {

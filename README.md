@@ -12,9 +12,8 @@ Then run `flutter run --dart-define=WP_HOST=<http(s)://ip:port>`, or use your ID
 ## Configuration
 for the moment in `lib/config.dart`  
 
+* `wordpress_host` is the Wordpress URL (can be overriden via env var `WP_HOST` to ease development)
+* `api_path` API path for Wordpress, may need to change between WP versions/activated plugins
 * `AppColors` defines colors used for general components (eg top/bottom bars)
-* `api_host` is the Wordpress URL (can be overriden via env var `WP_HOST` to ease development)
-* `api_path` API path for Wordpress, may need to change between WP versions
 * `calendars` ICS URLs to fetch events; events will be shown using `color` (depending of calendar)
-* `notif_titles_separator` string used to separate titles in notifications (rarely used if articles comes one by one)
 * `calendar_utc_offset` UTC offset of timezone where events take place

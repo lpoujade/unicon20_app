@@ -21,7 +21,7 @@ dependencies:
   flutter_local_notifications:
   rflutter_alert:
   url_launcher:
-  auto_size_text: 3.0.0-nullsafety.0
+  auto_size_text: ^3.0.0
 
   fluttertoast:
   http_retry:
@@ -31,6 +31,7 @@ dependencies:
   flutter_week_view: ^1.1.0
 
 dev_dependencies:
+  dartdoc: ^4.1.0
   flutter_launcher_icons: ^0.9.2
   flutter_test:
     sdk: flutter

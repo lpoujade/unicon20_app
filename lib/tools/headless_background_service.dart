@@ -32,6 +32,6 @@ headless_task(HeadlessTask task) async {
         article.categories.get_first()?.name
         );
   }
-
+  db.close();
   BackgroundFetch.finish(taskId);
 }

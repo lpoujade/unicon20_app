@@ -70,12 +70,18 @@ const supported_locales = [
   ['it', 'IT']
 ];
 
+/// UTC offset of timezone where events take place
 const calendar_utc_offset = {'hour': 1, 'minute': 0};
+
+/// Show year for events after this year
 const event_year = 2022;
 
+/// Notifications channel for Android if post category doesn't match with those configured under
 const default_notif_channel_slug = 'unicon20';
 const default_notif_channel_name = 'UNICON20';
 
+/// Categories and priority
+/// Only top priority category will be shown for each articles
 const categories_weight = {
   'important': 10,
   'information': 5
