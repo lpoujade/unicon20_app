@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../services/articles_list.dart';
 import '../data/article.dart';
+import '../services/articles_list.dart';
 
 /// News page (first app screen)
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
@@ -14,8 +14,8 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
           articles.sort((a, b) => b.date.compareTo(a.date));
           child = ListView(children:
               articles.map((e) => build_card(e, (article) {
-                if (!article.read) {
-                  article.read = true;
+                if (article.read != 1) {
+                  article.read = 1;
                   home_articles.update_item(article);
                 }
                 clicked_card_callback(article);
@@ -42,7 +42,7 @@ Widget build_card(Article article, var action) {
   var cat_name = article.categories.get_first()?.name;
   return Card(
       child: ListTile(
-          title: Text(article.title, style: TextStyle(color: (article.read ? Colors.grey : Colors.black))),
+          title: Text(article.title, style: TextStyle(color: (article.read == 1 ? Colors.grey : Colors.black))),
           subtitle: cat_name != null ? Text(cat_name) : null,
           // leading: SizedBox(width: 80, height: 80, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
