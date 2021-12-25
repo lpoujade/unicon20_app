@@ -1,16 +1,17 @@
 import 'dart:convert' show json;
+
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
 import 'package:ical_parser/ical_parser.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
+import '../config.dart' as config;
 import '../data/article.dart' show Article;
-import '../data/event.dart' show Event;
 import '../data/category.dart';
+import '../data/event.dart' show Event;
 import '../services/categories_list.dart';
 import '../services/database.dart';
-import '../config.dart' as config;
 
 /// get posts from wordpress API
 ///
@@ -22,7 +23,7 @@ Future<List<Article>> get_posts_from_wp(
   var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
   var path = config.wordpress_host + _lang + config.api_path + '/posts';
   var filters = ['_embed'];
-  if (since != null) filters.add('after=' + since.toIso8601String());
+  if (since != null) filters.add('modified_after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
@@ -73,7 +74,7 @@ Future<List<Article>> get_posts_from_wp(
             content: p['content']['rendered'],
             img: img,
             date: DateTime.parse(p['date']),
-            read: false,
+            read: 0,
             categories: categories)
     );
   }

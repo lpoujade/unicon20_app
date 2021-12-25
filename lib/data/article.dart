@@ -1,19 +1,21 @@
 import 'package:unicon/services/categories_list.dart';
+import 'package:unicon/services/database.dart';
 
 import 'abstract.dart';
 
 /// Article data & serializations functions
 class Article extends AData  {
+
   @override
   final int id;
-  final String title;
-  final String content;
-  final String img;
-  final bool important = false;
-  bool read = false;
-  late final DateTime date;
-  // late final List<String> categories;
-  late final CategoriesList categories;
+
+  String title;
+  String content;
+  String img;
+  int read = 0;
+  int important = 0;
+  DateTime date;
+  CategoriesList categories;
 
   Article(
       {required this.id,
@@ -33,8 +35,22 @@ class Article extends AData  {
       'content': content,
       'img': img,
       'date': date.millisecondsSinceEpoch,
-      'read': (read ? 1 : 0)
+      'read': read
     };
+  }
+
+  static Future<Article> to_article(DBInstance db, Map<String, dynamic> data) async {
+    var categories = CategoriesList(db: db, parent_id: data['id']);
+    await categories.fill();
+    return Article(
+        id: data['id'],
+        title: data['title'],
+        content: data['content'],
+        img: data['img'],
+        date : DateTime.fromMillisecondsSinceEpoch(data['date'] as int),
+        read: data['read'],
+        categories: categories
+    );
   }
 
   @override
