@@ -53,6 +53,10 @@ class Article extends AData  {
     );
   }
 
+  bool is_important() {
+    return categories.have_important_category();
+  }
+
   @override
   String toString() {
     return "Article('$id', '$title', '$categories')";
