@@ -39,10 +39,19 @@ Widget build_card(Article article, var action) {
           excludeFromSemantics: true
       );
       */
-  var cat_name = article.categories.get_first()?.name;
+
+  String? cat_name = article.categories.get_first()?.name;
+  final bool is_important = article.is_important();
+  final Color article_normal_text_color = (article.read == 1 ? Colors.grey : Colors.black);
+  final Color article_important_text_color = (article.read == 1 ? Colors.redAccent : Colors.red);
+  final TextStyle article_text_style = TextStyle(
+    color: is_important ? article_important_text_color : article_normal_text_color,
+    fontWeight: is_important ? FontWeight.bold : FontWeight.normal
+  );
+
   return Card(
       child: ListTile(
-          title: Text(article.title, style: TextStyle(color: (article.read == 1 ? Colors.grey : Colors.black))),
+          title: Text(article.title, style: article_text_style),
           subtitle: cat_name != null ? Text(cat_name) : null,
           // leading: SizedBox(width: 80, height: 80, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),

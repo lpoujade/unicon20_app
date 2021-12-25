@@ -1,7 +1,9 @@
 
+import 'package:collection/collection.dart';
+
+import '../config.dart' as config;
 import '../data/category.dart';
 import '../tools/list.dart';
-import '../config.dart' as config;
 import 'database.dart';
 
 class CategoriesList extends ItemList<Category> {
@@ -54,5 +56,9 @@ class CategoriesList extends ItemList<Category> {
         return (wa == null || wb == null) ? 0 : wb.compareTo(wa);
     });
     return cats.isNotEmpty ? cats.first : null;
+  }
+
+  bool have_important_category() {
+    return null != items.value.firstWhereOrNull((element) => element.name.toLowerCase() == 'important');
   }
 }
