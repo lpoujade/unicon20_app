@@ -1,8 +1,10 @@
-import 'package:flutter_html/flutter_html.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart' as config;
 
@@ -52,7 +54,19 @@ class TextPage extends StatelessWidget {
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(fontSize: 12))
                           ]),
-                      Html(data: content, onLinkTap: (s, u1, u2, u3) => launch(s.toString()))
+                      Html(
+                          data: content,
+                          onLinkTap: (s, u1, u2, u3) => launch(s.toString()),
+                          customImageRenders: {
+                            networkSourceMatcher(): (RenderContext context, Map<String, String> attributes, dom.Element? element) {
+                              return CachedNetworkImage(
+                                imageUrl: attributes['src'].toString(),
+                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                              );
+                            }
+                          }
+                      )
                     ])
             )
         )
