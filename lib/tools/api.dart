@@ -4,12 +4,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
-import 'package:ical_parser/ical_parser.dart';
 
 import '../config.dart' as config;
 import '../data/article.dart' show Article;
 import '../data/category.dart';
-import '../data/event.dart' show Event;
 import '../services/categories_list.dart';
 import '../services/database.dart';
 
@@ -79,34 +77,4 @@ Future<List<Article>> get_posts_from_wp(
   }
 
   return articles;
-}
-
-/// Download calendar from an ICS URL and parse it into
-/// [Event] array
-Future<List<Event>> get_events_from_ics() async {
-  List<Event> event_list = [];
-
-  for (String cal in config.calendars.keys) {
-    print("http GET '$cal': '${config.calendars[cal]}");
-    var client = RetryClient(http.Client());
-    try {
-      String raw_ical = await client.read(Uri.parse(config.calendars[cal]!['url'].toString()));
-      var json = ICal.toJson(raw_ical);
-      var json_events = json['VEVENT'];
-      for (var event in json_events) {
-        var e = Event.fromICalJson(event, cal);
-        event_list.add(e);
-      }
-    } catch(err) {
-      Fluttertoast.showToast(
-          msg: "Failed to fetch calendar events",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 2,
-          fontSize: 16.0
-      );
-      rethrow;
-    } finally { client.close(); }
-  }
-  return event_list;
 }

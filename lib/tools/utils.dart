@@ -18,6 +18,10 @@ launch_url(String url) async {
   );
 }
 
+DateTime parse_date(String str) {
+  return DateTime.parse(str);
+}
+
 /// Change event date/hour according to configured
 /// calendar offset, to show calendar as if user was
 /// already in the correct timezone

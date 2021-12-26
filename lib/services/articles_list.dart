@@ -16,7 +16,7 @@ class ArticleList extends ItemList<Article> {
   final network_error = ValueNotifier<bool>(false);
 
   ArticleList({required DBInstance db})
-    : super(db: db, db_table: 'article');
+    : super(db: db, db_table: 'articles');
 
   /// Read current language from db
   init_lang() async {
@@ -30,7 +30,7 @@ class ArticleList extends ItemList<Article> {
     _lang = l;
     await db.save_locale(l);
     items.value = [];
-    (await db.db).delete('article');
+    (await db.db).delete('articles');
     fill();
   }
 

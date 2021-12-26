@@ -11,6 +11,7 @@ class Event extends AData {
   final String type;
   final String description;
   final String summary;
+  final DateTime modification_date;
 
   Event({
     required this.uid,
@@ -20,7 +21,8 @@ class Event extends AData {
     required this.location,
     required this.type,
     required this.description,
-    required this.summary
+    required this.summary,
+    required this.modification_date
   }) : super(db_id_field:'uid');
 
   Event.from(Event e)
@@ -32,6 +34,7 @@ class Event extends AData {
       type = e.type,
       description = e.description,
       summary = e.summary,
+      modification_date = e.modification_date,
       super(db_id_field: 'uid');
 
   Event.fromICalJson(json, String calendar)
@@ -43,6 +46,7 @@ class Event extends AData {
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
       summary = clean_ics_text_fields(json['SUMMARY']),
+      modification_date = DateTime.parse(clean_ics_text_fields(json['LAST-MODIFIED'])),
       super(db_id_field: 'uid');
 
   @override
@@ -58,7 +62,8 @@ class Event extends AData {
       'location': location,
       'type': type,
       'description': description,
-      'summary': summary
+      'summary': summary,
+      'modification_date': modification_date.millisecondsSinceEpoch
     };
   }
 

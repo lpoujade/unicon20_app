@@ -12,9 +12,11 @@ const init_sql = [
 // migrations
 // key is the target version
 const migrations = {
-	2: [
-       'create table categories (id integer primary key, slug text, name slug)',
-     'create table articles_categories (article references article(id), category references categories(id), unique(category, article) on conflict ignore)'
+2: [
+      'create table categories (id integer primary key, slug text, name slug)',
+      'create table articles_categories (article references article(id), category references categories(id), unique(category, article) on conflict ignore)',
+      'alter table events add column modification_date integer not null default 1',
+      'alter table article rename to articles'
   ]
 };
 
@@ -43,7 +45,20 @@ class DBInstance {
 	/// if any
 	Future<DateTime?> get_last_sync_date() async {
 		await _dbi();
-		var sql = 'select date from article order by date desc limit 1';
+		var sql = 'select date from articles order by date desc limit 1';
+		final result = await _db!.rawQuery(sql);
+		if (result.isEmpty) return null;
+		var first = result.first;
+		dynamic date = first.isEmpty ? null : first['date'];
+		return (date != null)
+			? DateTime.fromMillisecondsSinceEpoch(date)
+			: null;
+	}
+
+	/// Read date of the most recent event in local database
+	Future<DateTime?> get_last_event_sync_date() async {
+		await _dbi();
+		var sql = 'select modification_date from events order by modification_date desc limit 1';
 		final result = await _db!.rawQuery(sql);
 		if (result.isEmpty) return null;
 		var first = result.first;

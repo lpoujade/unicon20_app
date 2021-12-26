@@ -55,8 +55,17 @@ const Map<String, Map<String, dynamic>> calendars = {
   'workshop': {
     'url': 'https://calendar.google.com/calendar/ical/acg4v7l8j9i8li8mfg29i2758g%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffEF7057)
+  },
+/*
+  'test': {
+    'url': 'https://unicon20-app-doc.lpo.host/test.ics',
+    'color': Color.fromRGBO(255, 0, 0, 1)
   }
+  */
 };
+
+/// URL to fetch last update date of each calendar
+const calendar_check_url = 'https://unicon20-app-doc.lpo.host/app_calendars/';
 
 /// Locales used in wordpress translation
 /// first is locale, second country code
