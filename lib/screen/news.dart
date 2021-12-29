@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/article.dart';
 import '../services/articles_list.dart';
@@ -30,15 +31,13 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
 /// Create a [Card] widget from an [Article]
 /// Expand to a [TextPage]
 Widget build_card(Article article, var action) {
-  /*
-  final img = article.img.isEmpty ? null
+  var img = article.img.isEmpty ? null
       : FadeInImage(
-          placeholder: AssetImage('res/topLogo.png'),
-          image: NetworkImage(article.img),
+          placeholder: const AssetImage('res/topLogo.png'),
+          image: CachedNetworkImageProvider(article.img),
           alignment: Alignment.centerLeft,
           excludeFromSemantics: true
       );
-      */
 
   String? cat_name = article.categories.get_first()?.name;
   final bool is_important = article.is_important();
@@ -53,7 +52,7 @@ Widget build_card(Article article, var action) {
       child: ListTile(
           title: Text(article.title, style: article_text_style),
           subtitle: cat_name != null ? Text(cat_name) : null,
-          // leading: SizedBox(width: 80, height: 80, child: img),
+          leading: SizedBox(width: 60, height: 60, child: img),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }
       ));

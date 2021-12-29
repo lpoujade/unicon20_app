@@ -30,7 +30,7 @@ abstract class ItemList<T extends AData> {
 
   /// Save the current items list to database
   save_list() async {
-    var batch = (await db.db).batch();
+    Batch batch = (await db.db).batch();
     for (var a in items.value) batch.insert(db_table, a.toSqlMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     try {
       batch.commit(noResult: true);

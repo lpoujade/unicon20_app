@@ -1,5 +1,5 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:unicon/tools/list.dart';
 
@@ -45,6 +45,9 @@ class ArticleList extends ItemList<Article> {
   /// Read articles from db then from wordpress
   @override
   fill() async {
+    for(var raw_article in await super.get_from_db()) {
+      items.value += [await Article.to_article(db, raw_article)];
+    }
     await refresh();
   }
 
@@ -70,36 +73,31 @@ class ArticleList extends ItemList<Article> {
     return wp_articles;
   }
 
-  // refresh loaded articles
+  /// refresh loaded articles
   Future<List<Article>> refresh() async {
 
-    final List<Article> db_articles = [];
-    final List<Article> new_articles = [];
-
-    for(var raw_article in await super.get_from_db()) {
-      db_articles.add(await Article.to_article(db, raw_article));
-    }
+    List<Article> new_articles = [];
 
     final List<Article> wp_articles = await _fetch_wp_articles();
 
     for(var wp_article in wp_articles) {
 
-      final Article? db_article = db_articles.firstWhereOrNull((element) => wp_article.id == element.id);
+      var db_article = items.value.firstWhereOrNull((element) => element.id == wp_article.id);
 
       if(db_article != null) {
+        db_article.read = 0;
+        db_article.date = wp_article.date;
         db_article.title = wp_article.title;
         db_article.content = wp_article.content;
         db_article.img = wp_article.img;
         db_article.categories = wp_article.categories;
       } else {
-        new_articles.add(wp_article);
-        db_articles.add(wp_article);
+        new_articles += [wp_article];
+        items.value += [wp_article];
       }
     }
 
-    items.value = db_articles;
-
-    if (wp_articles.isNotEmpty) {
+    if (new_articles.isNotEmpty) {
       await save_list();
     }
 

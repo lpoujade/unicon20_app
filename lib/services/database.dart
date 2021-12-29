@@ -23,15 +23,7 @@ class DBInstance {
 	static const db_name = 'unicon_db.db';
 	static const db_version = 2;
 
-  static int instance_count = 0;
-
-  Database? _db;
-
-	DBInstance() {
-    instance_count++;
-    print("database instance count: $instance_count");
-    log("database instance count: $instance_count");
-	}
+  static Database? _db;
 
 	get db async {
 		await _dbi();

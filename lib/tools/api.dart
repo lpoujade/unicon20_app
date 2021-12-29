@@ -58,7 +58,6 @@ Future<List<Article>> get_posts_from_wp(
         ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['thumbnail']['source_url']
         : '';
 
-    // TODO db multiple instance ?
     var categories = CategoriesList(db: DBInstance(), parent_id: p['id']);
     for (var category in p['_embedded']['wp:term'][0]) {
         var cat = Category(

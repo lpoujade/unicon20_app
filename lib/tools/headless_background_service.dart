@@ -6,18 +6,12 @@ import '../services/database.dart';
 import '../data/article.dart';
 import '../services/articles_list.dart';
 import '../services/notifications.dart';
-// import '../services/events_list.dart';
 
 headless_task(HeadlessTask task) async {
   String taskId = task.taskId;
   // bool isTimeout = task.timeout;
   var notifier = Notifications();
   var db = DBInstance();
-  if (DBInstance.instance_count > 1) {
-    print("[headless] db instances: ${DBInstance.instance_count}");
-    dev.log("[headless] db instances: ${DBInstance.instance_count}");
-    notifier.show('headless task instances > 1', 'count: ${DBInstance.instance_count}', '', 'debug', 'Debug');
-  }
   var article_list = ArticleList(db: db);
 
   List<Article> new_articles = await article_list.refresh();
