@@ -21,9 +21,8 @@ class CategoriesList extends ItemList<Category> {
       ''' where ac.article = ?''', [parent_id]);
 
     items.value = raw_cat.map((e) {
-      dynamic id = e['id'];
       return Category(
-          id: id,
+          id: e['id'] as int,
           slug: e['slug'].toString(),
           name: e['name'].toString()
       );
@@ -37,7 +36,6 @@ class CategoriesList extends ItemList<Category> {
 
   /// Save categories to db and link them to articles
   save() async {
-    print('saving categories for $parent_id');
     super.save_list();
 
     var batch = (await db.db).batch();
@@ -59,6 +57,6 @@ class CategoriesList extends ItemList<Category> {
   }
 
   bool have_important_category() {
-    return null != items.value.firstWhereOrNull((element) => element.name.toLowerCase() == 'important');
+    return null != items.value.firstWhereOrNull((element) => element.name.toLowerCase() == config.important_category_name);
   }
 }

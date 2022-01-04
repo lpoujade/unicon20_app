@@ -7,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../data/event.dart';
 import '../tools/list.dart';
 import 'database.dart';
-import '../tools/utils.dart';
 import '../config.dart' as config;
 
 /// Hold a [Event] list, a connection
@@ -22,19 +21,16 @@ class EventList extends ItemList<Event> {
    var raw_events = await super.get_from_db(); 
 
     items.value = raw_events.map((e) {
-      dynamic start = e['start'];
-      dynamic end = e['end'];
-      dynamic modification_date = e['modification_date'];
       return Event(
           uid: e['uid'].toString(),
           title: e['title'].toString(),
-          start: DateTime.fromMillisecondsSinceEpoch(start),
-          end: DateTime.fromMillisecondsSinceEpoch(end),
+          start: DateTime.fromMillisecondsSinceEpoch(e['start'] as int),
+          end: DateTime.fromMillisecondsSinceEpoch(e['end'] as int),
           location: e['location'].toString(),
           type: e['type'].toString(),
           description: e['description'].toString(),
           summary: e['summary'].toString(),
-          modification_date: DateTime.fromMillisecondsSinceEpoch(modification_date)
+          modification_date: DateTime.fromMillisecondsSinceEpoch(e['modification_date'] as int)
       );
     }).toList();
     await refresh();
@@ -43,18 +39,19 @@ class EventList extends ItemList<Event> {
   /// Download [Events] from ICS URLs
   refresh() async {
     var last_sync_date = await db.get_last_event_sync_date();
-    print("last event sync date: '$last_sync_date'");
     for (String cal in config.calendars.keys) {
       var client = RetryClient(http.Client());
       try {
         String raw_date = await client.read(Uri.parse(config.calendar_check_url + cal));
-        var date = parse_date(raw_date.trim());
+        var date = DateTime.parse(raw_date.trim());
         if (last_sync_date == null || date.isAfter(last_sync_date))
-          download_calendar(cal, config.calendars[cal]!['url']);
+        // TODO await all in once
+          await download_calendar(cal, config.calendars[cal]!['url']);
       } catch(err) {
         print("failed to check events update: '$err'");
       }
     }
+    // TODO save only if modified
     save_list();
   }
 

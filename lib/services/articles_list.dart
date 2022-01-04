@@ -26,7 +26,6 @@ class ArticleList extends ItemList<Article> {
   /// Update language
   /// Trigger a delete/download of all articles
   update_lang(l) async {
-    // print("update lang to '$l'");
     _lang = l;
     await db.save_locale(l);
     items.value = [];

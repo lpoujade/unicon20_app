@@ -7,10 +7,10 @@ class Event extends AData {
   final String title;
   DateTime start;
   DateTime end;
-  final String location;
+  final String? location;
   final String type;
-  final String description;
-  final String summary;
+  final String? description;
+  final String? summary;
   final DateTime modification_date;
 
   Event({
@@ -37,16 +37,16 @@ class Event extends AData {
       modification_date = e.modification_date,
       super(db_id_field: 'uid');
 
-  Event.fromICalJson(json, String calendar)
+  Event.fromICalJson(Map<String, dynamic> json, String calendar)
       : uid = json['UID'].toString(),
-      title = clean_ics_text_fields(json['SUMMARY']),
-      start = DateTime.parse(json['DTSTART']).toLocal(),
-      end = DateTime.parse(json['DTEND']).toLocal(),
+      title = clean_ics_text_fields(json['SUMMARY']) ?? '<< missing event title >>',
+      start = DateTime.parse(json['DTSTART'] ?? get_ics_tz_key(json, 'DTSTART')).toLocal(),
+      end = DateTime.parse(json['DTEND'] ?? get_ics_tz_key(json, 'DTEND')).toLocal(),
       location = clean_ics_text_fields(json['LOCATION']),
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
       summary = clean_ics_text_fields(json['SUMMARY']),
-      modification_date = DateTime.parse(clean_ics_text_fields(json['LAST-MODIFIED'])),
+      modification_date = json.containsKey('LAST-MODIFIED') ? DateTime.parse(clean_ics_text_fields(json['LAST-MODIFIED'])!) : DateTime.now(),
       super(db_id_field: 'uid');
 
   @override
@@ -59,10 +59,10 @@ class Event extends AData {
       'title': title,
       'start': start.millisecondsSinceEpoch,
       'end': end.millisecondsSinceEpoch,
-      'location': location,
+      'location': location ?? '',
       'type': type,
-      'description': description,
-      'summary': summary,
+      'description': description ?? '',
+      'summary': summary ?? '',
       'modification_date': modification_date.millisecondsSinceEpoch
     };
   }

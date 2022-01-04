@@ -10,8 +10,9 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
       builder: (context, articles, Widget? _child) {
         Widget child = ListView();
         if (articles.isNotEmpty) {
+          // TODO move to api & conf
           // specific to unicon20.fr wordpress
-          articles.removeWhere((article) => (article.date.isBefore(DateTime(2020, 12, 21))));
+          // articles.removeWhere((article) => (article.date.isBefore(DateTime(2020, 12, 21))));
           articles.sort((a, b) => b.date.compareTo(a.date));
           child = ListView(children:
               articles.map((e) => build_card(e, (article) {

@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:background_fetch/background_fetch.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'dart:math';

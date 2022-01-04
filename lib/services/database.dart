@@ -45,6 +45,8 @@ class DBInstance {
 	/// if any
 	Future<DateTime?> get_last_sync_date() async {
 		await _dbi();
+    // TODO add a few seconds
+    // TODO filter max 2020, 12, 21
 		var sql = 'select date from articles order by date desc limit 1';
 		final result = await _db!.rawQuery(sql);
 		if (result.isEmpty) return null;
@@ -62,7 +64,7 @@ class DBInstance {
 		final result = await _db!.rawQuery(sql);
 		if (result.isEmpty) return null;
 		var first = result.first;
-		dynamic date = first.isEmpty ? null : first['date'];
+		dynamic date = first.isEmpty ? null : first['modification_date'];
 		return (date != null)
 			? DateTime.fromMillisecondsSinceEpoch(date)
 			: null;
@@ -86,7 +88,7 @@ class DBInstance {
 
   /// Called on database file creation
   _onCreate(Database db, int version) async {
-    log('create db v$version');
+    print('create db v$version');
     var batch = db.batch();
     init_sql.forEach(batch.execute);
     migrations.forEach((i, migration_sql) {
@@ -101,7 +103,7 @@ class DBInstance {
 
   /// Called when updating database
   _onUpgrade(Database db, int cur_version, int new_version) async {
-    log('upgrade db from v$cur_version to v$new_version');
+    print('upgrade db from v$cur_version to v$new_version');
     var batch = db.batch();
     log('will execute: ');
     while (++cur_version <= new_version) {

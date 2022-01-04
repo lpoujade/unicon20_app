@@ -18,10 +18,6 @@ launch_url(String url) async {
   );
 }
 
-DateTime parse_date(String str) {
-  return DateTime.parse(str);
-}
-
 /// Change event date/hour according to configured
 /// calendar offset, to show calendar as if user was
 /// already in the correct timezone
@@ -42,11 +38,25 @@ DateTime fit_date_to_cal(DateTime date) {
 }
 
 /// Unescape ICS fields
-String clean_ics_text_fields(String text) {
-  String result = text
-      .replaceAll('\\,', ',')
+String? clean_ics_text_fields(String? text) {
+  return text
+      ?.replaceAll('\\,', ',')
       .replaceAll('\\;', ';')
       .replaceAll('\\\\', '\\')
       .replaceAll('\\N', '\\n');
-  return result;
 }
+
+String get_ics_tz_key(Map<String, dynamic> ics, String clean_key) {
+  print("search '$clean_key' in '$ics'");
+  String value = '';
+  ics.forEach((k, v) {
+    if (k.startsWith(clean_key)) {
+      print("found '$v'");
+      value = v;
+      return;
+    }
+  });
+  return value.trim();
+}
+
+

@@ -348,7 +348,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: c2f727086da7870fcb829ca4770c3db269a7b127
+      resolved-ref: "69eb47c6d04353d59f5025f01f4c12fbd3e5a4d9"
       url: "https://github.com/lpoujade/ical-parser"
     source: git
     version: "1.1.0"
