@@ -36,7 +36,6 @@ class Notifications {
         ticker: 'ticker');
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics);
-    print("notif: $title $text $payload");
     await notifier.show(
         0, title, text, platformChannelSpecifics,
         payload: payload);

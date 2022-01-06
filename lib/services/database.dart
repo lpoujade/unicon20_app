@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:sqflite/sqflite.dart';
 
-/// Initial database schema
+/// Initial database schema, version 1
 const init_sql = [
 	'create table article ( id integer unique, title text, content text, important integer default 0, date integer not null, read integer default 0, img text)',
 	'create table events ( uid text unique not null, title text not null, start integer not null, end integer not null, location text not null, type text not null, description text, summary text)',
@@ -16,6 +16,7 @@ const migrations = {
       'create table categories (id integer primary key, slug text, name slug)',
       'create table articles_categories (article references article(id), category references categories(id), unique(category, article) on conflict ignore)',
       'alter table events add column modification_date integer not null default 1',
+      'alter table article add column modification_date integer default null',
       'alter table article rename to articles'
   ]
 };
@@ -45,9 +46,7 @@ class DBInstance {
 	/// if any
 	Future<DateTime?> get_last_sync_date() async {
 		await _dbi();
-    // TODO add a few seconds
-    // TODO filter max 2020, 12, 21
-		var sql = 'select date from articles order by date desc limit 1';
+		var sql = 'select modification_date from articles order by modification_date desc limit 1';
 		final result = await _db!.rawQuery(sql);
 		if (result.isEmpty) return null;
 		var first = result.first;

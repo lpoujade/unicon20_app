@@ -6,6 +6,7 @@ import 'package:unicon/tools/list.dart';
 import '../data/article.dart';
 import '../tools/api.dart' as api;
 import 'database.dart';
+import '../config.dart' as config;
 
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
@@ -61,7 +62,7 @@ class ArticleList extends ItemList<Article> {
 
     try {
       wp_articles = await api.get_posts_from_wp(
-          since: await db.get_last_sync_date(),
+          since: (await db.get_last_sync_date()) ?? DateTime.parse(config.max_article_date),
           lang: _lang
       );
       network_error.value = false;
@@ -78,6 +79,7 @@ class ArticleList extends ItemList<Article> {
     List<Article> new_articles = [];
 
     final List<Article> wp_articles = await _fetch_wp_articles();
+    bool modified = false;
 
     for(var wp_article in wp_articles) {
 
@@ -86,17 +88,19 @@ class ArticleList extends ItemList<Article> {
       if(db_article != null) {
         db_article.read = 0;
         db_article.date = wp_article.date;
+        db_article.modified_date = wp_article.modified_date;
         db_article.title = wp_article.title;
         db_article.content = wp_article.content;
         db_article.img = wp_article.img;
         db_article.categories = wp_article.categories;
+        modified = true;
       } else {
         new_articles += [wp_article];
         items.value += [wp_article];
       }
     }
 
-    if (new_articles.isNotEmpty) {
+    if (modified || new_articles.isNotEmpty) {
       await save_list();
     }
 

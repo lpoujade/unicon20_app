@@ -90,4 +90,8 @@ const categories_weight = {
   'information': 5
 };
 
+/// Category which will be showed as important
 const important_category_name = 'important';
+
+/// Don't get articles from wordpress before this date
+const max_article_date = '2020-12-21';

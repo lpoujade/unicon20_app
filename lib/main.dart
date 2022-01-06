@@ -6,8 +6,6 @@ import 'config.dart' as config;
 import 'homepage.dart';
 import 'tools/headless_background_service.dart';
 
-// DBInstance db_instance;
-
 /// Launching of the programme.
 main() async {
   runApp(const UniconApp());

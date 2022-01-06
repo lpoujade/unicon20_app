@@ -15,6 +15,7 @@ class Article extends AData  {
   int read = 0;
   int important = 0;
   DateTime date;
+  DateTime? modified_date;
   CategoriesList categories;
 
   Article(
@@ -24,6 +25,7 @@ class Article extends AData  {
       required this.img,
       required this.date,
       required this.read,
+      this.modified_date,
       required this.categories})
       : super(db_id_field: 'id');
 
