@@ -33,8 +33,9 @@ class MyHomePage extends StatefulWidget {
     for (var article in new_articles) {
       notifier.show(
           article.title,
-          HtmlUnescape().convert(article.content.substring(0,
-              min(100, article.content.length))),
+          HtmlUnescape()
+	 	 .convert(article.content)
+		 .substring(0, min(100, article.content.length)),
           '${article.id}',
           article.categories.get_first()?.slug,
           article.categories.get_first()?.name
