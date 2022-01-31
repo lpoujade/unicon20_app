@@ -43,15 +43,19 @@ Widget build_card(Article article, var action) {
   final Color article_important_text_color = (article.read == 1 ? Colors.redAccent : Colors.red);
   final TextStyle article_text_style = TextStyle(
     color: is_important ? article_important_text_color : article_normal_text_color,
-    fontWeight: is_important ? FontWeight.bold : FontWeight.normal
+    fontWeight: is_important ? FontWeight.bold : FontWeight.normal,
   );
 
   return Card(
       child: ListTile(
           title: Text(article.title, style: article_text_style),
           subtitle: cat_name != null ? Text(cat_name) : null,
-          leading: SizedBox(width: 60, height: 60, child: img),
+          leading: ClipRRect(
+              borderRadius: BorderRadius.circular(50.0),
+              child: img
+            ),
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }
-      ));
+        )
+      );
 }
