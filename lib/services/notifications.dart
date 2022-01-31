@@ -27,7 +27,7 @@ class Notifications {
   /// Show notification
   /// payload is only used to pass data to the notification
   /// tap handler
-  Future<void> show(String title, String text, String payload, String? channel_slug, String? channel_name) async {
+  Future<void> show(String title, String? text, String payload, String? channel_slug, String? channel_name) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         channel_slug ?? config.default_notif_channel_slug,
         channel_name ?? config.default_notif_channel_name,

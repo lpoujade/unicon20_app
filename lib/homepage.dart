@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:background_fetch/background_fetch.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'dart:math';
 
 import 'services/articles_list.dart';
 import 'services/database.dart';
@@ -31,12 +29,10 @@ class MyHomePage extends StatefulWidget {
   background_task() async {
     var new_articles = await articles.refresh();
     for (var article in new_articles) {
+      if (article.read == 1) continue;
       notifier.show(
           article.title,
-          HtmlUnescape()
-	 	 .convert(article.content)
-		 .substring(0, min(100, article.content.length)),
-          '${article.id}',
+          null, '${article.id}',
           article.categories.get_first()?.slug,
           article.categories.get_first()?.name
           );
