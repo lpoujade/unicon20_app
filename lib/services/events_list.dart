@@ -37,7 +37,7 @@ class EventList extends ItemList<Event> {
   }
 
   /// Download [Events] from ICS URLs
-  refresh() async {
+  Future<void> refresh() async {
     var last_sync_date = await db.get_last_event_sync_date();
     for (String cal in config.calendars.keys) {
       var client = RetryClient(http.Client());

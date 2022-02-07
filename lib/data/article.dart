@@ -15,7 +15,7 @@ class Article extends AData  {
   int read = 0;
   int important = 0;
   DateTime date;
-  DateTime? modified_date;
+  DateTime? modification_date;
   CategoriesList categories;
 
   Article(
@@ -25,7 +25,7 @@ class Article extends AData  {
       required this.img,
       required this.date,
       required this.read,
-      this.modified_date,
+      this.modification_date,
       required this.categories})
       : super(db_id_field: 'id');
 
@@ -37,6 +37,7 @@ class Article extends AData  {
       'content': content,
       'img': img,
       'date': date.millisecondsSinceEpoch,
+      'modification_date': modification_date?.millisecondsSinceEpoch,
       'read': read
     };
   }
@@ -44,6 +45,9 @@ class Article extends AData  {
   static Future<Article> to_article(DBInstance db, Map<String, dynamic> data) async {
     var categories = CategoriesList(db: db, parent_id: data['id']);
     await categories.fill();
+    var modification_date = data['modification_date'] != null
+    	? DateTime.fromMillisecondsSinceEpoch(data['modification_date'] as int)
+	: null;
     return Article(
         id: data['id'],
         title: data['title'],
@@ -51,7 +55,8 @@ class Article extends AData  {
         img: data['img'],
         date : DateTime.fromMillisecondsSinceEpoch(data['date'] as int),
         read: data['read'],
-        categories: categories
+        categories: categories,
+	modification_date: modification_date
     );
   }
 

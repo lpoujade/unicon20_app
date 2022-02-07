@@ -17,13 +17,20 @@ class AppColors {
 }
 
 /// WordPress base URL (fetched from env to ease development)
-const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'https://unicon20.fr');
+const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://unicon-test-wordpress.lpo.host');
 
 /// Base endpoint
 const api_path = '/wp-json/wp/v2';
 
 /// Calendars
 const Map<String, Map<String, dynamic>> calendars = {
+  'test': {
+    'url': 'https://unicon20-app-doc.lpo.host/test.ics',
+    'color': Colors.green
+    }
+};
+
+const Map<String, Map<String, dynamic>> _calendars = {
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
     'color': Colors.grey
@@ -79,7 +86,7 @@ const calendar_utc_offset = {'hour': 1, 'minute': 0};
 /// Show year for events after this year
 const event_year = 2022;
 
-/// Notifications channel for Android if post category doesn't match with those configured under
+/// Notifications channel for Android if post category doesn't match with those configured below
 const default_notif_channel_slug = 'unicon20';
 const default_notif_channel_name = 'UNICON20';
 

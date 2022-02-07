@@ -47,11 +47,9 @@ String? clean_ics_text_fields(String? text) {
 }
 
 String get_ics_tz_key(Map<String, dynamic> ics, String clean_key) {
-  print("search '$clean_key' in '$ics'");
   String value = '';
   ics.forEach((k, v) {
     if (k.startsWith(clean_key)) {
-      print("found '$v'");
       value = v;
       return;
     }

@@ -86,9 +86,12 @@ class ArticleList extends ItemList<Article> {
       var db_article = items.value.firstWhereOrNull((element) => element.id == wp_article.id);
 
       if(db_article != null) {
-        db_article.read = 0;
+      	if (wp_article.modification_date != db_article.modification_date) {
+		db_article.read = 0;
+		print('article changed $db_article');
+	}
         db_article.date = wp_article.date;
-        db_article.modified_date = wp_article.modified_date;
+        db_article.modification_date = wp_article.modification_date;
         db_article.title = wp_article.title;
         db_article.content = wp_article.content;
         db_article.img = wp_article.img;

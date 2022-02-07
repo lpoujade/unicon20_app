@@ -71,7 +71,7 @@ Future<List<Article>> get_posts_from_wp(
             content: p['content']['rendered'],
             img: img,
             date: DateTime.parse(p['date']),
-            modified_date: DateTime.parse(p['modified']),
+            modification_date: DateTime.parse(p['modified']),
             read: 0,
             categories: categories)
     );

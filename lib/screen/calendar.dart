@@ -12,9 +12,9 @@ import '../tools/utils.dart';
 import '../config.dart' as config;
 
 /// Calendar page
-ValueListenableBuilder<List<Event>> calendar_page(EventList events) {
+ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
   return ValueListenableBuilder(
-      valueListenable: events.items,
+      valueListenable: home_events.items,
       builder: (context, List<Event> events, Widget? unused_child) {
         if (events.isEmpty) {
           return const CenteredCircularProgressIndicator();
@@ -60,7 +60,11 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList events) {
             controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
         );
         wk.controller.changeZoomFactor(.59);
-        return wk;
+
+	var refresh_indicator = RefreshIndicator(
+		onRefresh: home_events.refresh, child: wk);
+
+        return refresh_indicator;
       }
   );
 }

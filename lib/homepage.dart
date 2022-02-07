@@ -27,6 +27,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 
   background_task() async {
+    events.refresh();
     var new_articles = await articles.refresh();
     for (var article in new_articles) {
       if (article.read == 1) continue;

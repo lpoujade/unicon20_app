@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   wordpress:
-    image: wordpress
+    image: docker.io/wordpress
     restart: always
     ports:
       - 8080:80
@@ -16,7 +16,7 @@ services:
       - wordpress:/var/www/html
 
   db:
-    image: mysql:5.7
+    image: docker.io/mysql:5.7
     restart: always
     environment:
       MYSQL_DATABASE: hseddb
