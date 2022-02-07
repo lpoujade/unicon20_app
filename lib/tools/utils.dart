@@ -1,3 +1,5 @@
+/// Utility functions/wrappers
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config.dart' as config;

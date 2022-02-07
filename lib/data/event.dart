@@ -1,3 +1,5 @@
+/// Event definition
+
 import '../tools/utils.dart';
 import 'abstract.dart';
 

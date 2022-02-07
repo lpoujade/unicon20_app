@@ -1,3 +1,5 @@
+/// Utility to configure background service task
+
 import 'dart:developer';
 import 'package:background_fetch/background_fetch.dart';
 

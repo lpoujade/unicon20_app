@@ -1,3 +1,5 @@
+/// Article definition
+
 import 'package:unicon/services/categories_list.dart';
 import 'package:unicon/services/database.dart';
 

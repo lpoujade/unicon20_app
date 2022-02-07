@@ -1,3 +1,5 @@
+/// Main app bar
+
 import 'package:flutter/material.dart';
 
 import '../config.dart' as config;

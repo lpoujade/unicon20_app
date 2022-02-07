@@ -1,3 +1,5 @@
+/// Wordpress API connection, to be moved to lib/data/article.dart
+
 import 'dart:convert' show json;
 
 import 'package:fluttertoast/fluttertoast.dart';
