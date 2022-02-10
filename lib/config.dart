@@ -24,13 +24,12 @@ const api_path = '/wp-json/wp/v2';
 
 /// Calendars
 const Map<String, Map<String, dynamic>> calendars = {
+/*
   'test': {
     'url': 'https://unicon20-app-doc.lpo.host/test.ics',
     'color': Colors.green
-    }
-};
-
-const Map<String, Map<String, dynamic>> _calendars = {
+  },
+  */
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
     'color': Colors.grey

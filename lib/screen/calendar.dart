@@ -1,27 +1,35 @@
 /// Calendar page definition
-
-
-import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter_week_view/flutter_week_view.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
-import '../services/events_list.dart';
-import '../data/event.dart';
-import '../ui/centered_circular_progress_indicator.dart';
-import '../tools/utils.dart';
 import '../config.dart' as config;
+import '../data/event.dart';
+import '../services/events_list.dart';
+import '../tools/utils.dart';
+
+class MyZoomListener implements ZoomControllerListener {
+	@override
+	onZoomFactorChanged(controller, scale_details) {
+		print(controller);
+		print(scale_details);
+	}
+
+	@override
+	onZoomStart(controller, scale_start_details) {
+		print(controller);
+		print(scale_start_details);
+	}
+}
 
 /// Calendar page
 ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
   return ValueListenableBuilder(
       valueListenable: home_events.items,
       builder: (context, List<Event> events, Widget? unused_child) {
-        if (events.isEmpty) {
-          return const CenteredCircularProgressIndicator();
-        }
         List<Event> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
@@ -41,6 +49,12 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
         }
         min_time = min_time.subtract(const HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
+
+	var view_height = MediaQuery.of(context).size.height * .8;
+
+	var zoom_controller = WeekViewController();
+	zoom_controller.addListener(MyZoomListener());
+
         var wk = WeekView(
             dates: dates,
             initialTime: DateTime.now(),
@@ -59,10 +73,13 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
                   + ' ' + year_str;
               return str;
             }),
+	    dayViewStyleBuilder: (date) => DayViewStyle(hourRowHeight: view_height / (24 - min_time.hour)),
             events: fitted_events.map((e) => get_wkview_event(context, e)).toList(),
-            controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
+	    controller: zoom_controller
+            // controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
         );
-        wk.controller.changeZoomFactor(.59);
+	// wk.controller.changeZoomFactor(3);
+
 
 	var refresh_indicator = RefreshIndicator(
 		onRefresh: home_events.refresh, child: wk);
@@ -75,12 +92,15 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
 /// Create a [FlutterWeekViewEvent] from a [Event]
 FlutterWeekViewEvent get_wkview_event(context, Event calendar_event) {
   return FlutterWeekViewEvent(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: config.calendars[calendar_event.type]?['color']),
       eventTextBuilder: (event, context, dayView, h, w) {
         List<Widget> elements = [
-          Expanded(child: AutoSizeText(event.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  minFontSize: 5,
-                  wrapWords: false
+          Expanded(child: Center(
+            child: AutoSizeText(event.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    minFontSize: 5,
+                    wrapWords: false
+            ),
           ))
         ];
 
@@ -92,7 +112,7 @@ FlutterWeekViewEvent get_wkview_event(context, Event calendar_event) {
       backgroundColor: config.calendars[calendar_event.type]?['color'],
       end: calendar_event.end,
       padding: const EdgeInsets.all(1),
-      margin: const EdgeInsets.fromLTRB(0, 1, 0, 0),
+      margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
       onTap: () { show_event_popup(calendar_event, context); }
   );
 }
@@ -155,7 +175,6 @@ void show_event_popup(Event event, BuildContext context) {
         buttonAreaPadding: const EdgeInsets.all(0)
         ),
       buttons: buttons,
-      // TODO scrollview
       content: Column(crossAxisAlignment: CrossAxisAlignment.start, children: alert_children)
       );
 

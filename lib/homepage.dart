@@ -55,8 +55,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           body: TabBarView(
             controller: _principalController,
             children: [
+              calendar_page(widget.events),
               news_page(widget.articles, openArticle),
-              calendar_page(widget.events)
             ]
           ),
           bottomNavigationBar: Container(
@@ -71,8 +71,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               labelColor: const Color(config.AppColors.green),
               unselectedLabelColor: const Color(config.AppColors.light_blue),
               tabs: const [
+                Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.home)),
-                Tab(icon: Icon(Icons.access_time))
               ]
               )
             )
