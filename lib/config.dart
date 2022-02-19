@@ -29,7 +29,7 @@ const Map<String, Map<String, dynamic>> calendars = {
     'url': 'https://unicon20-app-doc.lpo.host/test.ics',
     'color': Colors.green
   },
-  */
+	*/
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
     'color': Colors.grey
@@ -101,3 +101,6 @@ const important_category_name = 'important';
 
 /// Don't get articles from wordpress before this date
 const max_article_date = '2020-12-21';
+
+/// Map default location
+const map_default_loc = [45.1268, 5.7266];

@@ -13,11 +13,13 @@ const init_sql = [
 // key is the target version
 const migrations = {
 2: [
-      'create table categories (id integer primary key, slug text, name slug)',
+      'create table categories (id integer primary key, slug text, name text)',
       'create table articles_categories (article references article(id), category references categories(id), unique(category, article) on conflict ignore)',
       'alter table events add column modification_date integer not null default 1',
       'alter table article add column modification_date integer default null',
-      'alter table article rename to articles'
+      'alter table article rename to articles',
+
+			'create table places (address text, lat real, lon real, unique(address))'
   ]
 };
 
@@ -67,6 +69,20 @@ class DBInstance {
 		return (date != null)
 			? DateTime.fromMillisecondsSinceEpoch(date)
 			: null;
+	}
+
+	Future<List<double>?> get_loc(var addr) async {
+		await _dbi();
+		var sql = 'select lat, lon from places where address = ?';
+		final result = await _db!.rawQuery(sql, [addr]);
+		if (result.isEmpty) return null;
+		var res = result.first;
+		return [res['lat'] as double, res['lon'] as double];
+	}
+
+	insert_loc(var addr, lat, lon) async {
+		await _dbi();
+		return await _db!.insert('places', {'address': addr, 'lat': lat, 'lon': lon});
 	}
 
 	/// Read the saved locale

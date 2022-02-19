@@ -56,6 +56,7 @@ class TextPage extends StatelessWidget {
                       Html(
                           data: content,
                           onLinkTap: (s, u1, u2, u3) => launch(s.toString()),
+			  /*
                           customImageRenders: {
                             networkSourceMatcher(): (RenderContext context, Map<String, String> attributes, dom.Element? element) {
                               return CachedNetworkImage(
@@ -65,6 +66,7 @@ class TextPage extends StatelessWidget {
                               );
                             }
                           }
+			  */
                       )
                     ])
             )

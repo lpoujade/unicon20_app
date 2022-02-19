@@ -31,6 +31,9 @@ dependencies:
   flutter_week_view:
   cached_network_image:
 
+  geocode:
+  universe: 1.1.3-nullsafety
+
 dev_dependencies:
   dartdoc:
   flutter_launcher_icons:

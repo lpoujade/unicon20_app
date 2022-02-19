@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:background_fetch/background_fetch.dart';
 
+import 'screen/places.dart';
 import 'services/articles_list.dart';
 import 'services/database.dart';
 import 'services/events_list.dart';
@@ -45,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
-  late final TabController _principalController = TabController(length: 2, vsync: this, initialIndex: 0);
+  late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 2);
   late String lang;
 
   @override
@@ -55,8 +56,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           body: TabBarView(
             controller: _principalController,
             children: [
-              calendar_page(widget.events),
               news_page(widget.articles, openArticle),
+							calendar_page(widget.events),
+							places_page(widget.events)
             ]
           ),
           bottomNavigationBar: Container(
@@ -71,8 +73,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               labelColor: const Color(config.AppColors.green),
               unselectedLabelColor: const Color(config.AppColors.light_blue),
               tabs: const [
-                Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.home)),
+								Tab(icon: Icon(Icons.access_time)),
+                Tab(icon: Icon(Icons.place))
               ]
               )
             )

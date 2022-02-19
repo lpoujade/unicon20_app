@@ -10,6 +10,7 @@ class Event extends AData {
   DateTime start;
   DateTime end;
   final String? location;
+	List<double>? coords;
   final String type;
   final String? description;
   final String? summary;

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../data/article.dart';
 import '../services/articles_list.dart';
 
+
 /// News page (first app screen)
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.items,
