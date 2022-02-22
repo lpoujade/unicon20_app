@@ -6,20 +6,14 @@ import 'config.dart' as config;
 import 'homepage.dart';
 import 'tools/headless_background_service.dart';
 
-/// Launching of the programme.
 main() async {
   runApp(const UniconApp());
   BackgroundFetch.registerHeadlessTask(headless_task);
 }
 
-/// First creating page of the application.
 class UniconApp extends StatelessWidget {
   const UniconApp({Key? key}) : super(key: key);
 
-  /// The information of the first page we draw to screen.
-  ///
-  /// This create the main core of the application, here it create the mores basics information
-  /// and call 'MyHomePage' class which contain all the others information.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

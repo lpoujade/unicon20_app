@@ -28,7 +28,7 @@ class MyZoomListener implements ZoomControllerListener {
 /// Calendar page
 ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
   return ValueListenableBuilder(
-      valueListenable: home_events.items,
+      valueListenable: home_events.items, child: const CircularProgressIndicator(),
       builder: (context, List<Event> events, Widget? unused_child) {
         List<Event> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
@@ -50,35 +50,33 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
         min_time = min_time.subtract(const HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
 
-	var view_height = MediaQuery.of(context).size.height * .8;
+	var view_height = MediaQuery.of(context).size.height * .9;
 
 	var zoom_controller = WeekViewController();
 	zoom_controller.addListener(MyZoomListener());
 
-        var wk = WeekView(
-            dates: dates,
-            initialTime: DateTime.now(),
-            minimumTime: min_time,
-            hoursColumnStyle: HoursColumnStyle(
-                width: 25,
-                textAlignment: Alignment.centerRight,
-                timeFormatter: (time) => (time.hour.toString() + ' ')
-            ),
-            dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
-              var date = DateTime(year, month, day);
-              var year_str = (year == config.event_year
-                  ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
-                  : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
-              var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
-                  + ' ' + year_str;
-              return str;
-            }),
+  var wk = WeekView(
+      dates: dates,
+      initialTime: DateTime.now(),
+      minimumTime: min_time,
+      hoursColumnStyle: HoursColumnStyle(
+          width: 25,
+          textAlignment: Alignment.centerRight,
+          timeFormatter: (time) => (time.hour.toString() + ' ')
+      ),
+      dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
+        var date = DateTime(year, month, day);
+        var year_str = (year == config.event_year
+            ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
+            : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
+        var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
+            + ' ' + year_str;
+        return str;
+      }),
 	    dayViewStyleBuilder: (date) => DayViewStyle(hourRowHeight: view_height / (24 - min_time.hour)),
             events: fitted_events.map((e) => get_wkview_event(context, e)).toList(),
 	    controller: zoom_controller
-            // controller: WeekViewController(zoomCoefficient: .5, minZoom: .5)
         );
-	// wk.controller.changeZoomFactor(3);
 
 
 	var refresh_indicator = RefreshIndicator(
@@ -120,7 +118,7 @@ FlutterWeekViewEvent get_wkview_event(context, Event calendar_event) {
 /// Create and open an [Alert] popup to show [Event] info
 void show_event_popup(Event event, BuildContext context) {
   List<DialogButton> buttons = [];
-  if (event.location != null && event.location != 'TBD') { // TODO remove once calendar fixed
+  if (event.location != null && event.location != 'TBD' && event.location != '') { // TODO remove once fixed upstream
     buttons.add(
         DialogButton(
             child: Row(
@@ -165,12 +163,16 @@ void show_event_popup(Event event, BuildContext context) {
         );
   }
 
+	var calendar_color = config.calendars[event.type] != null ?
+		config.calendars[event.type]!['color']
+		: config.default_calendar_color;
+
   var alert = Alert(
       context: context,
       style: AlertStyle(
         isCloseButton: false,
         animationDuration: const Duration(milliseconds: 100),
-        backgroundColor: config.calendars[event.type]!['color'],
+        backgroundColor: calendar_color,
         alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2))),
         buttonAreaPadding: const EdgeInsets.all(0)
         ),

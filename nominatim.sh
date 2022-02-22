@@ -6,11 +6,13 @@ _encode() {
 
 _search() {
 	addr=$(_encode "$1")
-	url="https://nominatim.lpo.host/search?q=$addr&limit=1"
-	echo "$1 :"
-	curl -s "$url" | json_pp | grep -E '"(lat|lon)"'
+	#url="https://nominatim.lpo.host/search?q=$addr&limit=1"
+	url="https://api-adresse.data.gouv.fr/search?q=$addr&limit=1&autocomplete=0"
+	#echo "$1 :"
+	#echo "$url"
+	curl -s "$url" | json_pp | grep -A2 oordinates | grep -v oord
 
-	echo "---------------"
+	#echo "---------------"
 }
 
 #_encode "$1"

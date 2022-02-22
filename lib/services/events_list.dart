@@ -1,17 +1,15 @@
 /// Manage events list
 
-import 'dart:io';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
 import 'package:ical_parser/ical_parser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocode/geocode.dart';
 
 import '../data/event.dart';
 import '../tools/list.dart';
 import 'database.dart';
+import '../tools/geofr.dart';
 import '../config.dart' as config;
 
 /// Hold a [Event] list, a connection
@@ -46,6 +44,7 @@ class EventList extends ItemList<Event> {
 
   /// Download [Events] from ICS URLs
   Future<void> refresh() async {
+		var proms = [];
     var last_sync_date = await db.get_last_event_sync_date();
     for (String cal in config.calendars.keys) {
       var client = RetryClient(http.Client());
@@ -53,12 +52,12 @@ class EventList extends ItemList<Event> {
         String raw_date = await client.read(Uri.parse(config.calendar_check_url + cal));
         var date = DateTime.parse(raw_date.trim());
         if (last_sync_date == null || date.isAfter(last_sync_date))
-        // TODO await all in once
-          await download_calendar(cal, config.calendars[cal]!['url']);
+          proms.add(download_calendar(cal, config.calendars[cal]!['url']));
       } catch(err) {
         print("failed to check events update: '$err'");
       }
     }
+		for (var p in proms) await p;
 		fill_locations();
     save_list();
 		_items = items.value;
@@ -120,7 +119,7 @@ class EventList extends ItemList<Event> {
 
 	fill_locations() async {
 		var locs = {};
-		late GeoCode geocode = GeoCode();
+		late GeoFR geocode = GeoFR();
 		for (var ev in items.value) {
 			if (ev.location == null
 					|| ev.location == 'TBD' // TODO remove once fixed upstream
@@ -134,31 +133,64 @@ class EventList extends ItemList<Event> {
 			var saved = await db.get_loc(ev.location);
 			if (saved != null) {
 				locs[ev.location] = saved;
+				ev.coords = saved;
 				_update_item(ev);
 				continue;
 			}
-			Coordinates latlng;
+			var coords = <double>[];
 			try {
-				latlng = await geocode.forwardGeocoding(address: ev.location!);
-				sleep(const Duration(seconds: 2));
+				coords = await geocode.geocode(ev.location!);
 			}
 			catch (err) {
 				print("didn't found ${ev.location} or req failed : $err");
 				continue;
 			}
-			print("fetched loc $latlng for ${ev.location}");
-			var lat = latlng.latitude!;
-			var lon  = latlng.longitude!;
-			ev.coords = [lat, lon];
+			print("fetched loc $coords for ${ev.location}");
+			ev.coords = coords;
 			_update_item(ev);
-			locs[ev.location] = [lat, lon];
-			db.insert_loc(ev.location, lat, lon);
+			locs[ev.location] = coords;
+			db.insert_loc(ev.location, coords[0], coords[1]);
 		}
+	}
+
+	get_day_extent() {
+		List<DateTime> dates = [];
+		for (Event e in _items) {
+			var start_day = DateTime(e.start.year, e.start.month, e.start.day);
+			var end_day = DateTime(e.end.year, e.end.month, e.end.day);
+			if (!dates.contains(start_day)) dates.add(start_day);
+			if (end_day != start_day && !dates.contains(end_day)) dates.add(end_day);
+		}
+		dates.sort((a, b) => a.compareTo(b));
+		return dates;
+	}
+
+	get_time_extend() {
+	}
+
+	get_calendars() {
+		var calendars = Set();
+		for (var ev in _items) {
+			calendars.add(ev.type);
+		}
+		return calendars;
 	}
 
 	filter_reset() { items.value = _items; }
 
-	filter_by_day(DateTime date) {
-		items.value = _items.where((e) => DateTime(e.start.year, e.start.month, e.start.day) == date).toList();
+	filter_by_days(List<DateTime> dates) {
+		if (dates.isEmpty) {
+			items.value = _items;
+			return;
+		}
+		// var comp = DateTime(date.year, date.month, date.day);
+		items.value = _items.where((e) => 
+			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
+			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
+			).toList();
+	}
+
+	filter_by_types(types) {
+		items.value = _items.where((e) => types.contains(e.type)).toList();
 	}
 }

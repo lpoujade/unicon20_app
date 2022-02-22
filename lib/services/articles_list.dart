@@ -32,6 +32,8 @@ class ArticleList extends ItemList<Article> {
     _lang = l;
     await db.save_locale(l);
     items.value = [];
+    (await db.db).delete('articles_categories');
+    (await db.db).delete('categories');
     (await db.db).delete('articles');
     fill();
   }

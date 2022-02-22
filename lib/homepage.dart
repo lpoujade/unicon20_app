@@ -9,7 +9,6 @@ import 'services/database.dart';
 import 'services/events_list.dart';
 import 'data/article.dart';
 import 'services/notifications.dart';
-import 'ui/app_bar.dart';
 import 'ui/text_page.dart';
 import 'screen/calendar.dart';
 import 'screen/news.dart';
@@ -46,14 +45,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
-  late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 2);
+  late final TabController _principalController = TabController(length: 3, vsync: this, initialIndex: 0);
   late String lang;
 
   @override
     Widget build(BuildContext context) {
       return Scaffold(
-          appBar: appBar,
           body: TabBarView(
+						physics: const NeverScrollableScrollPhysics(),
             controller: _principalController,
             children: [
               news_page(widget.articles, openArticle),
@@ -63,13 +62,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ),
           bottomNavigationBar: Container(
             color: Colors.white,
-            padding: const EdgeInsets.all(4.0),
+						padding: const EdgeInsets.all(4.0),
             child: TabBar(
               controller: _principalController,
               indicatorColor: const Color(config.AppColors.green),
               indicatorSize: TabBarIndicatorSize.label,
               indicatorWeight: 2,
-              indicatorPadding: const EdgeInsets.only(bottom: 4.0),
               labelColor: const Color(config.AppColors.green),
               unselectedLabelColor: const Color(config.AppColors.light_blue),
               tabs: const [

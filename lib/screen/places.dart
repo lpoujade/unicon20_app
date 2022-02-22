@@ -1,9 +1,10 @@
 /// Locations page definition
 
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:unicon/data/event.dart';
 import 'package:unicon/services/events_list.dart';
-import 'package:universe/universe.dart';
+import 'package:universe/universe.dart' as u;
 import '../config.dart' as config;
 
 get_places(events) {
@@ -26,33 +27,20 @@ get_places(events) {
 }
 
 evlistMBanner(listenable, data, context) {
-			return MaterialBanner(
-								content: ValueListenableBuilder(
-									valueListenable: listenable,
-									builder: (context, List<Event> events, _child) {
-										List<Widget> content = [];
-										for (var ev in data)
-											content.add(Text(ev.title));
-										return ListView(children: content, shrinkWrap: true);
-									}
-								),
-								actions: <Widget>[
-								TextButton(onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
-									child: const Icon(Icons.close)),
-								],
-				);
+	List<Widget> content = [];
+	for (var ev in data)
+		content.add(Text(ev.title));
+
+	return MaterialBanner(
+			content: ListView(children: content, shrinkWrap: true),
+			actions: <Widget>[
+				TextButton(onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
+				child: const Icon(Icons.close)),
+			],
+	);
 }
 
-LatLng? _center = LatLng(45.1268, 5.7266);
-double? _zoom = 11;
-var controller = MapController();
-double _currentSliderValue = 20;
-
-ValueListenableBuilder<List<Event>> places_page(EventList evlist) {
-	return ValueListenableBuilder(
-			valueListenable: evlist.items,
-			builder: (context, List<Event> events, Widget? _child) {
-
+build_marker_layer(context, events) {
 			var places = get_places(events);
 			var markers = [];
 			for (var p in places.keys) {
@@ -63,39 +51,123 @@ ValueListenableBuilder<List<Event>> places_page(EventList evlist) {
 					children.add(Container(width: c_width, color: color));
 				}
 
-
 				var coords = places[p]['coords'];
-				markers.add(U.Marker(coords, data: places[p]['events'], widget: 
-					SizedBox(height: 30, width: 30, child: ClipRRect(child: Row(children: children)))));
+				markers.add(u.U.Marker(coords, data: places[p]['events'], widget: 
+					SizedBox(height: 30, width: 30, child: ClipRRect(borderRadius: BorderRadius.circular(30), child: Row(children: children)))));
 			}
 
-			var marker_layer = U.MarkerLayer(
+			return u.U.MarkerLayer(
 					markers,
 					onTap: (latlng, data) {
 						ScaffoldMessenger.of(context).clearMaterialBanners();
-						ScaffoldMessenger.of(context).showMaterialBanner(evlistMBanner(evlist.items, data, context));
+						ScaffoldMessenger.of(context).showMaterialBanner(evlistMBanner(events, data, context));
 					}
 			);
+}
 
-			return Stack(
-				children: [ValueListenableBuilder(
-					valueListenable: evlist.items,
-					builder: (context, List<Event> events, _child) {
-					return U.OpenStreetMap(controller: controller, center: _center,
-							zoom: _zoom, markers: marker_layer, onChanged: (center, zoom, w)
-							{_center = center; _zoom = zoom; }); // TODO debounce
-					}),
-          Positioned(
-            left: 20.0, bottom: 10,
-            child: Slider(
-   				   value: _currentSliderValue,
-						 divisions: 5,
-   				   max: 100,
-   				   label: _currentSliderValue.round().toString(),
-   				   onChanged: (double value) { _currentSliderValue = value; },
-   				 )
-          ),
-					]);
-					}
-			);
+var day_status = {};
+build_day_filter_btns(events) {
+return ValueListenableBuilder(
+			valueListenable: events.items, child: const CircularProgressIndicator(),
+			builder: (context, List<Event> events_list, _child) {
+			var ev_days = events.get_day_extent();
+			var children = <Widget>[];
+
+			for (DateTime d in ev_days) {
+				var timestamp = d.millisecondsSinceEpoch;
+				if (!day_status.keys.contains(timestamp))
+						day_status[timestamp] = false;
+				children.add(CheckboxListTile(checkColor: Colors.white, value: day_status[timestamp], onChanged: (b) {
+							day_status[timestamp] = !day_status[timestamp];
+							List<DateTime> selected = [];
+							for (var e in day_status.keys) {
+								if (day_status[e] == true)
+									selected.add(DateTime.fromMillisecondsSinceEpoch(e));
+							}
+							print(day_status);
+							print(selected);
+							events.filter_by_days(selected);
+						},
+						dense: true, subtitle: null, visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+						contentPadding: EdgeInsets.zero,
+						title: Text(DateFormat.E(Localizations.localeOf(context).languageCode).format(d)
+							+ ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(d),
+							style: const TextStyle(height: 1))
+			));
 			}
+			return Column(children: children);
+			});
+}
+
+var cal_status = {};
+build_calendar_filter(events) {
+return ValueListenableBuilder(
+			valueListenable: events.items, child: const CircularProgressIndicator(),
+			builder: (context, List<Event> events_list, _child) {
+			var calendars = events.get_calendars();
+			var children = <Widget>[];
+
+			for (var cal in calendars) {
+				if (!cal_status.keys.contains(cal))
+						cal_status[cal] = false;
+				children.add(Container(color: config.calendars[cal]?['color'],
+				child: CheckboxListTile(
+					checkColor: Colors.white,
+					value: cal_status[cal],
+					onChanged: (b) {
+							cal_status[cal] = !cal_status[cal];
+							var selected = [];
+							for (var c in cal_status.keys) {
+								if (cal_status[c] == true)
+									selected.add(c);
+							}
+							print(cal_status);
+							print(selected);
+							events.filter_by_types(selected);
+						},
+						dense: true, subtitle: null, visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+						contentPadding: EdgeInsets.zero,
+						title: Text(cal,
+							style: const TextStyle(height: 1))
+			)));
+			}
+			return Column(children: children);
+			});
+}
+
+places_page(EventList evlist) {
+	u.LatLng? _center = u.LatLng(config.map_default_lat, config.map_default_lon);
+	double? _zoom = 11;
+	double? _rotation = 0;
+	var controller = u.MapController();
+
+	var map = ValueListenableBuilder(
+			valueListenable: evlist.items, child: const CircularProgressIndicator(),
+			builder: (context, List<Event> events, _child) {
+			return u.U.OpenStreetMap(controller: controller, center: _center, rotation: _rotation,
+					zoom: _zoom, markers: build_marker_layer(context, events), onChanged: (center, zoom, w)
+					{_center = center; _zoom = zoom; _rotation = w;});
+			});
+
+	var buttons = Column(children: [
+				ExpansionTile(
+					expandedAlignment: const Alignment(0, 0),
+					leading: null, subtitle: null, trailing: null,
+					childrenPadding: EdgeInsets.zero,
+					tilePadding: EdgeInsets.zero,
+					title: const Text('days'),
+					children: [build_day_filter_btns(evlist)]
+					),
+				 ExpansionTile(
+					title: const Text('legend'),
+					children: [build_calendar_filter(evlist)]
+					)
+	]);
+
+	return Stack(
+			children: [map,
+			Positioned(
+				left: 10.0, bottom: 10.0, width: 150,
+				child: buttons),
+			]);
+}

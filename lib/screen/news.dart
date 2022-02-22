@@ -11,17 +11,17 @@ import '../services/articles_list.dart';
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.items,
       builder: (context, articles, Widget? _child) {
-        Widget child = ListView();
+        Widget child = Container(color: Colors.grey, child: ListView());
         if (articles.isNotEmpty) {
           articles.sort((a, b) => b.date.compareTo(a.date));
-          child = ListView(children:
+          child =  Container(color: Color(0xffd3d3d3), child: ListView(children:
               articles.map((e) => build_card(e, (article) {
                 if (article.read != 1) {
                   article.read = 1;
                   home_articles.update_item(article);
                 }
                 clicked_card_callback(article);
-              })).toList());
+              })).toList()));
         }
         var refresh_indicator = RefreshIndicator(
             onRefresh: home_articles.refresh, child: child);
@@ -49,7 +49,8 @@ Widget build_card(Article article, var action) {
     fontWeight: is_important ? FontWeight.bold : FontWeight.normal,
   );
 
-  return Card(
+  return Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Card(
+			shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
           title: Text(article.title, style: article_text_style),
           subtitle: cat_name != null ? Text(cat_name) : null,
@@ -60,5 +61,5 @@ Widget build_card(Article article, var action) {
           trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
           onTap: () { action(article); }
         )
-      );
+      ));
 }

@@ -29,10 +29,10 @@ dependencies:
   html_unescape:
   flutter_html: 
   flutter_week_view:
-  cached_network_image:
+  cached_network_image: ^3.0.0-alpha.2
 
-  geocode:
   universe: 1.1.3-nullsafety
+  gpx:
 
 dev_dependencies:
   dartdoc:
