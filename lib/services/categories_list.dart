@@ -57,6 +57,6 @@ class CategoriesList extends ItemList<Category> {
   }
 
   bool have_important_category() {
-    return null != items.value.firstWhereOrNull((element) => element.name.toLowerCase() == config.important_category_name);
+    return null != items.value.firstWhereOrNull((element) => element.slug == config.important_category_name);
   }
 }

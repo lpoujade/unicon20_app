@@ -93,12 +93,12 @@ const default_notif_channel_name = 'UNICON20';
 /// Categories and priority
 /// Only top priority category will be shown for each articles
 const categories_weight = {
-  'important': 10,
+  'priority': 10,
   'information': 5
 };
 
 /// Category which will be showed as important
-const important_category_name = 'important';
+const important_category_name = 'priority';
 
 /// Don't get articles from wordpress before this date
 const max_article_date = '2020-12-21';

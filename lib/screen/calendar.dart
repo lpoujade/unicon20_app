@@ -11,20 +11,6 @@ import '../data/event.dart';
 import '../services/events_list.dart';
 import '../tools/utils.dart';
 
-class MyZoomListener implements ZoomControllerListener {
-	@override
-	onZoomFactorChanged(controller, scale_details) {
-		print(controller);
-		print(scale_details);
-	}
-
-	@override
-	onZoomStart(controller, scale_start_details) {
-		print(controller);
-		print(scale_start_details);
-	}
-}
-
 /// Calendar page
 ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
   return ValueListenableBuilder(
@@ -53,11 +39,9 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
 	var view_height = MediaQuery.of(context).size.height * .9;
 
 	var zoom_controller = WeekViewController();
-	zoom_controller.addListener(MyZoomListener());
 
   var wk = WeekView(
       dates: dates,
-      initialTime: DateTime.now(),
       minimumTime: min_time,
       hoursColumnStyle: HoursColumnStyle(
           width: 25,

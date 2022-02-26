@@ -55,7 +55,7 @@ Future<List<Article>> get_posts_from_wp(
 
   for (final p in postList) {
     final img =  (p['_embedded']['wp:featuredmedia'] != null)
-        ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['thumbnail']['source_url']
+        ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['medium_large']['source_url']
         : '';
 
     var categories = CategoriesList(db: DBInstance(), parent_id: p['id']);

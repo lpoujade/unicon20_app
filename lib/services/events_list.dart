@@ -58,12 +58,12 @@ class EventList extends ItemList<Event> {
       }
     }
 		for (var p in proms) await p;
-		fill_locations();
+		await fill_locations();
     save_list();
 		_items = items.value;
   }
 
-  download_calendar(String name, String url) async {
+  Future<void> download_calendar(String name, String url) async {
     List<Event> event_list = [];
     print("http GET '$name': '$url");
     var client = RetryClient(http.Client());
@@ -118,23 +118,22 @@ class EventList extends ItemList<Event> {
 	}
 
 	fill_locations() async {
-		var locs = {};
+		Map<String, List<double>> locs = {};
 		late GeoFR geocode = GeoFR();
 		for (var ev in items.value) {
 			if (ev.location == null
 					|| ev.location == 'TBD' // TODO remove once fixed upstream
-					|| ev.location == '')
+					|| ev.location == '') {
 				continue;
+				}
 			if (locs.keys.contains(ev.location)) {
 				ev.coords = locs[ev.location];
-				_update_item(ev);
 				continue;
 			}
 			var saved = await db.get_loc(ev.location);
 			if (saved != null) {
-				locs[ev.location] = saved;
+				locs[ev.location!] = saved;
 				ev.coords = saved;
-				_update_item(ev);
 				continue;
 			}
 			var coords = <double>[];
@@ -142,14 +141,11 @@ class EventList extends ItemList<Event> {
 				coords = await geocode.geocode(ev.location!);
 			}
 			catch (err) {
-				print("didn't found ${ev.location} or req failed : $err");
 				continue;
 			}
-			print("fetched loc $coords for ${ev.location}");
 			ev.coords = coords;
-			_update_item(ev);
-			locs[ev.location] = coords;
-			db.insert_loc(ev.location, coords[0], coords[1]);
+			locs[ev.location!] = coords;
+			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
 	}
 

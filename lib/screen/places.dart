@@ -17,7 +17,7 @@ get_places(events) {
 			continue;
 
 		if (!places.keys.contains(addr))
-			places[addr] =  {'coords': coords, 'events': <Event>[], 'colors': Set()};
+			places[addr] =  {'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
 
 		places[addr]?['events'].add(event);
 		places[addr]?['colors'].add(config.calendars[event.type]?['color']);
@@ -48,12 +48,11 @@ build_marker_layer(context, events) {
 				var c_width = 30 / places[p]['colors'].length;
 				List<Widget> children = [];
 				for (var color in places[p]['colors']) {
-					children.add(Container(width: c_width, color: color));
+					children.add(Container(width: c_width, height: 30, color: color));
 				}
 
 				var coords = places[p]['coords'];
-				markers.add(u.U.Marker(coords, data: places[p]['events'], widget: 
-					SizedBox(height: 30, width: 30, child: ClipRRect(borderRadius: BorderRadius.circular(30), child: Row(children: children)))));
+				markers.add(u.U.Marker(coords, data: places[p]['events'], widget: Row(children: children)));
 			}
 
 			return u.U.MarkerLayer(
@@ -84,15 +83,13 @@ return ValueListenableBuilder(
 								if (day_status[e] == true)
 									selected.add(DateTime.fromMillisecondsSinceEpoch(e));
 							}
-							print(day_status);
-							print(selected);
 							events.filter_by_days(selected);
 						},
-						dense: true, subtitle: null, visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+						dense: true, visualDensity: const VisualDensity(vertical: -4),
 						contentPadding: EdgeInsets.zero,
 						title: Text(DateFormat.E(Localizations.localeOf(context).languageCode).format(d)
 							+ ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(d),
-							style: const TextStyle(height: 1))
+							style: const TextStyle(height: 1, color: Colors.white))
 			));
 			}
 			return Column(children: children);
@@ -121,12 +118,9 @@ return ValueListenableBuilder(
 								if (cal_status[c] == true)
 									selected.add(c);
 							}
-							print(cal_status);
-							print(selected);
 							events.filter_by_types(selected);
 						},
 						dense: true, subtitle: null, visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-						contentPadding: EdgeInsets.zero,
 						title: Text(cal,
 							style: const TextStyle(height: 1))
 			)));
@@ -149,20 +143,18 @@ places_page(EventList evlist) {
 					{_center = center; _zoom = zoom; _rotation = w;});
 			});
 
-	var buttons = Column(children: [
+	var buttons = Container(
+	color: Colors.black.withOpacity(.3),
+	child: Column(children: [
 				ExpansionTile(
-					expandedAlignment: const Alignment(0, 0),
-					leading: null, subtitle: null, trailing: null,
-					childrenPadding: EdgeInsets.zero,
-					tilePadding: EdgeInsets.zero,
-					title: const Text('days'),
+					title: const Text('days', style: TextStyle(color: Colors.white)),
 					children: [build_day_filter_btns(evlist)]
 					),
 				 ExpansionTile(
-					title: const Text('legend'),
+					title: const Text('legend', style: TextStyle(color: Colors.white)),
 					children: [build_calendar_filter(evlist)]
 					)
-	]);
+	]));
 
 	return Stack(
 			children: [map,

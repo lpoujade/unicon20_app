@@ -11,17 +11,17 @@ import '../services/articles_list.dart';
 ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var clicked_card_callback) {
   return ValueListenableBuilder(valueListenable: home_articles.items,
       builder: (context, articles, Widget? _child) {
-        Widget child = Container(color: Colors.grey, child: ListView());
+        Widget child = ListView();
         if (articles.isNotEmpty) {
           articles.sort((a, b) => b.date.compareTo(a.date));
-          child =  Container(color: Color(0xffd3d3d3), child: ListView(children:
-              articles.map((e) => build_card(e, (article) {
+          child = ListView(children:
+              articles.map((e) => build_card(e, context, (article) {
                 if (article.read != 1) {
                   article.read = 1;
                   home_articles.update_item(article);
                 }
                 clicked_card_callback(article);
-              })).toList()));
+              })).toList());
         }
         var refresh_indicator = RefreshIndicator(
             onRefresh: home_articles.refresh, child: child);
@@ -31,35 +31,37 @@ ValueListenableBuilder<List<Article>> news_page(ArticleList home_articles, var c
 
 /// Create a [Card] widget from an [Article]
 /// Expand to a [TextPage]
-Widget build_card(Article article, var action) {
-  var img = article.img.isEmpty ? null
-      : FadeInImage(
-          placeholder: const AssetImage('res/topLogo.png'),
-          image: CachedNetworkImageProvider(article.img),
-          alignment: Alignment.centerLeft,
-          excludeFromSemantics: true
-      );
+Widget build_card(Article article, context, var action) {
+	var card_height = MediaQuery.of(context).size.height / 3.5;
 
   String? cat_name = article.categories.get_first()?.name;
-  final bool is_important = article.is_important();
-  final Color article_normal_text_color = (article.read == 1 ? Colors.grey : Colors.black);
-  final Color article_important_text_color = (article.read == 1 ? Colors.redAccent : Colors.red);
-  final TextStyle article_text_style = TextStyle(
-    color: is_important ? article_important_text_color : article_normal_text_color,
-    fontWeight: is_important ? FontWeight.bold : FontWeight.normal,
+  const TextStyle title_style = TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+		fontSize: 20
   );
+  var cat_style = article.is_important() ?
+	const TextStyle(backgroundColor: Colors.red, color: Colors.white)
+	: const TextStyle(color: Colors.white, backgroundColor: Colors.blue);
 
-  return Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Card(
-			shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: ListTile(
-          title: Text(article.title, style: article_text_style),
-          subtitle: cat_name != null ? Text(cat_name) : null,
-          leading: ClipRRect(
-              borderRadius: BorderRadius.circular(50.0),
-              child: img
-            ),
-          trailing: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.grey),
+	return Card(
+			margin: const EdgeInsets.only(bottom: 2),
+			shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(60)),
+			child: Container(
+				height: card_height,
+				decoration: BoxDecoration(
+					color: Colors.black,
+					image: DecorationImage(
+						opacity: .5,
+						fit: BoxFit.cover,
+						image: CachedNetworkImageProvider(article.img),
+						)
+					),
+				child: Center(child: ListTile(
+					subtitle: Text(article.title, style: title_style),
+					title: cat_name != null ? Text(cat_name, style: cat_style) : null,
           onTap: () { action(article); }
-        )
-      ));
+					))
+				)
+		);
 }
