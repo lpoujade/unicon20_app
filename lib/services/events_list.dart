@@ -20,6 +20,7 @@ class EventList extends ItemList<Event> {
   EventList({required DBInstance db}): super(db: db, db_table: 'events');
 
 	List<DateTime> dates = [];
+	var filters = {};
 
   /// Get events from db and from ics calendar
   @override
@@ -61,6 +62,8 @@ class EventList extends ItemList<Event> {
 		await fill_locations();
     save_list();
 		_items = items.value;
+		items.value = [];
+		items.value = _items;
   }
 
   Future<void> download_calendar(String name, String url) async {
@@ -161,9 +164,6 @@ class EventList extends ItemList<Event> {
 		return dates;
 	}
 
-	get_time_extend() {
-	}
-
 	get_calendars() {
 		var calendars = Set();
 		for (var ev in _items) {
@@ -179,7 +179,6 @@ class EventList extends ItemList<Event> {
 			items.value = _items;
 			return;
 		}
-		// var comp = DateTime(date.year, date.month, date.day);
 		items.value = _items.where((e) => 
 			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
 			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
@@ -187,6 +186,10 @@ class EventList extends ItemList<Event> {
 	}
 
 	filter_by_types(types) {
+		if (types.isEmpty) {
+			items.value = _items;
+			return;
+		}
 		items.value = _items.where((e) => types.contains(e.type)).toList();
 	}
 }
