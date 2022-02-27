@@ -12,8 +12,7 @@ class Notifications {
   /// Initialize plugin and attach callback to handle
   /// notifications tap
   initialize(Future<dynamic> Function(String?)? notif_callback) async {
-    // app_icon from android/app/src/main/res/drawable
-    const initializationSettingsAndroid = AndroidInitializationSettings('notification_icon');
+    const initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
     const initializationSettingsIOS = IOSInitializationSettings();
     const initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid,

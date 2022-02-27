@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# generate files with last modification date from ICS calendars URL
+# usage: ./caldav_diff.sh target_dir/ calendar_urls
+# with calendar_urls a path to a file with a calendar name and an url on each line like:
+# unicon_admin https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics
+
 set -e
 
 dir="$1"
@@ -15,9 +20,8 @@ test -f "$calendars" || {
   exit 3;
 }
 
-while read line; do
-  test "$line" || continue
-  calendar_name="$line"
+while read calendar_name; do
+  test "$calendar_name" || continue
   read url
   test "$url" || {
     echo "missing url for calendar '$calendar_name'";

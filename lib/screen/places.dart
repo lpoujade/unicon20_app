@@ -32,7 +32,7 @@ evlistMBanner(listenable, data, context) {
 		content.add(Text(ev.title));
 
 	return MaterialBanner(
-			content: ListView(children: content, shrinkWrap: true),
+			content: SizedBox(height: MediaQuery.of(context).size.height/3, child: ListView(children: content, shrinkWrap: true)),
 			actions: <Widget>[
 				TextButton(onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
 				child: const Icon(Icons.close)),

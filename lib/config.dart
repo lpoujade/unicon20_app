@@ -19,7 +19,7 @@ class AppColors {
 /// WordPress base URL (fetched from env to ease development)
 const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://unicon-test-wordpress.lpo.host');
 
-/// Base endpoint
+/// Base endpoint, may changed between wp versions/plugins
 const api_path = '/wp-json/wp/v2';
 
 /// Calendars
@@ -83,7 +83,7 @@ const supported_locales = [
 /// UTC offset of timezone where events take place
 const calendar_utc_offset = {'hour': 1, 'minute': 0};
 
-/// Show year for events after this year
+/// Show year with day/month for events after/before this year
 const event_year = 2022;
 
 /// Notifications channel for Android if post category doesn't match with those configured below
@@ -107,7 +107,7 @@ const max_article_date = '2020-12-21';
 const map_default_lat = 45.1268;
 const map_default_lon = 5.7266;
 
-/// Geocoding service url : should accept a single and complete url-encoded address
-/// and return a GeoJSON with one feature of type point using crs 4326
+/// Geocoding service url : should accept a complete url-encoded address
+/// and return a GeoJSON with one feature of type point
 /// 'QUERY' will be replaced by url encoded adresse,
 const geoservice = 'https://api-adresse.data.gouv.fr/search?q=QUERY&limit=1&autocomplete=0';

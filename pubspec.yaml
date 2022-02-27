@@ -13,18 +13,20 @@ dependencies:
     sdk: flutter
 
   http:
+  http_retry:
   sqflite:
   path:
   ical_parser:
     git: https://github.com/lpoujade/ical-parser
+
   background_fetch:
   flutter_local_notifications:
-  rflutter_alert:
   url_launcher:
+
+  rflutter_alert:
   auto_size_text:
 
   fluttertoast:
-  http_retry:
 
   html_unescape:
   flutter_html: 

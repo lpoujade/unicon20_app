@@ -62,6 +62,7 @@ class EventList extends ItemList<Event> {
 		await fill_locations();
     save_list();
 		_items = items.value;
+		// TODO fix
 		items.value = [];
 		items.value = _items;
   }

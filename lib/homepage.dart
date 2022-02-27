@@ -113,10 +113,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     }
 
   openArticle(Article article) {
-    if (Navigator.canPop(context)) Navigator.pop(context);
-    _principalController.index = 0;
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) =>
-          TextPage(title: article.title, content: article.content, date: article.date)));
-  }
+		if (Navigator.canPop(context)) Navigator.pop(context);
+		_principalController.index = 0;
+		Navigator.push(context,
+				MaterialPageRoute(builder: (context) =>
+					TextPage(title: article.title, content: article.content, date: article.date)));
+	}
 }
