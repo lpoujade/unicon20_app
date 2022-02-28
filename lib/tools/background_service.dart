@@ -12,7 +12,7 @@ BackgroundFetchConfig config =  BackgroundFetchConfig(
     requiresCharging: false,
     requiresStorageNotLow: false,
     requiresDeviceIdle: false,
-    requiredNetworkType: NetworkType.UNMETERED
+    requiredNetworkType: NetworkType.ANY
     );
 
 
