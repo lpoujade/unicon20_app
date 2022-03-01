@@ -70,4 +70,11 @@ class Article extends AData  {
   String toString() {
     return "Article('$id', '$title', '$categories')";
   }
+
+	get_last_update() {
+		if (modification_date != null && modification_date!.isAfter(date))
+			return modification_date;
+		else
+			return date;
+	}
 }

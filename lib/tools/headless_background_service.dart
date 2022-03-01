@@ -15,19 +15,26 @@ headless_task(HeadlessTask task) async {
   var article_list = ArticleList(db: db);
   var event_list = EventList(db: db);
 
-  event_list.refresh();
+  var evp = event_list.refresh();
   List<Article> new_articles = await article_list.refresh();
 
+	var count = 0;
+	Article last = article_list.items.value.first;
+
   for (var article in new_articles) {
-    if (article.read == 1) continue;
-    notifier.show(
-        article.title,
-	null,
-        '${article.id}',
-        article.categories.get_first()?.slug,
-        article.categories.get_first()?.name
-        );
-  }
-  db.close();
-  BackgroundFetch.finish(taskId);
+		if (article.read == 1) continue;
+		count++;
+		if (article.get_last_update().isAfter(last.get_last_update()))
+			last = article;
+	}
+	notifier.show(
+			last.title,
+			count > 0 ? 'and $count more' : null,
+			'${last.id}',
+			last.categories.get_first()?.slug,
+			last.categories.get_first()?.name
+			);
+	await evp;
+	db.close();
+	BackgroundFetch.finish(taskId);
 }

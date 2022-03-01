@@ -51,8 +51,14 @@ build_marker_layer(context, events) {
 					children.add(Container(width: c_width, height: 30, color: color));
 				}
 
+				Widget marker = Stack(children: [
+						const Positioned(bottom: 0, width: 30, child: Icon(Icons.place)),
+						Row(children: children)
+				]);
+
+
 				var coords = places[p]['coords'];
-				markers.add(u.U.Marker(coords, data: places[p]['events'], widget: Row(children: children)));
+				markers.add(u.U.Marker(coords, data: places[p]['events'], widget: marker));
 			}
 
 			return u.U.MarkerLayer(

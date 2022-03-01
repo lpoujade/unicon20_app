@@ -17,30 +17,38 @@ import 'tools/background_service.dart';
 
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+	MyHomePage({Key? key}) : super(key: key);
 
-  final db = DBInstance();
-  late final notifier = Notifications();
+	final db = DBInstance();
+	late final notifier = Notifications();
 
-  late final articles = ArticleList(db: db);
-  late final events = EventList(db: db);
+	late final articles = ArticleList(db: db);
+	late final events = EventList(db: db);
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+	@override
+		State<MyHomePage> createState() => _MyHomePageState();
 
-  background_task() async {
-    events.refresh();
-    var new_articles = await articles.refresh();
-    for (var article in new_articles) {
-      if (article.read == 1) continue;
-      notifier.show(
-          article.title,
-          null, '${article.id}',
-          article.categories.get_first()?.slug,
-          article.categories.get_first()?.name
-          );
-    }
-  }
+	background_task() async {
+		events.refresh();
+		var new_articles = await articles.refresh();
+
+		var count = 0;
+		Article last = articles.items.value.first;
+
+		for (var article in new_articles) {
+			if (article.read == 1) continue;
+			count++;
+			if (article.get_last_update().isAfter(last.get_last_update()))
+				last = article;
+		}
+		notifier.show(
+				last.title,
+				count > 0 ? 'and $count more' : null,
+				'${last.id}',
+				last.categories.get_first()?.slug,
+				last.categories.get_first()?.name
+				);
+	}
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {

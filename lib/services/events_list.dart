@@ -130,6 +130,10 @@ class EventList extends ItemList<Event> {
 					|| ev.location == '') {
 				continue;
 				}
+			if (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(ev.location!)) {
+				ev.coords = ev.location!.split(',').map((e) => double.parse(e)).toList();
+				continue;
+			}
 			if (locs.keys.contains(ev.location)) {
 				ev.coords = locs[ev.location];
 				continue;
@@ -174,6 +178,18 @@ class EventList extends ItemList<Event> {
 	}
 
 	filter_reset() { items.value = _items; }
+
+	filter(dates, types) {
+		if (dates.isEmpty && types.isEmpty) {
+			items.value = _items;
+			return;
+		}
+		items.value = _items.where((e) => 
+			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
+			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
+			|| types.contains(e.type)
+			).toList();
+	}
 
 	filter_by_days(List<DateTime> dates) {
 		if (dates.isEmpty) {

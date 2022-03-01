@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:unicon/data/event.dart';
 
 var day_status = {};
+List<DateTime> selected_dates = [];
+
 build_day_filter_btns(events) {
 return ValueListenableBuilder(
 			valueListenable: events.items, child: const CircularProgressIndicator(),
@@ -18,12 +20,12 @@ return ValueListenableBuilder(
 						day_status[timestamp] = false;
 				children.add(CheckboxListTile(checkColor: Colors.white, value: day_status[timestamp], onChanged: (b) {
 							day_status[timestamp] = !day_status[timestamp];
-							List<DateTime> selected = [];
+							selected_dates = [];
 							for (var e in day_status.keys) {
 								if (day_status[e] == true)
-									selected.add(DateTime.fromMillisecondsSinceEpoch(e));
+									selected_dates.add(DateTime.fromMillisecondsSinceEpoch(e));
 							}
-							events.filter_by_days(selected);
+							events.filter(selected_dates, selected_types);
 						},
 						dense: true, visualDensity: const VisualDensity(vertical: -4),
 						contentPadding: EdgeInsets.zero,
@@ -37,6 +39,8 @@ return ValueListenableBuilder(
 }
 
 var cal_status = {};
+var selected_types = [];
+
 build_calendar_filter(events) {
 return ValueListenableBuilder(
 			valueListenable: events.items, child: const CircularProgressIndicator(),
@@ -53,12 +57,12 @@ return ValueListenableBuilder(
 					value: cal_status[cal],
 					onChanged: (b) {
 							cal_status[cal] = !cal_status[cal];
-							var selected = [];
+							selected_types = [];
 							for (var c in cal_status.keys) {
 								if (cal_status[c] == true)
-									selected.add(c);
+									selected_types.add(c);
 							}
-							events.filter_by_types(selected);
+							events.filter(selected_dates, selected_types);
 						},
 						dense: true, subtitle: null, visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
 						title: Text(cal,
