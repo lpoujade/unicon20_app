@@ -90,27 +90,27 @@ class ArticleList extends ItemList<Article> {
       var db_article = items.value.firstWhereOrNull((element) => element.id == wp_article.id);
 
       if(db_article != null) {
-      	if (wp_article.modification_date != db_article.modification_date) {
-		db_article.read = 0;
-		print('article changed $db_article');
+				if (wp_article.modification_date != db_article.modification_date) {
+					db_article.read = 0;
+					print('article changed $db_article');
+					db_article.date = wp_article.date;
+					db_article.modification_date = wp_article.modification_date;
+					db_article.title = wp_article.title;
+					db_article.content = wp_article.content;
+					db_article.img = wp_article.img;
+					db_article.categories = wp_article.categories;
+					modified = true;
+				}
+			} else {
+				new_articles += [wp_article];
+				items.value += [wp_article];
+			}
+		}
+
+		if (modified || new_articles.isNotEmpty) {
+			await save_list();
+		}
+
+		return new_articles;
 	}
-        db_article.date = wp_article.date;
-        db_article.modification_date = wp_article.modification_date;
-        db_article.title = wp_article.title;
-        db_article.content = wp_article.content;
-        db_article.img = wp_article.img;
-        db_article.categories = wp_article.categories;
-        modified = true;
-      } else {
-        new_articles += [wp_article];
-        items.value += [wp_article];
-      }
-    }
-
-    if (modified || new_articles.isNotEmpty) {
-      await save_list();
-    }
-
-    return new_articles;
-  }
 }

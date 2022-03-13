@@ -41,13 +41,15 @@ class MyHomePage extends StatefulWidget {
 			if (article.get_last_update().isAfter(last.get_last_update()))
 				last = article;
 		}
-		notifier.show(
-				last.title,
-				count > 0 ? 'and $count more' : null,
-				'${last.id}',
-				last.categories.get_first()?.slug,
-				last.categories.get_first()?.name
-				);
+		if (count > 0) {
+			notifier.show(
+					last.title,
+					count > 0 ? 'and $count more' : null,
+					'${last.id}',
+					last.categories.get_first()?.slug,
+					last.categories.get_first()?.name
+					);
+		}
 	}
 }
 
