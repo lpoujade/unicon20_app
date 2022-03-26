@@ -45,7 +45,6 @@ class EventList extends ItemList<Event> {
 
   /// Download [Events] from ICS URLs
   Future<void> refresh() async {
-		var proms = [];
     var last_sync_date = await db.get_last_event_sync_date();
     for (String cal in config.calendars.keys) {
       var client = RetryClient(http.Client());
@@ -53,12 +52,11 @@ class EventList extends ItemList<Event> {
         String raw_date = await client.read(Uri.parse(config.calendar_check_url + cal));
         var date = DateTime.parse(raw_date.trim());
         if (last_sync_date == null || date.isAfter(last_sync_date))
-          proms.add(download_calendar(cal, config.calendars[cal]!['url']));
+          await download_calendar(cal, config.calendars[cal]!['url']);
       } catch(err) {
         print("failed to check events update: '$err'");
       }
     }
-		for (var p in proms) await p;
 		await fill_locations();
     save_list();
 		_items = items.value;
