@@ -31,7 +31,7 @@ def keystoreProperties = new Properties()
     }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -41,7 +41,7 @@ android {
     defaultConfig {
         applicationId "fr.cnm.unicon"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -60,8 +60,12 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+		buildscript {
+			ext.kotlin_version = '1.6.10'               // or latest
+		}
 }
 
 flutter {
-    source '../..'
+	source '../..'
 }

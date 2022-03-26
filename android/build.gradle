@@ -1,8 +1,8 @@
 buildscript {
-    ext.kotlin_version = '1.3.72'               // or latest
+    ext.kotlin_version = '1.6.10'               // or latest
     ext {
-        compileSdkVersion   = 30                // or latest
-        targetSdkVersion    = 30                // or latest
+        compileSdkVersion   = 31                // or latest
+        targetSdkVersion    = 31                // or latest
         appCompatVersion    = "1.1.0"           // or latest
     }
     repositories {

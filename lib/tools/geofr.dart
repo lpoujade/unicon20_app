@@ -10,8 +10,8 @@ class GeoFR {
 		var client = http.Client();
     var response = await client.read(uri).timeout(const Duration(seconds: 60));
 		var result = json.decode(response);
-		var coords = result['features'][0]['geometry']['coordinates'];
-		List<double> latlng = [coords[1], coords[0]];
-		return latlng;
+		if (result.isEmpty) throw("didn't found '$address'");
+		var _res = result.first;
+		return [double.parse(_res['lat']), double.parse(_res['lon'])];
 	}
 }

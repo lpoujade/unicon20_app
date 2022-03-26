@@ -21,13 +21,12 @@ Future<List<Article>> get_posts_from_wp(
 
   print('api using lang $lang');
   var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
-  var path = config.wordpress_host + _lang + config.api_path + '/posts?per_page=100';
-  var filters = ['_embed'];
+  var path = config.wordpress_host + _lang + config.api_path + '/posts';
+  var filters = ['_embed', 'per_page=100'];
   if (since != null) filters.add('modified_after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
   if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
   if (filters.isNotEmpty) path += '?' + filters.join('&');
-  print("http GET '$path'");
   var url = Uri.parse(path);
   var articles = <Article>[];
 
@@ -40,7 +39,6 @@ Future<List<Article>> get_posts_from_wp(
   try {
     print('get $url');
     var response = await client.read(url).timeout(const Duration(seconds: 60));
-    print("got api response");
     postList = json.decode(response);
   } catch(err) {
     Fluttertoast.showToast(
@@ -54,9 +52,10 @@ Future<List<Article>> get_posts_from_wp(
   } finally { client.close(); }
 
   for (final p in postList) {
-    final img =  (p['_embedded']['wp:featuredmedia'] != null)
-        ? p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['medium_large']['source_url']
-        : '';
+		var img =  '';
+		try {
+			img = p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['medium_large']['source_url'];
+		} catch (e) {1;}
 
     var categories = CategoriesList(db: DBInstance(), parent_id: p['id']);
     for (var category in p['_embedded']['wp:term'][0]) {

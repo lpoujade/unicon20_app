@@ -108,6 +108,7 @@ class EventList extends ItemList<Event> {
 		return places;
 	}
 
+	/*
 	_update_item(_item) {
 		// items.value.removeWhere((element) => element.id == _item.id);
 		var t = items.value;
@@ -118,14 +119,17 @@ class EventList extends ItemList<Event> {
 		// items.value = items.value + [_item];
 		// items.value.add(_item);
 	}
+	*/
 
 	fill_locations() async {
 		Map<String, List<double>> locs = {};
+		List<String> faileds = [];
 		late GeoFR geocode = GeoFR();
 		for (var ev in items.value) {
 			if (ev.location == null
 					|| ev.location == 'TBD' // TODO remove once fixed upstream
-					|| ev.location == '') {
+					|| ev.location == ''
+					|| faileds.contains(ev.location)) {
 				continue;
 				}
 			if (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(ev.location!)) {
@@ -147,12 +151,15 @@ class EventList extends ItemList<Event> {
 				coords = await geocode.geocode(ev.location!);
 			}
 			catch (err) {
+				faileds.add(ev.location!);
 				continue;
 			}
 			ev.coords = coords;
 			locs[ev.location!] = coords;
 			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
+		print("didn't found coords for: ");
+		for (var f in faileds) print(f);
 	}
 
 	get_day_extent() {
@@ -168,7 +175,7 @@ class EventList extends ItemList<Event> {
 	}
 
 	get_calendars() {
-		var calendars = Set();
+		var calendars = []; // = Set();
 		for (var ev in _items) {
 			calendars.add(ev.type);
 		}

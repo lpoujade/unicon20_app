@@ -14,27 +14,28 @@ dependencies:
 
   http:
   http_retry:
+
   sqflite:
   path:
+
   ical_parser:
     git: https://github.com/lpoujade/ical-parser
 
   background_fetch:
   flutter_local_notifications:
-  url_launcher:
 
   rflutter_alert:
   auto_size_text:
-
   fluttertoast:
-
   html_unescape:
   flutter_html: 
+  url_launcher:
+
   flutter_week_view:
   cached_network_image: ^3.0.0-alpha.2
 
-  universe: 1.1.3-nullsafety
-  gpx:
+  universe:
+    git: https://github.com/lpoujade/universe
 
 dev_dependencies:
   dartdoc:

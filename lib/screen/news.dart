@@ -51,11 +51,11 @@ Widget build_card(Article article, context, var action) {
 				height: card_height,
 				decoration: BoxDecoration(
 					color: Colors.black,
-					image: DecorationImage(
+					image: article.img.isEmpty ? null : DecorationImage(
 						opacity: .5,
 						fit: BoxFit.cover,
 						image: CachedNetworkImageProvider(article.img),
-						)
+						),
 					),
 				child: Center(child: ListTile(
 					subtitle: Text(article.title, style: title_style),

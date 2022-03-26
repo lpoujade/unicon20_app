@@ -85,14 +85,13 @@ class ArticleList extends ItemList<Article> {
     final List<Article> wp_articles = await _fetch_wp_articles();
     bool modified = false;
 
-    for(var wp_article in wp_articles) {
+    for (var wp_article in wp_articles) {
 
       var db_article = items.value.firstWhereOrNull((element) => element.id == wp_article.id);
 
       if(db_article != null) {
 				if (wp_article.modification_date != db_article.modification_date) {
 					db_article.read = 0;
-					print('article changed $db_article');
 					db_article.date = wp_article.date;
 					db_article.modification_date = wp_article.modification_date;
 					db_article.title = wp_article.title;
