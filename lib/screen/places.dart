@@ -1,5 +1,6 @@
 /// Locations page definition
 
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:unicon/data/event.dart';
 import 'package:unicon/services/events_list.dart';
@@ -28,14 +29,24 @@ get_places(events) {
 
 evlistMBanner(listenable, data, context) {
 	List<Widget> content = [];
-	for (var ev in data)
-		content.add(Text(ev.title));
+		for (var ev in data)
+			content.add(Row(
+				children: [Text(ev.title), Text(DateFormat.Md(Localizations.localeOf(context).languageCode).format(ev.start))],
+				mainAxisAlignment: MainAxisAlignment.spaceBetween));
 
+	var banner_height = content.length * 20.0 > MediaQuery.of(context).size.height/1.5
+		 ? MediaQuery.of(context).size.height/1.5
+		 : content.length  * 20.0;
 	return MaterialBanner(
-			content: SizedBox(height: MediaQuery.of(context).size.height/3, child: ListView(children: content, shrinkWrap: true)),
+		forceActionsBelow: true,
+			content: SizedBox(height: banner_height, child: ListView(children: content, shrinkWrap: true)),
 			actions: <Widget>[
-				TextButton(onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
-				child: const Icon(Icons.close)),
+				SizedBox(height: 15, child: IconButton(
+						onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
+						padding: EdgeInsets.zero,
+						icon: const Icon(Icons.minimize)
+					)
+				)
 			],
 	);
 }
@@ -89,6 +100,6 @@ places_page(EventList evlist) {
 			children: [map,
 			Positioned(
 				left: 10.0, bottom: 10.0, width: 150,
-				child: get_filters(evlist)),
+				child: get_filters(evlist, legend_only:true)),
 			]);
 }

@@ -48,11 +48,11 @@ class ArticleList extends ItemList<Article> {
 
   /// Read articles from db then from wordpress
   @override
-  fill() async {
+  fill({bool update=true}) async {
     for(var raw_article in await super.get_from_db()) {
       items.value += [await Article.to_article(db, raw_article)];
     }
-    await refresh();
+		if (update) await refresh();
   }
 
   // Fetch wp articles and update network status
@@ -109,6 +109,8 @@ class ArticleList extends ItemList<Article> {
 		if (modified || new_articles.isNotEmpty) {
 			await save_list();
 		}
+
+		print(new_articles);
 
 		return new_articles;
 	}

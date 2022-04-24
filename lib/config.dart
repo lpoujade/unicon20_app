@@ -112,3 +112,4 @@ const map_default_lon = 5.7266;
 /// 'QUERY' will be replaced by url encoded adresse,
 // const geoservice = 'https://api-adresse.data.gouv.fr/search?q=QUERY&limit=1&autocomplete=0';
 const geoservice = 'https://nominatim.lpo.host/search?q=QUERY&limit=1';
+// const geoservice = 'https://nominatim.openstreetmap.org/search?q=QUERY&limit=1&format=json';

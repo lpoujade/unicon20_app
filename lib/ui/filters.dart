@@ -73,18 +73,22 @@ return ValueListenableBuilder(
 			});
 }
 
-get_filters(evlist) {
-	return Container(
-	color: Colors.black.withOpacity(.3),
-	child: Column(children: [
-				ExpansionTile(
-					title: const Text('days', style: TextStyle(color: Colors.white)),
-					children: [build_day_filter_btns(evlist)]
-					),
+get_filters(evlist, {bool legend_only=false}) {
+	var children = [
 				 ExpansionTile(
 					title: const Text('legend', style: TextStyle(color: Colors.white)),
 					children: [build_calendar_filter(evlist)]
 					)
-	]));
+	];
+	if (!legend_only) {
+		children.add(
+				ExpansionTile(
+					title: const Text('days', style: TextStyle(color: Colors.white)),
+					children: [build_day_filter_btns(evlist)]
+					));
+	}
+	return Container(
+	color: Colors.black.withOpacity(.3),
+	child: Column(children: children));
 
 }

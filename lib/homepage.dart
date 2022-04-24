@@ -31,20 +31,10 @@ class MyHomePage extends StatefulWidget {
 	background_task() async {
 		events.refresh();
 		var new_articles = await articles.refresh();
-
-		var count = 0;
-		Article last = articles.items.value.first;
-
-		for (var article in new_articles) {
-			if (article.read == 1) continue;
-			count++;
-			if (article.get_last_update().isAfter(last.get_last_update()))
-				last = article;
-		}
-		if (count > 0) {
+		Article last = new_articles.first;
+		if (new_articles.isNotEmpty) {
 			notifier.show(
-					last.title,
-					count > 0 ? 'and $count more' : null,
+					last.title, '',
 					'${last.id}',
 					last.categories.get_first()?.slug,
 					last.categories.get_first()?.name

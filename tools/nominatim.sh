@@ -10,10 +10,7 @@ _search() {
 	#url="https://api-adresse.data.gouv.fr/search?q=$addr&limit=1&autocomplete=0"
 	echo "$1 :"
 	echo "$url"
-	curl -s "$url" | json_pp | grep -A2 oordinates | grep -v oord
-
-	#echo "---------------"
+	curl -s "$url" | json_pp
 }
 
-#_encode "$1"
-_search "$1"
+_search "$(echo "$1" | tr -d '\r')"

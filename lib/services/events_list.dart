@@ -1,5 +1,7 @@
 /// Manage events list
 
+import 'dart:io';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
@@ -123,15 +125,11 @@ class EventList extends ItemList<Event> {
 
 	fill_locations() async {
 		Map<String, List<double>> locs = {};
-		List<String> faileds = [];
+		List<String> invalids = ['TBD', '']; // TODO remove once fixed upstream
 		late GeoFR geocode = GeoFR();
 		for (var ev in items.value) {
-			if (ev.location == null
-					|| ev.location == 'TBD' // TODO remove once fixed upstream
-					|| ev.location == ''
-					|| faileds.contains(ev.location)) {
+			if (ev.location == null || invalids.contains(ev.location))
 				continue;
-				}
 			if (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(ev.location!)) {
 				ev.coords = ev.location!.split(',').map((e) => double.parse(e)).toList();
 				continue;
@@ -151,15 +149,16 @@ class EventList extends ItemList<Event> {
 				coords = await geocode.geocode(ev.location!);
 			}
 			catch (err) {
-				faileds.add(ev.location!);
+				invalids.add(ev.location!);
 				continue;
 			}
+			sleep(const Duration(seconds: 1));
 			ev.coords = coords;
 			locs[ev.location!] = coords;
 			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
 		print("didn't found coords for: ");
-		for (var f in faileds) print(f);
+		for (var f in invalids) print(f);
 	}
 
 	get_day_extent() {
@@ -175,7 +174,7 @@ class EventList extends ItemList<Event> {
 	}
 
 	get_calendars() {
-		var calendars = []; // = Set();
+		var calendars = Set();
 		for (var ev in _items) {
 			calendars.add(ev.type);
 		}
@@ -190,9 +189,9 @@ class EventList extends ItemList<Event> {
 			return;
 		}
 		items.value = _items.where((e) => 
-			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
-			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
-			|| types.contains(e.type)
+			(dates.isEmpty || (dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
+			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))))
+			&& (types.isEmpty || types.contains(e.type))
 			).toList();
 	}
 

@@ -37,42 +37,41 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
         min_time = min_time.subtract(const HourMinute(minute: 30));
         dates.sort((a, b) => a.compareTo(b));
 
-	var view_height = MediaQuery.of(context).size.height * .9;
+			var view_height = MediaQuery.of(context).size.height * .9;
 
-	var zoom_controller = WeekViewController();
+			var zoom_controller = WeekViewController();
 
-  var wk = Stack(children: [Padding(padding: const EdgeInsets.only(top: 20), child: WeekView(
-			userZoomable: false,
-      dates: dates,
-      minimumTime: min_time,
-      hoursColumnStyle: HoursColumnStyle(
-          width: 25,
-          textAlignment: Alignment.centerRight,
-          timeFormatter: (time) => (time.hour.toString() + ' ')
-      ),
-      dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
-        var date = DateTime(year, month, day);
-        var year_str = (year == config.event_year
-            ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
-            : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
-        var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
-            + ' ' + year_str;
-        return str;
-      }),
-	    dayViewStyleBuilder: (date) => DayViewStyle(hourRowHeight: view_height / (24 - min_time.hour)),
-            events: fitted_events.map((e) => get_wkview_event(context, e)).toList(),
-	    controller: zoom_controller
-        )),
-			Positioned(
-				left: 10.0, bottom: 10.0, width: 150,
-				child: get_filters(home_events))
-				]);
+  		var wk = Stack(children: [Padding(padding: const EdgeInsets.only(top: 20), child: WeekView(
+					userZoomable: false,
+  		    dates: dates,
+  		    minimumTime: min_time,
+  		    hoursColumnStyle: HoursColumnStyle(
+  		        width: 25,
+  		        textAlignment: Alignment.centerRight,
+  		        timeFormatter: (time) => (time.hour.toString() + ' ')
+  		    ),
+  		    dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
+  		      var date = DateTime(year, month, day);
+  		      var year_str = (year == config.event_year
+  		          ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
+  		          : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
+  		      var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
+  		          + ' ' + year_str;
+  		      return str;
+  		    }),
+			    dayViewStyleBuilder: (date) => DayViewStyle(hourRowHeight: view_height / (24 - min_time.hour)),
+  		          events: fitted_events.map((e) => get_wkview_event(context, e)).toList(),
+			    controller: zoom_controller
+  		      )),
+					Positioned(
+						left: 10.0, bottom: 10.0, width: 150,
+						child: get_filters(home_events, legend_only: true))
+						]);
 
-
-	var refresh_indicator = RefreshIndicator(
-		onRefresh: home_events.refresh, child: wk);
-	return refresh_indicator;
-			}
+			var refresh_indicator = RefreshIndicator(
+				onRefresh: home_events.refresh, child: wk);
+			return refresh_indicator;
+    }
   );
 }
 

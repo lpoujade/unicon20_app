@@ -20,7 +20,6 @@ class Notifications {
 
     await notifier.initialize(initializationSettings,
         onSelectNotification: notif_callback);
-
   }
 
   /// Show notification
