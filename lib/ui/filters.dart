@@ -76,7 +76,7 @@ return ValueListenableBuilder(
 get_filters(evlist, {bool legend_only=false}) {
 	var children = [
 				 ExpansionTile(
-					title: const Text('legend', style: TextStyle(color: Colors.white)),
+					title: const Text('caption', style: TextStyle(color: Colors.white)),
 					children: [build_calendar_filter(evlist)]
 					)
 	];
