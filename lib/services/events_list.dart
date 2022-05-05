@@ -18,7 +18,7 @@ import '../config.dart' as config;
 /// to [Database] and functions to read from
 /// an ICS URL
 class EventList extends ItemList<Event> {
-	List<Event> _items = [];
+	final List<Event> _items = [];
   EventList({required DBInstance db}): super(db: db, db_table: 'events');
 
 	List<DateTime> dates = [];
@@ -29,7 +29,7 @@ class EventList extends ItemList<Event> {
   fill() async {
    var raw_events = await super.get_from_db(); 
 
-	 items.value = raw_events.map((e) {
+	list = raw_events.map((e) {
 			 return Event(
 					 uid: e['uid'].toString(),
 					 title: e['title'].toString(),
@@ -61,10 +61,6 @@ class EventList extends ItemList<Event> {
     }
 		await fill_locations();
     save_list();
-		_items = items.value;
-		// TODO fix
-		items.value = [];
-		items.value = _items;
   }
 
   Future<void> download_calendar(String name, String url) async {
@@ -79,9 +75,9 @@ class EventList extends ItemList<Event> {
         var e = Event.fromICalJson(event, name);
         event_list.add(e);
       }
-      items.value.removeWhere((element) => element.type == name);
-      items.value += event_list;
-    } catch(err) {
+			list.removeWhere((element) => element.type == name);
+			list.add(event_list);
+		} catch(err) {
       Fluttertoast.showToast(
           msg: "Failed to fetch events from '$name' calendar at '$url'",
           toastLength: Toast.LENGTH_SHORT,
@@ -96,7 +92,7 @@ class EventList extends ItemList<Event> {
 	Future<Map<String, List<Event>>> get_places() async {
 
 		Map<String, List<Event>> places = {};
-		for (Event event in items.value) {
+		for (Event event in list) {
 			var loc = event.location;
 			if (loc == null) continue;
 			if (loc == 'TBD') continue; // TODO remove once fixed upstream
@@ -110,38 +106,28 @@ class EventList extends ItemList<Event> {
 		return places;
 	}
 
-	/*
-	_update_item(_item) {
-		// items.value.removeWhere((element) => element.id == _item.id);
-		var t = items.value;
-		items.value = [];
-		t.removeWhere((i) => i.id == _item.id);
-		t.add(_item);
-		items.value = t;
-		// items.value = items.value + [_item];
-		// items.value.add(_item);
-	}
-	*/
-
 	fill_locations() async {
 		Map<String, List<double>> locs = {};
 		List<String> invalids = ['TBD', '']; // TODO remove once fixed upstream
 		late GeoFR geocode = GeoFR();
-		for (var ev in items.value) {
+		for (var ev in list) {
 			if (ev.location == null || invalids.contains(ev.location))
 				continue;
 			if (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(ev.location!)) {
 				ev.coords = ev.location!.split(',').map((e) => double.parse(e)).toList();
+				notifyListeners();
 				continue;
 			}
 			if (locs.keys.contains(ev.location)) {
 				ev.coords = locs[ev.location];
+				notifyListeners();
 				continue;
 			}
 			var saved = await db.get_loc(ev.location);
 			if (saved != null) {
 				locs[ev.location!] = saved;
 				ev.coords = saved;
+				notifyListeners();
 				continue;
 			}
 			var coords = <double>[];
@@ -154,6 +140,7 @@ class EventList extends ItemList<Event> {
 			}
 			sleep(const Duration(seconds: 1));
 			ev.coords = coords;
+			notifyListeners();
 			locs[ev.location!] = coords;
 			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
@@ -181,14 +168,14 @@ class EventList extends ItemList<Event> {
 		return calendars;
 	}
 
-	filter_reset() { items.value = _items; }
+	filter_reset() { list = _items; }
 
 	filter(dates, types) {
 		if (dates.isEmpty && types.isEmpty) {
-			items.value = _items;
+		list = _items;
 			return;
 		}
-		items.value = _items.where((e) => 
+	list = _items.where((e) => 
 			(dates.isEmpty || (dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
 			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))))
 			&& (types.isEmpty || types.contains(e.type))
@@ -197,10 +184,10 @@ class EventList extends ItemList<Event> {
 
 	filter_by_days(List<DateTime> dates) {
 		if (dates.isEmpty) {
-			items.value = _items;
+		list = _items;
 			return;
 		}
-		items.value = _items.where((e) => 
+	list = _items.where((e) => 
 			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
 			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
 			).toList();
@@ -208,9 +195,9 @@ class EventList extends ItemList<Event> {
 
 	filter_by_types(types) {
 		if (types.isEmpty) {
-			items.value = _items;
+		list = _items;
 			return;
 		}
-		items.value = _items.where((e) => types.contains(e.type)).toList();
+	list = _items.where((e) => types.contains(e.type)).toList();
 	}
 }

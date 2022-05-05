@@ -6,12 +6,12 @@ import 'package:unicon/main.dart';
 void main() {
 
   testWidgets('Verify main title', (WidgetTester tester) async {
-    await tester.pumpWidget(const UniconApp());
+    await tester.pumpWidget(UniconApp());
     expect(find.textContaining('Unicon'), findsOneWidget);
   });
 
   testWidgets('Search for app bar', (WidgetTester tester) async {
-    await tester.pumpWidget(const UniconApp());
+    await tester.pumpWidget(UniconApp());
     expect(find.byType(AppBar), findsOneWidget);
   });
 }

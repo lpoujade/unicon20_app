@@ -116,7 +116,6 @@ class DBInstance {
     await batch.commit();
   }
 
-  /// Called when updating database
   _onUpgrade(Database db, int cur_version, int new_version) async {
     print('upgrade db from v$cur_version to v$new_version');
     var batch = db.batch();

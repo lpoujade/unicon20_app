@@ -7,10 +7,10 @@ import 'package:unicon/data/event.dart';
 var day_status = {};
 List<DateTime> selected_dates = [];
 
-build_day_filter_btns(events) {
-return ValueListenableBuilder(
-			valueListenable: events.items, child: const CircularProgressIndicator(),
-			builder: (context, List<Event> events_list, _child) {
+build_day_filter_btns(context, events) {
+// return ValueListenableBuilder(
+// 			valueListenable: events.items, child: const CircularProgressIndicator(),
+// 			builder: (context, List<Event> events_list, _child) {
 			var ev_days = events.get_day_extent();
 			var children = <Widget>[];
 
@@ -18,33 +18,37 @@ return ValueListenableBuilder(
 				var timestamp = d.millisecondsSinceEpoch;
 				if (!day_status.keys.contains(timestamp))
 						day_status[timestamp] = false;
-				children.add(CheckboxListTile(checkColor: Colors.white, value: day_status[timestamp], onChanged: (b) {
-							day_status[timestamp] = !day_status[timestamp];
-							selected_dates = [];
-							for (var e in day_status.keys) {
-								if (day_status[e] == true)
-									selected_dates.add(DateTime.fromMillisecondsSinceEpoch(e));
-							}
-							events.filter(selected_dates, selected_types);
-						},
-						dense: true, visualDensity: const VisualDensity(vertical: -4),
-						contentPadding: EdgeInsets.zero,
-						title: Text(DateFormat.E(Localizations.localeOf(context).languageCode).format(d)
-							+ ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(d),
-							style: const TextStyle(height: 1, color: Colors.white))
-			));
-			}
-			return Column(children: children);
-			});
+				children.add(CheckboxListTile(checkColor: Colors.white, value: day_status[timestamp],
+					onChanged: (b) {
+								day_status[timestamp] = !day_status[timestamp];
+								selected_dates = [];
+								for (var e in day_status.keys) {
+									if (day_status[e] == true)
+										selected_dates.add(DateTime.fromMillisecondsSinceEpoch(e));
+								}
+								events.filter(selected_dates, selected_types);
+					},
+					dense: true, visualDensity: const VisualDensity(vertical: -4),
+					contentPadding: EdgeInsets.zero,
+					title: Text(DateFormat.E(Localizations.localeOf(context).languageCode).format(d)
+						+ ' ' + DateFormat.Md(Localizations.localeOf(context).languageCode).format(d),
+						style: const TextStyle(height: 1, color: Colors.white)
+					)
+				)
+			);
+		}
+		return Column(children: children);
+//		}
+//	);
 }
 
 var cal_status = {};
 var selected_types = [];
 
 build_calendar_filter(events) {
-return ValueListenableBuilder(
-			valueListenable: events.items, child: const CircularProgressIndicator(),
-			builder: (context, List<Event> events_list, _child) {
+// return ValueListenableBuilder(
+// 			valueListenable: events.items, child: const CircularProgressIndicator(),
+// 			builder: (context, List<Event> events_list, _child) {
 			var calendars = events.get_calendars();
 			var children = <Widget>[];
 
@@ -70,10 +74,10 @@ return ValueListenableBuilder(
 			)));
 			}
 			return Column(children: children);
-			});
+// 			});
 }
 
-get_filters(evlist, {bool legend_only=false}) {
+get_filters(context, evlist, {bool legend_only=false}) {
 	var children = [
 				 ExpansionTile(
 					title: const Text('caption', style: TextStyle(color: Colors.white)),
@@ -84,7 +88,7 @@ get_filters(evlist, {bool legend_only=false}) {
 		children.add(
 				ExpansionTile(
 					title: const Text('days', style: TextStyle(color: Colors.white)),
-					children: [build_day_filter_btns(evlist)]
+					children: [build_day_filter_btns(context, evlist)]
 					));
 	}
 	return Container(

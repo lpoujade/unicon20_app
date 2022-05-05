@@ -1,7 +1,5 @@
 /// Manage articles list
 
-import 'package:flutter/foundation.dart';
-import 'package:collection/collection.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:unicon/tools/list.dart';
 
@@ -13,10 +11,8 @@ import '../config.dart' as config;
 /// Hold a list of [Article], a connection to [Database] and
 /// handle connections to wordpress
 class ArticleList extends ItemList<Article> {
-
   String? _lang;
   bool loaded = false;
-  final network_error = ValueNotifier<bool>(false);
 
   ArticleList({required DBInstance db})
     : super(db: db, db_table: 'articles');
@@ -31,7 +27,7 @@ class ArticleList extends ItemList<Article> {
   update_lang(l) async {
     _lang = l;
     await db.save_locale(l);
-    items.value = [];
+    list.clear();
     (await db.db).delete('articles_categories');
     (await db.db).delete('categories');
     (await db.db).delete('articles');
@@ -43,14 +39,14 @@ class ArticleList extends ItemList<Article> {
   @override
   save_list() async {
       await super.save_list();
-      for (var a in items.value) await a.categories.save();
+      for (var a in list) await a.categories.save();
   }
 
   /// Read articles from db then from wordpress
   @override
   fill({bool update=true}) async {
     for(var raw_article in await super.get_from_db()) {
-      items.value += [await Article.to_article(db, raw_article)];
+     add(await Article.to_article(db, raw_article));
     }
 		if (update) await refresh();
   }
@@ -69,10 +65,7 @@ class ArticleList extends ItemList<Article> {
           since: (await db.get_last_sync_date()) ?? DateTime.parse(config.max_article_date),
           lang: _lang
       );
-      network_error.value = false;
-    } catch(err) {
-      network_error.value = true;
-    }
+    } catch(err) { print(err); }
 
     return wp_articles;
   }
@@ -87,7 +80,8 @@ class ArticleList extends ItemList<Article> {
 
     for (var wp_article in wp_articles) {
 
-      var db_article = items.value.firstWhereOrNull((element) => element.id == wp_article.id);
+      var db_article = list.firstWhere((element) => element.id == wp_article.id,
+				orElse: () => null);
 
       if(db_article != null) {
 				if (wp_article.modification_date != db_article.modification_date) {
@@ -101,16 +95,14 @@ class ArticleList extends ItemList<Article> {
 					modified = true;
 				}
 			} else {
-				new_articles += [wp_article];
-				items.value += [wp_article];
+				new_articles.add(wp_article);
+				add(wp_article);
 			}
 		}
 
 		if (modified || new_articles.isNotEmpty) {
 			await save_list();
 		}
-
-		print(new_articles);
 
 		return new_articles;
 	}

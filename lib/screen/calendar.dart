@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:unicon/ui/filters.dart';
 
@@ -12,15 +13,20 @@ import '../data/event.dart';
 import '../services/events_list.dart';
 import '../tools/utils.dart';
 
-/// Calendar page
-ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
-  return ValueListenableBuilder(
-      valueListenable: home_events.items, child: const CircularProgressIndicator(),
-      builder: (context, List<Event> events, Widget? unused_child) {
+class Calendar extends StatelessWidget {
+	final EventList events;
+	const Calendar({Key? key, required this.events}) : super(key: key);
+
+	@override
+		Widget build(BuildContext context) {
+			var consumer = Consumer<EventList>(builder: (context, events, child) {
+			if (events.list.isEmpty) {
+				return const Center(child: Text('plz wait'));
+			}
         List<Event> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
-        for (Event e in events) {
+        for (Event e in events.list) {
           Event tmp = Event.from(e);
           tmp.start = fit_date_to_cal(e.start);
           tmp.end = fit_date_to_cal(e.end);
@@ -65,14 +71,15 @@ ValueListenableBuilder<List<Event>> calendar_page(EventList home_events) {
   		      )),
 					Positioned(
 						left: 10.0, bottom: 10.0, width: 150,
-						child: get_filters(home_events, legend_only: true))
+						child: get_filters(context, events, legend_only: true))
 						]);
 
 			var refresh_indicator = RefreshIndicator(
-				onRefresh: home_events.refresh, child: wk);
+				onRefresh: events.refresh, child: wk);
 			return refresh_indicator;
-    }
-  );
+			});
+			return ChangeNotifierProvider.value(value: events, child: consumer);
+		}
 }
 
 /// Create a [FlutterWeekViewEvent] from a [Event]

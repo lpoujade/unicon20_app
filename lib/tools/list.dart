@@ -4,10 +4,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:unicon/data/abstract.dart';
 import '../services/database.dart';
 
-abstract class ItemList<T extends AData> {
+abstract class ItemList<T extends AData> extends ChangeNotifier  {
   DBInstance db;
   String db_table;
-  final items = ValueNotifier<List<T>>([]);
+	final _items = [];
+	// final items = ValueNotifier<List<T>>([]);
 
   ItemList({required this.db, required this.db_table});
 
@@ -17,12 +18,24 @@ abstract class ItemList<T extends AData> {
   // Fetch new items from network source
   // Future<List<T>> refresh();
 
+	get list => _items;
+	set list(other) {
+		_items.clear();
+		_items.addAll(other);
+    notifyListeners();
+	}
+
+	add(T item) {
+		_items.add(item);
+    notifyListeners();
+	}
+
   /// Save an item to local database & to current list
   save_item(T item) async {
     try {
       await (await db.db).insert(db_table, item.toSqlMap(),
           conflictAlgorithm: ConflictAlgorithm.fail);
-      items.value += [item];
+			add(item);
     } catch (e) {
       log("failed to save article '$item': '$e'");
     }
@@ -31,12 +44,12 @@ abstract class ItemList<T extends AData> {
   /// Save the current items list to database
   save_list() async {
     Batch batch = (await db.db).batch();
-    for (var a in items.value)
+    for (var a in _items)
 			batch.insert(db_table, a.toSqlMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     try {
       batch.commit(noResult: true);
     } catch (e) {
-      print("failed to insert into '$db_table' from '${items.value}': '$e'");
+      print("failed to insert into '$db_table' from '$list': '$e'");
     }
   }
 

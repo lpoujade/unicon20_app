@@ -2,6 +2,7 @@
 
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:unicon/data/event.dart';
 import 'package:unicon/services/events_list.dart';
 import 'package:unicon/ui/filters.dart';
@@ -51,6 +52,8 @@ evlistMBanner(listenable, data, context) {
 	);
 }
 
+
+
 build_marker_layer(context, events) {
 			var places = get_places(events);
 			var markers = [];
@@ -81,25 +84,30 @@ build_marker_layer(context, events) {
 			);
 }
 
-places_page(EventList evlist) {
-	u.LatLng? _center = u.LatLng(config.map_default_lat, config.map_default_lon);
-	double? _zoom = 11;
-	double? _rotation = 0;
-	var controller = u.MapController();
+class Map extends StatelessWidget {
+	final EventList events;
+	const Map({Key? key, required this.events}) : super(key: key);
 
-	var map = ValueListenableBuilder(
-			valueListenable: evlist.items, child: const CircularProgressIndicator(),
-			builder: (context, List<Event> events, _child) {
-			return u.U.OpenStreetMap(disableRotation: true, controller: controller, center: _center, rotation: _rotation,
-					zoom: _zoom, markers: build_marker_layer(context, events), onChanged: (center, zoom, w)
-					{_center = center; _zoom = zoom; _rotation = w;});
+	@override
+		Widget build(BuildContext context) {
+			var consumer = Consumer<EventList>(builder: (context, events, child) {
+					u.LatLng? _center = u.LatLng(config.map_default_lat, config.map_default_lon);
+					double? _zoom = 11;
+					double? _rotation = 0;
+					// var controller = u.MapController();
+
+					var map = u.U.OpenStreetMap(markers: build_marker_layer(context, events.list),
+							disableRotation: true, center: _center, rotation: _rotation, zoom: _zoom, 
+							onChanged: (center, zoom, w) {_center = center; _zoom = zoom; _rotation = w;}
+					);
+
+					return Stack(
+							children: [map,
+							Positioned(
+								left: 10.0, bottom: 10.0, width: 150,
+								child: get_filters(context, events, legend_only:true)),
+							]);
 			});
-
-
-	return Stack(
-			children: [map,
-			Positioned(
-				left: 10.0, bottom: 10.0, width: 150,
-				child: get_filters(evlist, legend_only:true)),
-			]);
+			return ChangeNotifierProvider.value(value: events, child: consumer);
+		}
 }

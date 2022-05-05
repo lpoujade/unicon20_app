@@ -64,7 +64,7 @@ Future<List<Article>> get_posts_from_wp(
             slug: category['slug'],
             name: category['name']
             );
-        categories.items.value.add(cat);
+        categories.list.add(cat);
     }
     articles.add(Article(
             id: p['id'],
