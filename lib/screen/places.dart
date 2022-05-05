@@ -18,11 +18,11 @@ get_places(events) {
 		if (coords == null)
 			continue;
 
-		if (!places.keys.contains(addr))
-			places[addr] =  {'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
+		if (!places.keys.contains(coords))
+			places[coords] =  {'addr': addr, 'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
 
-		places[addr]?['events'].add(event);
-		places[addr]?['colors'].add(config.calendars[event.type]?['color']);
+		places[coords]?['events'].add(event);
+		places[coords]?['colors'].add(config.calendars[event.type]?['color']);
 	}
 
 	return places;
@@ -30,6 +30,7 @@ get_places(events) {
 
 evlistMBanner(listenable, data, context) {
 	List<Widget> content = [];
+		data.sort((a, b) => (a.start as DateTime).compareTo(b.start));
 		for (var ev in data)
 			content.add(Row(
 				children: [Text(ev.title), Text(DateFormat.Md(Localizations.localeOf(context).languageCode).format(ev.start))],
