@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../data/article.dart';
 import '../services/articles_list.dart';
 
 class CompetitionsInfo extends StatefulWidget {

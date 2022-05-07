@@ -71,8 +71,8 @@ class Calendar extends StatelessWidget {
   		      )),
 					Positioned(
 						left: 10.0, bottom: 10.0, width: 150,
-						child: get_filters(context, events, legend_only: true))
-						]);
+						child: CalendarFilter(events: events)
+						)]);
 
 			var refresh_indicator = RefreshIndicator(
 				onRefresh: events.refresh, child: wk);

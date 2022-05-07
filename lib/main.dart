@@ -16,6 +16,7 @@ import 'tools/background_service.dart';
 import 'tools/headless_background_service.dart';
 
 main() async {
+	WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(home: UniconApp(),
        title: config.Strings.Title,
        theme: ThemeData(
@@ -35,13 +36,17 @@ main() async {
 }
 
 class UniconApp extends StatefulWidget {
-	UniconApp({Key? key}) : super(key: key);
-
 	final db = DBInstance();
 	late final notifier = Notifications();
 
 	late final articles = ArticleList(db: db);
 	late final events = EventList(db: db);
+
+	UniconApp({Key? key}) : super(key: key) {
+      events.fill();
+      initBackgroundService(background_task)
+        .then((e) => BackgroundFetch.start());
+	}
 
 	@override
 		State<UniconApp> createState() => _UniconAppState();
@@ -98,14 +103,6 @@ class _UniconAppState extends State<UniconApp> with SingleTickerProviderStateMix
               )
             )
           );
-    }
-
-  @override
-    initState() {
-      super.initState();
-      widget.events.fill();
-      initBackgroundService(widget.background_task)
-        .then((e) => BackgroundFetch.start());
     }
 
   @override

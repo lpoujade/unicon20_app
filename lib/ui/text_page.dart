@@ -54,7 +54,7 @@ class TextPage extends StatelessWidget {
                           ]),
 											Html(
 												data: content,
-												onLinkTap: (s, u1, u2, u3) => launch(s.toString()),
+												onLinkTap: (s, u1, u2, u3) => launchUrl(Uri.parse(s.toString())),
 												customRenders: {
 													imageMatcher(): CustomRender.widget(widget: (context, attributes) {
 															var img = context.tree.element?.attributes['horizontal'];

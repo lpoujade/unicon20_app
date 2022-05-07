@@ -43,6 +43,8 @@ class EventList extends ItemList<Event> {
 			 );
 			 }).toList();
     await refresh();
+		_items.clear();
+		_items.addAll(list.cast<Event>());
   }
 
   /// Download [Events] from ICS URLs
@@ -76,7 +78,7 @@ class EventList extends ItemList<Event> {
         event_list.add(e);
       }
 			list.removeWhere((element) => element.type == name);
-			list.add(event_list);
+			list = list + event_list;
 		} catch(err) {
       Fluttertoast.showToast(
           msg: "Failed to fetch events from '$name' calendar at '$url'",
@@ -145,7 +147,7 @@ class EventList extends ItemList<Event> {
 			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
 		print("didn't found coords for: ");
-		for (var f in invalids) print(f);
+		for (var f in invalids) print("'$f'");
 	}
 
 	get_day_extent() {
@@ -172,32 +174,13 @@ class EventList extends ItemList<Event> {
 
 	filter(dates, types) {
 		if (dates.isEmpty && types.isEmpty) {
-		list = _items;
+			list = _items;
 			return;
 		}
-	list = _items.where((e) => 
-			(dates.isEmpty || (dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
-			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))))
-			&& (types.isEmpty || types.contains(e.type))
-			).toList();
-	}
-
-	filter_by_days(List<DateTime> dates) {
-		if (dates.isEmpty) {
-		list = _items;
-			return;
-		}
-	list = _items.where((e) => 
-			dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
-			|| dates.contains(DateTime(e.end.year, e.end.month, e.end.day))
-			).toList();
-	}
-
-	filter_by_types(types) {
-		if (types.isEmpty) {
-		list = _items;
-			return;
-		}
-	list = _items.where((e) => types.contains(e.type)).toList();
+		list = _items.where((e) => 
+				(dates.isEmpty || (dates.contains(DateTime(e.start.year, e.start.month, e.start.day))
+													 || dates.contains(DateTime(e.end.year, e.end.month, e.end.day))))
+				&& (types.isEmpty || types.contains(e.type))
+				).toList();
 	}
 }

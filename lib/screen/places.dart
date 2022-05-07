@@ -95,7 +95,6 @@ class Map extends StatelessWidget {
 					u.LatLng? _center = u.LatLng(config.map_default_lat, config.map_default_lon);
 					double? _zoom = 11;
 					double? _rotation = 0;
-					// var controller = u.MapController();
 
 					var map = u.U.OpenStreetMap(markers: build_marker_layer(context, events.list),
 							disableRotation: true, center: _center, rotation: _rotation, zoom: _zoom, 
@@ -106,8 +105,8 @@ class Map extends StatelessWidget {
 							children: [map,
 							Positioned(
 								left: 10.0, bottom: 10.0, width: 150,
-								child: get_filters(context, events, legend_only:true)),
-							]);
+								child: CalendarFilter(events: events)
+							)]);
 			});
 			return ChangeNotifierProvider.value(value: events, child: consumer);
 		}

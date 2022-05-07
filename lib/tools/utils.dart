@@ -7,8 +7,9 @@ import '../config.dart' as config;
 /// Open an URL in an external app if possible,
 /// else show a toast to notify user about error
 launch_url(String url) async {
-  if ((await canLaunch(url)) != false) {
-    await launch(url);
+	var _url = Uri.parse(url);
+  if ((await canLaunchUrl(_url)) != false) {
+    await launchUrl(_url);
     return;
   }
   Fluttertoast.showToast(
