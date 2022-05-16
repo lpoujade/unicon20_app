@@ -20,7 +20,10 @@ class AppColors {
 const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://unicon-test-wordpress.lpo.host');
 
 /// Base endpoint, may changed between wp versions/plugins
-const api_path = '/wp-json/wp/v2';
+const wp_api_path = '/wp-json/wp/v2';
+
+const competition_api_path = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
+const competition_api_token = String.fromEnvironment('REG_TOKEN');
 
 /// Calendars
 var default_calendar_color = Colors.grey;
@@ -45,8 +48,14 @@ const Map<String, Map<String, dynamic>> calendars = {
   },
   'road': {
     'url': 'https://calendar.google.com/calendar/ical/f53rlq1p3jcm4tf3jguaj1a5ss%40group.calendar.google.com/public/basic.ics',
+    'color': Color(0xffFF5E4D)
+  },
+	/*
+  'road': {
+    'url': 'https://calendar.google.com/calendar/ical/f53rlq1p3jcm4tf3jguaj1a5ss%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xff9dee08)
   },
+	*/
   'team': {
     'url': 'https://calendar.google.com/calendar/ical/sb5l8ble394dohk4kdfnnsarlg%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xfff5b226)

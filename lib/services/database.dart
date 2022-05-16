@@ -20,13 +20,18 @@ const migrations = {
       'alter table article rename to articles',
 
 			'create table places (address text, lat real, lon real, unique(address))'
-  ]
+  ],
+3: [
+		'create table competitions (id integer, name text, updated_at integer, competitor_list_pdf text, start_list text)',
+		'create table results (id integer, name text, published_at integer, pdf text)',
+		'create table competitions_results (competition references competitions(id), result references results(id))'
+]
 };
 
 class DBInstance {
 	static const appid = 1;
 	static const db_name = 'unicon_db.db';
-	static const db_version = 2;
+	static const db_version = 3;
 
   static Database? _db;
 

@@ -11,10 +11,11 @@ Then run the app with a modified env var: `flutter run --dart-define=WP_HOST=htt
 in `lib/config.dart`  
 
 * `wordpress_host` is the Wordpress URL (can be overriden via env var `WP_HOST` to ease development)
+* `competition_api_path` the host (with path) for [Unicycling Registration instance](https://github.com/rdunlop/unicycling-registration). Auth token must be in env for the build system
 * `AppColors` defines colors used for general components (eg top/bottom bars)
 * `calendars` ICS URLs to fetch events; events will be shown using `color` (depending of calendar)
 * `categories_weight` and `important_category_name` for emphasis on certains articles
-* `map_default_lat`/`mai_default_lon` for default map center
+* `map_default_lat`/`map_default_lon` for default map center
 * `geoservice` to define which geocoding service to use to place events on the map
 
 ## Calendar update

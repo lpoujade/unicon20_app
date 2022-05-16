@@ -21,7 +21,7 @@ Future<List<Article>> get_posts_from_wp(
 
   print('api using lang $lang');
   var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
-  var path = config.wordpress_host + _lang + config.api_path + '/posts';
+  var path = config.wordpress_host + _lang + config.wp_api_path + '/posts';
   var filters = ['_embed', 'per_page=100'];
   if (since != null) filters.add('modified_after=' + since.toIso8601String());
   if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));

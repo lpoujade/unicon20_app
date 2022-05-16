@@ -11,6 +11,7 @@ import 'screen/places.dart';
 import 'services/articles_list.dart';
 import 'services/database.dart';
 import 'services/events_list.dart';
+import 'services/competitions_list.dart';
 import 'services/notifications.dart';
 import 'tools/background_service.dart';
 import 'tools/headless_background_service.dart';
@@ -41,9 +42,11 @@ class UniconApp extends StatefulWidget {
 
 	late final articles = ArticleList(db: db);
 	late final events = EventList(db: db);
+	late final competitions = CompetitionsList(db: db);
 
 	UniconApp({Key? key}) : super(key: key) {
       events.fill();
+			competitions.fill();
       initBackgroundService(background_task)
         .then((e) => BackgroundFetch.start());
 	}
@@ -81,7 +84,7 @@ class _UniconAppState extends State<UniconApp> with SingleTickerProviderStateMix
 							News(articles: widget.articles),
 							Calendar(events: widget.events),
 							Map(events: widget.events),
-							CompetitionsInfo(articles: widget.articles)
+							CompetitionsInfo(competitions: widget.competitions)
             ]
           ),
           bottomNavigationBar: Container(

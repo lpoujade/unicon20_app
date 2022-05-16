@@ -12,7 +12,6 @@ import '../config.dart' as config;
 /// handle connections to wordpress
 class ArticleList extends ItemList<Article> {
   String? _lang;
-  bool loaded = false;
 
   ArticleList({required DBInstance db})
     : super(db: db, db_table: 'articles');
