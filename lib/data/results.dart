@@ -4,7 +4,7 @@ class Result extends AData {
 	@override
 	final int id;
 	final String name;
-	final Uri pdf;
+	final String pdf;
 	final DateTime published_at;
 
 	Result({required this.id,
@@ -19,7 +19,7 @@ class Result extends AData {
       'id': id,
       'name': name,
       'pdf': pdf,
-			'published_at': published_at
+			'published_at': published_at.millisecondsSinceEpoch
     };
   }
 }

@@ -10,12 +10,13 @@ import 'package:sqflite/sqflite.dart';
 import 'package:unicon/tools/list.dart';
 
 import '../data/competition.dart';
+import '../data/results.dart';
 import 'database.dart';
 import '../config.dart' as config;
 import 'results_list.dart';
 
 /// Hold a list of [Competition], a connection to [Database] and
-/// handle connections to wordpress
+/// handle connections to the registration website API
 class CompetitionsList extends ItemList<Competition> {
 
   CompetitionsList({required DBInstance db})
@@ -38,8 +39,8 @@ class CompetitionsList extends ItemList<Competition> {
 					 id: e['id'] as int,
 					 name: e['name'].toString(),
 					 updated_at: DateTime.fromMillisecondsSinceEpoch(e['updated_at'] as int),
-					 competitor_list_pdf:e['competitor_list_pdf'].toString(),
-					 start_list_pdf: ['start_list_pdf'].toString(),
+					 competitor_list_pdf: e['competitor_list_pdf'].toString(),
+					 start_list_pdf: e['start_list_pdf'].toString(),
 					 results: ResultsList(db: db, parent_id: e['id'] as int)
 			 );
 			 }).toList();
@@ -62,13 +63,16 @@ class CompetitionsList extends ItemList<Competition> {
 			print('ERROR downloading competitions');
 			rethrow;
 		} finally { client.close(); }
-		// print(competitionsList);
 		var competitions = competitionsList['competitions'];
-		// print(competitions);
-		// {name: Basket - , competitor_list_pdf: null, start_list_pdf: null, results: null, updated_at: 2021-10-19T06:35:13-05:00}
 		for (final comp in competitions) {
 			var comp_id = Random().nextInt(1000);
 			var results = ResultsList(db: db, parent_id: comp_id);
+			if (comp['results'] != null) {
+				for (final res in comp['results']) {
+					var res_id = Random().nextInt(1000);
+					results.add(Result(id: res_id, name: res['name'], published_at: DateTime.parse(res['published_at']), pdf: res['pdf']));
+				}
+			}
 			var _comp = Competition(
 						id: comp_id,
 						name: comp['name'],
@@ -80,6 +84,7 @@ class CompetitionsList extends ItemList<Competition> {
 			new_comps.add(_comp);
 			add(_comp);
 		}
+		save_list();
 		return [];
 	}
 }

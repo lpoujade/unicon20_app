@@ -23,9 +23,9 @@ class Competition extends AData {
     return {
       'id': id,
       'name': name,
-			'updated_at': updated_at,
-			'start_list': start_list_pdf,
-			'competitor_list': competitor_list_pdf
+			'updated_at': updated_at.millisecondsSinceEpoch,
+			'start_list_pdf': start_list_pdf,
+			'competitor_list_pdf': competitor_list_pdf
     };
   }
 

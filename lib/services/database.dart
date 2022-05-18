@@ -22,9 +22,9 @@ const migrations = {
 			'create table places (address text, lat real, lon real, unique(address))'
   ],
 3: [
-		'create table competitions (id integer, name text, updated_at integer, competitor_list_pdf text, start_list text)',
-		'create table results (id integer, name text, published_at integer, pdf text)',
-		'create table competitions_results (competition references competitions(id), result references results(id))'
+		'create table competitions (id integer primary key, name text, updated_at integer, competitor_list_pdf text, start_list_pdf text)',
+		'create table results (id integer primary key, name text, published_at integer, pdf text)',
+		'create table competitions_results (competition references competitions(id), result references results(id), unique(competition, result) on conflict ignore)'
 ]
 };
 

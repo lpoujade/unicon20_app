@@ -21,7 +21,7 @@ class ResultsList extends ItemList<Result> {
       return Result(
           id: e['id'] as int,
           name: e['name'].toString(),
-					pdf: Uri.parse(e['pdf'].toString()),
+					pdf: e['pdf'].toString(),
 					published_at: DateTime.fromMillisecondsSinceEpoch(e['published_at'] as int),
       );
     }).toList();
@@ -34,11 +34,11 @@ class ResultsList extends ItemList<Result> {
 
   /// Save results to db and link them to competitions
   save() async {
-    super.save_list();
+    await super.save_list();
 
     var batch = (await db.db).batch();
-    for (var cat in list) {
-      batch.execute('insert into competitions_results values (?, ?)', [parent_id, cat.id]);
+    for (var result in list) {
+      batch.execute('insert into competitions_results values (?, ?)', [parent_id, result.id]);
     }
     batch.commit();
   }
