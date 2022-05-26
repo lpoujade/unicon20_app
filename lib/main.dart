@@ -56,6 +56,7 @@ class UniconApp extends StatefulWidget {
 
 	background_task() async {
 		events.refresh();
+		competitions.refresh();
 		var new_articles = await articles.refresh();
 		Article last = new_articles.first;
 		if (new_articles.isNotEmpty) {
@@ -101,7 +102,7 @@ class _UniconAppState extends State<UniconApp> with SingleTickerProviderStateMix
                 Tab(icon: Icon(Icons.home)),
 								Tab(icon: Icon(Icons.access_time)),
                 Tab(icon: Icon(Icons.place)),
-                Tab(icon: Icon(Icons.format_list_bulleted))
+                Tab(icon: Icon(Icons.workspace_premium))
               ]
               )
             )

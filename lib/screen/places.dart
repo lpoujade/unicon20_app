@@ -21,8 +21,8 @@ get_places(events) {
 		if (!places.keys.contains(coords))
 			places[coords] =  {'addr': addr, 'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
 
-		places[coords]?['events'].add(event);
-		places[coords]?['colors'].add(config.calendars[event.type]?['color']);
+		places[coords]!['events'].add(event);
+		places[coords]!['colors'].add(config.calendars[event.type]?['color']);
 	}
 
 	return places;

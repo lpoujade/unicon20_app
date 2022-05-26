@@ -55,8 +55,10 @@ class EventList extends ItemList<Event> {
       try {
         String raw_date = await client.read(Uri.parse(config.calendar_check_url + cal));
         var date = DateTime.parse(raw_date.trim());
-        if (last_sync_date == null || date.isAfter(last_sync_date))
+        if (last_sync_date == null || date.isAfter(last_sync_date)) {
+					await delete_calendar(cal);
           await download_calendar(cal, config.calendars[cal]!['url']);
+					}
       } catch(err) {
         print("failed to check events update: '$err'");
       }
@@ -90,6 +92,11 @@ class EventList extends ItemList<Event> {
       rethrow;
     } finally { client.close(); }
   }
+
+	delete_calendar(String name) async {
+			var _db = db.db;
+			await _db.delete('events', where: 'type = ?', whereArgs: [name]);
+	}
 
 	Future<Map<String, List<Event>>> get_places() async {
 

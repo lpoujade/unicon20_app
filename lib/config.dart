@@ -23,6 +23,7 @@ const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://u
 const wp_api_path = '/wp-json/wp/v2';
 
 const competition_api_path = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
+//const competition_api_path = 'https://unicon2020.reg.unicycling-software.com/fr/api/competitions';
 const competition_api_token = String.fromEnvironment('REG_TOKEN');
 
 /// Calendars
@@ -90,7 +91,7 @@ const supported_locales = [
 ];
 
 /// UTC offset of timezone where events take place
-const calendar_utc_offset = {'hour': 2, 'minute': 0};
+const calendar_utc_offset = {'hour': 1, 'minute': 0};
 
 /// Show year with day/month for events after/before this year
 const event_year = 2022;
