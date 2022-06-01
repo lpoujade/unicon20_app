@@ -29,12 +29,6 @@ const competition_api_token = String.fromEnvironment('REG_TOKEN');
 /// Calendars
 var default_calendar_color = Colors.grey;
 const Map<String, Map<String, dynamic>> calendars = {
-/*
-  'test': {
-    'url': 'https://unicon20-app-doc.lpo.host/test.ics',
-    'color': Colors.green
-  },
-	*/
   'admin': {
     'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffbebec1)
@@ -76,7 +70,8 @@ const Map<String, Map<String, dynamic>> calendars = {
 };
 
 /// URL to fetch last update date of each calendar
-const calendar_check_url = 'https://unicon20-app-doc.lpo.host/app_calendars/';
+const calendar_check_url = String.fromEnvironment('CALDAV_DIFF_URL', defaultValue: 'https://unicon20-app-doc.lpo.host/app_calendars/');
+
 
 /// Locales used in wordpress translation
 /// first is locale, second country code

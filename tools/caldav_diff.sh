@@ -1,14 +1,15 @@
 #!/bin/sh
 
-# generate files with last modification date from ICS calendars URL
-# usage: ./caldav_diff.sh target_dir/ calendar_urls
-# with calendar_urls a path to a file with a calendar name and an url on each line like:
-# unicon_admin https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics
+# periodically download calendar ICS files, compare its hash with
+# previous version and generate a file with last modification date
 
-set -e
+# caldav_diff.sh
+# calendars.md5sum
+# calendars/ [calendars list with last modification date]
 
 dir="$1"
 calendars="$2"
+gen_md5="$3"
 
 test -d "$dir" || {
   echo "missing dir '$dir'";
@@ -20,15 +21,22 @@ test -f "$calendars" || {
   exit 3;
 }
 
+mkdir -p $dir/ics
+mkdir -p $dir/md5sums
+
 while read calendar_name; do
   test "$calendar_name" || continue
   read url
   test "$url" || {
-    echo "missing url for calendar '$calendar_name'";
-    exit 1;
+    echo "missing url for calendar '$calendar_name'" >&2;
+    continue;
   }
-  { curl --no-progress-meter "$url" || {
-      echo "failed to download calendar '$calendar_name' from '$url'" >&2 ;
-      continue;
-   }; }  | grep '^LAST-MODIFIED:' | cut -d':' -f2 | sort -nr | head -1 > "$dir/$calendar_name"
+	curl --no-progress-meter  "$url" | grep -v DTSTAMP > $dir/ics/$calendar_name.ics || {
+		echo "failed to download calendar '$calendar_name' from '$url'" >&2;
+		continue;
+	}
+	md5sum --status -c $dir/md5sums/$calendar_name || {
+		date +%s > $dir/$calendar_name
+		md5sum $dir/ics/$calendar_name.ics > $dir/md5sums/$calendar_name;
+	}
 done < "$calendars"

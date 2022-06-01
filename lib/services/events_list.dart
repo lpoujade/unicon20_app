@@ -57,7 +57,7 @@ class EventList extends ItemList<Event> {
         var date = DateTime.parse(raw_date.trim());
         if (last_sync_date == null || date.isAfter(last_sync_date)) {
 					await delete_calendar(cal);
-          await download_calendar(cal, config.calendars[cal]!['url']);
+          await download_calendar(cal, config.calendars[cal]!['url'], date);
 					}
       } catch(err) {
         print("failed to check events update: '$err'");
@@ -67,7 +67,7 @@ class EventList extends ItemList<Event> {
     save_list();
   }
 
-  Future<void> download_calendar(String name, String url) async {
+  Future<void> download_calendar(String name, String url, DateTime date) async {
     List<Event> event_list = [];
     print("http GET '$name': '$url");
     var client = RetryClient(http.Client());
@@ -76,7 +76,7 @@ class EventList extends ItemList<Event> {
       var json = ICal.toJson(raw_ical);
       var json_events = json['VEVENT'];
       for (var event in json_events) {
-        var e = Event.fromICalJson(event, name);
+        var e = Event.fromICalJson(event, name, date);
         event_list.add(e);
       }
 			list.removeWhere((element) => element.type == name);
@@ -94,8 +94,7 @@ class EventList extends ItemList<Event> {
   }
 
 	delete_calendar(String name) async {
-			var _db = db.db;
-			await _db.delete('events', where: 'type = ?', whereArgs: [name]);
+			(await db.db).delete('events', where: 'type = ?', whereArgs: [name]);
 	}
 
 	Future<Map<String, List<Event>>> get_places() async {
