@@ -51,7 +51,7 @@ class CompetitionsList extends ItemList<Competition> {
 		var new_comps = [];
 		Map<String, dynamic> competitionsList;
 		var client = RetryClient(http.Client(),
-				whenError: (_o, _s) => true,
+				whenError: (o, s) => true,
 				retries: 3);
 		Map<String, String> auth_headers = {HttpHeaders.authorizationHeader: 'Token ${config.competition_api_token}'};
 		try {
@@ -80,8 +80,8 @@ class CompetitionsList extends ItemList<Competition> {
 						updated_at: DateTime.parse(comp['updated_at']),
 						results: results
 						);
-			new_comps.add(_comp);
-			add(_comp);
+      new_comps.add(_comp);
+      list = new_comps;
 		}
 		save_list();
 		return [];
