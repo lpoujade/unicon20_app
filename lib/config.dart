@@ -22,9 +22,9 @@ const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://u
 /// Base endpoint, may changed between wp versions/plugins
 const wp_api_path = '/wp-json/wp/v2';
 
+// const competition_api_path = 'https://unicon2020.reg.unicycling-software.com/fr/api/competitions';
 const competition_api_path = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
-//const competition_api_path = 'https://unicon2020.reg.unicycling-software.com/fr/api/competitions';
-const competition_api_token = String.fromEnvironment('REG_TOKEN');
+const competition_api_token = 'eTpyUHp58fIZToKIM3yQ'; // String.fromEnvironment('REG_TOKEN');
 
 /// Calendars
 var default_calendar_color = Colors.grey;
@@ -70,7 +70,7 @@ const Map<String, Map<String, dynamic>> calendars = {
 };
 
 /// URL to fetch last update date of each calendar
-const calendar_check_url = String.fromEnvironment('CALDAV_DIFF_URL', defaultValue: 'https://unicon20-app-doc.lpo.host/app_calendars/');
+const calendar_check_url = String.fromEnvironment('CALDAV_DIFF_URL', defaultValue: 'https://unicon20-app-doc.lpo.host/app_calendars/results/');
 
 
 /// Locales used in wordpress translation
@@ -115,6 +115,6 @@ const map_default_lon = 5.7266;
 /// Geocoding service url : should accept a complete url-encoded address
 /// and return a GeoJSON with one feature of type point
 /// 'QUERY' will be replaced by url encoded adresse,
-// const geoservice = 'https://api-adresse.data.gouv.fr/search?q=QUERY&limit=1&autocomplete=0';
 const geoservice = 'https://nominatim.lpo.host/search?q=QUERY&limit=1';
-// const geoservice = 'https://nominatim.openstreetmap.org/search?q=QUERY&limit=1&format=json';
+// const geoservice = 'https://api-adresse.data.gouv.fr/search?q=QUERY&limit=1&autocomplete=0';
+//const geoservice = 'https://nominatim.openstreetmap.org/search?q=QUERY&limit=1&format=json';

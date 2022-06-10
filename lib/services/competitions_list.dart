@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
@@ -65,11 +64,11 @@ class CompetitionsList extends ItemList<Competition> {
 		} finally { client.close(); }
 		var competitions = competitionsList['competitions'];
 		for (final comp in competitions) {
-			var comp_id = Random().nextInt(1000);
+			var comp_id = comp['id'];
 			var results = ResultsList(db: db, parent_id: comp_id);
 			if (comp['results'] != null) {
 				for (final res in comp['results']) {
-					var res_id = Random().nextInt(1000);
+					var res_id = res['id'];
 					results.add(Result(id: res_id, name: res['name'], published_at: DateTime.parse(res['published_at']), pdf: res['pdf']));
 				}
 			}
