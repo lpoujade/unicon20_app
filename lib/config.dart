@@ -26,6 +26,7 @@ const wp_api_path = '/wp-json/wp/v2';
 const competition_api_path = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
 const competition_api_token = 'eTpyUHp58fIZToKIM3yQ'; // String.fromEnvironment('REG_TOKEN');
 
+
 /// Calendars
 var default_calendar_color = Colors.grey;
 const Map<String, Map<String, dynamic>> calendars = {

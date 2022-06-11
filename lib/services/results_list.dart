@@ -1,4 +1,3 @@
-import '../config.dart' as config;
 import '../tools/list.dart';
 import '../data/results.dart';
 import 'database.dart';
