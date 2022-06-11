@@ -15,16 +15,20 @@ get_places(events) {
 	for (Event event in events) {
 		var addr = event.location;
 		var coords = event.coords;
+    var coords_str = coords.toString();
 		if (coords == null)
 			continue;
 
-		if (!places.keys.contains(coords))
-			places[coords] =  {'addr': addr, 'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
+		if (!places.keys.contains(coords_str))
+			places[coords_str] = {'addr': addr, 'coords': coords, 'events': <Event>[], 'colors': <dynamic>{}};
 
-		places[coords]!['events'].add(event);
-		places[coords]!['colors'].add(config.calendars[event.type]?['color']);
+		places[coords_str]!['events'].add(event);
+		places[coords_str]!['colors'].add(config.calendars[event.type]?['color']);
 	}
 
+  print(places.keys);
+  for (var k in places.keys)
+    print('$k : ${places[k]['addr']}');
 	return places;
 }
 
