@@ -6,14 +6,14 @@ import '../config.dart' as config;
 
 /// Open an URL in an external app if possible,
 /// else show a toast to notify user about error
-launch_url(String url) async {
-	var _url = Uri.parse(url);
-  if ((await canLaunchUrl(_url)) != false) {
-    await launchUrl(_url);
+launch_url(String raw_url) async {
+	var url = Uri.parse(raw_url);
+  if ((await canLaunchUrl(url)) != false) {
+    await launchUrl(url);
     return;
   }
   Fluttertoast.showToast(
-      msg: "Failed to open '$url'",
+      msg: "Failed to open '$raw_url'",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
       timeInSecForIosWeb: 2,

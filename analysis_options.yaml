@@ -6,7 +6,11 @@ linter:
     # don't require camelCase
     non_constant_identifier_names: false
     constant_identifier_names: false
+
+    # yeah, pay attention to control struct with only one instruction
     curly_braces_in_flow_control_structures: false
+
+    avoid_print: false
 
 # https://dart.dev/guides/language/analysis-options
 # https://dart-lang.github.io/linter/lints/index.html.

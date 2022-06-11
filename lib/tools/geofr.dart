@@ -11,7 +11,7 @@ class GeoFR {
     var response = await client.read(uri, headers: {'User-Agent': 'unicon mobile app'}).timeout(const Duration(seconds: 60));
 		var result = json.decode(response);
 		if (result.isEmpty) throw("didn't found '$address'");
-		var _res = result.first;
-		return [double.parse(_res['lat']), double.parse(_res['lon'])];
+		var res = result.first;
+		return [double.parse(res['lat']), double.parse(res['lon'])];
 	}
 }

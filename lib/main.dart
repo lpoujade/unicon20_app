@@ -114,6 +114,7 @@ class _UniconAppState extends State<UniconApp> with SingleTickerProviderStateMix
       if (widget.articles.lang == null) {
         await widget.articles.init_lang();
       }
+      if (!mounted) return; // avoid using invalid context
       var cur_lang = Localizations.localeOf(context).languageCode;
       if (widget.articles.lang != cur_lang) {
         widget.articles.update_lang(cur_lang);

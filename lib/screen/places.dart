@@ -29,28 +29,31 @@ get_places(events) {
 }
 
 evlistMBanner(listenable, data, context) {
-	List<Widget> content = [];
-		data.sort((a, b) => (a.start as DateTime).compareTo(b.start));
-		for (var ev in data)
-			content.add(Row(
-				children: [Text(ev.title), Text(DateFormat.Md(Localizations.localeOf(context).languageCode).format(ev.start))],
-				mainAxisAlignment: MainAxisAlignment.spaceBetween));
+  List<Widget> content = [];
+  data.sort((a, b) => (a.start as DateTime).compareTo(b.start));
+  for (var ev in data)
+    content.add(
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [Text(ev.title), Text(DateFormat.Md(Localizations.localeOf(context).languageCode).format(ev.start))]
+      )
+    );
 
-	var banner_height = content.length * 20.0 > MediaQuery.of(context).size.height/1.5
-		 ? MediaQuery.of(context).size.height/1.5
-		 : content.length  * 20.0;
-	return MaterialBanner(
-		forceActionsBelow: true,
-			content: SizedBox(height: banner_height, child: ListView(children: content, shrinkWrap: true)),
-			actions: <Widget>[
-				SizedBox(height: 15, child: IconButton(
-						onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
-						padding: EdgeInsets.zero,
-						icon: const Icon(Icons.minimize)
-					)
-				)
-			],
-	);
+  var banner_height = content.length * 20.0 > MediaQuery.of(context).size.height/1.5
+      ? MediaQuery.of(context).size.height/1.5
+      : content.length  * 20.0;
+  return MaterialBanner(
+    forceActionsBelow: true,
+    content: SizedBox(height: banner_height, child: ListView(shrinkWrap: true, children: content)),
+    actions: <Widget>[
+      SizedBox(height: 15, child: IconButton(
+          onPressed: ScaffoldMessenger.of(context).clearMaterialBanners,
+          padding: EdgeInsets.zero,
+          icon: const Icon(Icons.minimize)
+      )
+      )
+    ],
+  );
 }
 
 
@@ -92,13 +95,13 @@ class Map extends StatelessWidget {
 	@override
 		Widget build(BuildContext context) {
 			var consumer = Consumer<EventList>(builder: (context, events, child) {
-					u.LatLng? _center = u.LatLng(config.map_default_lat, config.map_default_lon);
-					double? _zoom = 11;
-					double? _rotation = 0;
+					u.LatLng? map_center = u.LatLng(config.map_default_lat, config.map_default_lon);
+					double? map_zoom = 11;
+					double? map_rotation = 0;
 
 					var map = u.U.OpenStreetMap(markers: build_marker_layer(context, events.list),
-							disableRotation: true, center: _center, rotation: _rotation, zoom: _zoom, 
-							onChanged: (center, zoom, w) {_center = center; _zoom = zoom; _rotation = w;}
+							disableRotation: true, center: map_center, rotation: map_rotation, zoom: map_zoom, 
+							onChanged: (center, zoom, w) {map_center = center; map_zoom = zoom; map_rotation = w;}
 					);
 
 					return Stack(

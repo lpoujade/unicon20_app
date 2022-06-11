@@ -72,15 +72,15 @@ class CompetitionsList extends ItemList<Competition> {
 					results.add(Result(id: res_id, name: res['name'], published_at: DateTime.parse(res['published_at']), pdf: res['pdf']));
 				}
 			}
-			var _comp = Competition(
+      new_comps.add(Competition(
 						id: comp_id,
 						name: comp['name'],
 						competitor_list_pdf: comp['competition_list_pdf'],
 						start_list_pdf: comp['start_list_pdf'],
 						updated_at: DateTime.parse(comp['updated_at']),
 						results: results
-						);
-      new_comps.add(_comp);
+						)
+        );
       list = new_comps;
 		}
 		save_list();

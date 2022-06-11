@@ -54,15 +54,14 @@ class Calendar extends StatelessWidget {
   		    hoursColumnStyle: HoursColumnStyle(
   		        width: 25,
   		        textAlignment: Alignment.centerRight,
-  		        timeFormatter: (time) => (time.hour.toString() + ' ')
+  		        timeFormatter: (time) => ('${time.hour.toString()} ')
   		    ),
   		    dayBarStyleBuilder: (date) => DayBarStyle(dateFormatter: (int year, int month, int day) {
   		      var date = DateTime(year, month, day);
   		      var year_str = (year == config.event_year
   		          ? DateFormat.Md(Localizations.localeOf(context).languageCode).format(date)
   		          : DateFormat.yMd(Localizations.localeOf(context).languageCode).format(date));
-  		      var str = DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)
-  		          + ' ' + year_str;
+  		      var str = '${DateFormat.EEEE(Localizations.localeOf(context).languageCode).format(date)} $year_str';
   		      return str;
   		    }),
 			    dayViewStyleBuilder: (date) => DayViewStyle(hourRowHeight: view_height / (24 - min_time.hour)),
@@ -115,23 +114,25 @@ void show_event_popup(Event event, BuildContext context) {
   List<DialogButton> buttons = [];
   if (event.location != null && event.location != 'TBD' && event.location != '') { // TODO remove once fixed upstream
     buttons.add(
-        DialogButton(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 80, width: 200, child:
-                    AutoSizeText(event.location!.replaceAll(',', '\n'), textAlign: TextAlign.right, minFontSize: 6)),
-                    const Icon(Icons.location_pin)
-                ]),
-            color: Colors.transparent,
-            onPressed: () async {
-              var url = (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(event.location!))
-                  ? Uri(scheme: 'geo', host: event.location).toString()
-                  : Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString();
-              launch_url(url);
-            }
-    ));
+      DialogButton(
+        color: Colors.transparent,
+        onPressed: () async {
+          var url = (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(event.location!))
+              ? Uri(scheme: 'geo', host: event.location).toString()
+              : Uri(scheme: 'geo', host: '0,0', queryParameters: {'q': event.location}).toString();
+          launch_url(url);
+        },
+        child: Row(
+                 mainAxisAlignment: MainAxisAlignment.end,
+                 crossAxisAlignment: CrossAxisAlignment.center,
+                 children: [
+                   SizedBox(height: 80, width: 200, child:
+                     AutoSizeText(event.location!.replaceAll(',', '\n'), textAlign: TextAlign.right, minFontSize: 6)
+                   ),
+                   const Icon(Icons.location_pin)
+                 ]
+               )
+      ));
   }
 
   var start_hour = DateFormat.Hm().format(event.start);
@@ -139,10 +140,10 @@ void show_event_popup(Event event, BuildContext context) {
 
   List<Widget> alert_children = [
     Container(
-        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-        child: Text("$start_hour -> $end_hour",
-          style: const TextStyle(fontSize: 10)),
-        )
+      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      child: Text("$start_hour -> $end_hour",
+        style: const TextStyle(fontSize: 10)),
+    )
   ];
 
   if (event.summary != null)
@@ -150,30 +151,30 @@ void show_event_popup(Event event, BuildContext context) {
 
   if (event.description != null) {
     alert_children.add(
-        Html(
-          data: event.description!.replaceAll('\\n', '<br/>'),
-          onLinkTap: (s, u1, u2, u3) { launch_url(s.toString()); },
-          style: { 'a': Style(color: const Color(config.AppColors.dark_blue)) }
-          )
-        );
+      Html(
+        data: event.description!.replaceAll('\\n', '<br/>'),
+        onLinkTap: (s, u1, u2, u3) { launch_url(s.toString()); },
+        style: { 'a': Style(color: const Color(config.AppColors.dark_blue)) }
+      )
+    );
   }
 
-	var calendar_color = config.calendars[event.type] != null ?
-		config.calendars[event.type]!['color']
-		: config.default_calendar_color;
+  var calendar_color = config.calendars[event.type] != null ?
+      config.calendars[event.type]!['color']
+      : config.default_calendar_color;
 
   var alert = Alert(
-      context: context,
-      style: AlertStyle(
-        isCloseButton: false,
-        animationDuration: const Duration(milliseconds: 100),
-        backgroundColor: calendar_color,
-        alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2))),
-        buttonAreaPadding: const EdgeInsets.all(0)
-        ),
-      buttons: buttons,
-      content: Column(crossAxisAlignment: CrossAxisAlignment.start, children: alert_children)
-      );
+    context: context,
+    style: AlertStyle(
+      isCloseButton: false,
+      animationDuration: const Duration(milliseconds: 100),
+      backgroundColor: calendar_color,
+      alertBorder: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2))),
+      buttonAreaPadding: const EdgeInsets.all(0)
+    ),
+    buttons: buttons,
+    content: Column(crossAxisAlignment: CrossAxisAlignment.start, children: alert_children)
+  );
 
-    alert.show();
+  alert.show();
 }

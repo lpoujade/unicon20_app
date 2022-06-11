@@ -1,16 +1,19 @@
 name: unicon
-description: UNICON20 companion application
+description: Unicon20 companion application
 publish_to: 'none'
-version: 2.0.1+2
+version: 2.0.1+3
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
+# need to specify versions ?
+# security checks can be done before each release build
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  intl:
 
   provider:
 
@@ -70,17 +73,3 @@ flutter:
         - asset: res/font/futura/futura.ttf
         - asset: res/font/futura/futura-bold.ttf
           weight: 700
-    - family: aAnggota
-      fonts:
-        - asset: res/font/aAnggota.ttf
-    - family: LinLiber
-      fonts:
-        - asset: res/font/linlibertine/LinLibertine_R.ttf
-        - asset: res/font/linlibertine/LinLibertine_RB.ttf
-          style: italic
-        - asset: res/font/linlibertine/LinLibertine_RBI.ttf
-          style: italic
-          weight: 700
-        - asset: res/font/linlibertine/LinLibertine_RI.ttf
-          weight: 700
-

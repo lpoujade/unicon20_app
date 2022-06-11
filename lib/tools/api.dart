@@ -20,20 +20,20 @@ Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
 
   print('api using lang $lang');
-  var _lang = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
-  var path = config.wordpress_host + _lang + config.wp_api_path + '/posts';
+  var lang_param = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
+  var path = '${config.wordpress_host}$lang_param${config.wp_api_path}/posts';
   var filters = ['_embed', 'per_page=100'];
-  if (since != null) filters.add('modified_after=' + since.toIso8601String());
-  if (exclude_ids.isNotEmpty) filters.add('exclude=' + exclude_ids.join(','));
-  if (only_ids.isNotEmpty) filters.add('include=' + only_ids.join(','));
-  if (filters.isNotEmpty) path += '?' + filters.join('&');
+  if (since != null) filters.add('modified_after=${since.toIso8601String()}');
+  if (exclude_ids.isNotEmpty) filters.add('exclude=${exclude_ids.join(",")}');
+  if (only_ids.isNotEmpty) filters.add('include=${only_ids.join(",")}');
+  if (filters.isNotEmpty) path += '?${filters.join("&")}';
   var url = Uri.parse(path);
   var articles = <Article>[];
 
   List<dynamic> postList = [];
  
   var client = RetryClient(http.Client(),
-      whenError: (_o, _s) => true,
+      whenError: (o, s) => true,
       retries: 3);
       //onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
   try {

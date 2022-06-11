@@ -169,6 +169,8 @@ class EventList extends ItemList<Event> {
 	}
 
 	get_calendars() {
+    // we don't want duplicates, so
+		// ignore: prefer_collection_literals
 		var calendars = Set();
 		for (var ev in _items) {
 			calendars.add(ev.type);
