@@ -87,7 +87,7 @@ const supported_locales = [
 ];
 
 /// UTC offset of timezone where events take place
-const calendar_utc_offset = {'hour': 1, 'minute': 0};
+const calendar_utc_offset = {'hour': 2, 'minute': 0};
 
 /// Show year with day/month for events after/before this year
 const event_year = 2022;
