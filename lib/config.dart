@@ -22,9 +22,11 @@ const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://u
 /// Base endpoint, may changed between wp versions/plugins
 const wp_api_path = '/wp-json/wp/v2';
 
-// const competition_api_path = 'https://unicon2020.reg.unicycling-software.com/fr/api/competitions';
-const competition_api_path = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
-const competition_api_token = 'eTpyUHp58fIZToKIM3yQ'; // String.fromEnvironment('REG_TOKEN');
+// const competition_api_host = 'https://unicon2020.reg.unicycling-software.com/fr/api/competitions';
+// const competition_api_host = 'https://tous1mono2021.reg.unicycling-software.com/fr/api/competitions';
+const competition_api_host = 'https://cfm2019.reg.unicycling-software.com';
+const competition_api_path = '/LANG/api/competitions';
+const competition_api_token = String.fromEnvironment('REG_TOKEN');
 
 
 /// Calendars

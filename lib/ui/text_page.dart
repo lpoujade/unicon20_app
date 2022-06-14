@@ -54,7 +54,7 @@ class TextPage extends StatelessWidget {
                           ]),
 											Html(
 												data: content,
-												onLinkTap: (s, u1, u2, u3) => launchUrl(Uri.parse(s.toString())),
+												onLinkTap: (s, u1, u2, u3) => launchUrl(Uri.parse(s.toString()), mode: LaunchMode.externalApplication),
 												customRenders: {
 													imageMatcher(): CustomRender.widget(widget: (context, attributes) {
 															var img = context.tree.element?.attributes['horizontal'];
@@ -62,7 +62,7 @@ class TextPage extends StatelessWidget {
 															: const Center(child: CircularProgressIndicator());
 													})
 												},
-												tagsList: Html.tags..addAll(['image']),
+												tagsList: Html.tags..addAll(['image']) // TODO ?
 												)
                     ])
             )

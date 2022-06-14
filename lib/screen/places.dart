@@ -26,9 +26,6 @@ get_places(events) {
 		places[coords_str]!['colors'].add(config.calendars[event.type]?['color']);
 	}
 
-  print(places.keys);
-  for (var k in places.keys)
-    print('$k : ${places[k]['addr']}');
 	return places;
 }
 

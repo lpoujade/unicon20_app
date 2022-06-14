@@ -41,6 +41,7 @@ dependencies:
 
   universe:
     git: https://github.com/lpoujade/universe
+  flutter_cached_pdfview: ^0.4.1
 
 dev_dependencies:
   dartdoc:

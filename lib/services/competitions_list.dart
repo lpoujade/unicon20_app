@@ -6,10 +6,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:unicon/tools/list.dart';
 
 import '../data/competition.dart';
 import '../data/results.dart';
+import '../tools/list.dart';
 import 'database.dart';
 import '../config.dart' as config;
 import 'results_list.dart';
@@ -17,6 +17,7 @@ import 'results_list.dart';
 /// Hold a list of [Competition], a connection to [Database] and
 /// handle connections to the registration website API
 class CompetitionsList extends ItemList<Competition> {
+  String? _lang;
 
   CompetitionsList({required DBInstance db})
     : super(db: db, db_table: 'competitions');
@@ -45,9 +46,19 @@ class CompetitionsList extends ItemList<Competition> {
 			 }).toList();
      await refresh();
   }
+  /// Read current language from db
+  init_lang() async {
+    _lang = await db.get_locale();
+  }
+
 
 	Future<List<Competition>> refresh() async {
-		var url = Uri.parse(config.competition_api_path);
+
+    if (_lang == null) {
+      await init_lang();
+    }
+
+		var url = Uri.parse(config.competition_api_host + config.competition_api_path.replaceFirst('LANG', _lang ?? 'en'));
 		var new_comps = [];
 		Map<String, dynamic> competitionsList;
 		var client = RetryClient(http.Client(),
