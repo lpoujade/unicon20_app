@@ -6,15 +6,12 @@ class Category extends AData {
   final String name;
   final String slug;
 
-  Category({required this.id, required this.name, required this.slug}) : super(db_id_field: 'id');
+  Category({required this.id, required this.name, required this.slug})
+      : super(db_id_field: 'id');
 
   @override
   Map<String, dynamic> toSqlMap() {
-    return {
-      'id': id,
-      'slug': slug,
-      'name': name
-    };
+    return {'id': id, 'slug': slug, 'name': name};
   }
 
   @override

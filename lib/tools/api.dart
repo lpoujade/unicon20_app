@@ -18,7 +18,6 @@ import '../services/database.dart';
 /// return a list of [Article]
 Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
-
   print('api using lang $lang');
   var lang_param = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
   var path = '${config.wordpress_host}$lang_param${config.wp_api_path}/posts';
@@ -31,53 +30,50 @@ Future<List<Article>> get_posts_from_wp(
   var articles = <Article>[];
 
   List<dynamic> postList = [];
- 
-  var client = RetryClient(http.Client(),
-      whenError: (o, s) => true,
-      retries: 3);
-      //onRetry: (req, resp, status) => print("retrying '$req' ($status)"));
+
+  var client =
+      RetryClient(http.Client(), whenError: (o, s) => true, retries: 3);
   try {
     print('get $url');
     var response = await client.read(url).timeout(const Duration(seconds: 60));
     postList = json.decode(response);
-  } catch(err) {
+  } catch (err) {
     Fluttertoast.showToast(
         msg: "Failed to fetch articles",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 2,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
     rethrow;
-  } finally { client.close(); }
+  } finally {
+    client.close();
+  }
 
   for (final p in postList) {
-		var img =  '';
-		try {
-			img = p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']['medium_large']['source_url'];
-		} catch (e) {1;}
+    var img = '';
+    try {
+      img = p['_embedded']['wp:featuredmedia'].first['media_details']['sizes']
+          ['medium_large']['source_url'];
+    } catch (e) {
+      1;
+    }
 
     var categories = CategoriesList(db: DBInstance(), parent_id: p['id']);
     for (var category in p['_embedded']['wp:term'][0]) {
-        var cat = Category(
-            id: category['id'],
-            slug: category['slug'],
-            name: category['name']
-            );
-        categories.list.add(cat);
+      var cat = Category(
+          id: category['id'], slug: category['slug'], name: category['name']);
+      categories.list.add(cat);
     }
     articles.add(Article(
-            id: p['id'],
-            title: HtmlUnescape().convert(p['title']['rendered']),
-            content: p['content']['rendered'],
-            img: img,
-            date: DateTime.parse(p['date']),
-            modification_date: DateTime.parse(p['modified']),
-            read: 0,
-            categories: categories)
-    );
+        id: p['id'],
+        title: HtmlUnescape().convert(p['title']['rendered']),
+        content: p['content']['rendered'],
+        img: img,
+        date: DateTime.parse(p['date']),
+        modification_date: DateTime.parse(p['modified']),
+        read: 0,
+        categories: categories));
   }
 
   return articles;
 }
-
