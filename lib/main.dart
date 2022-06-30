@@ -38,7 +38,7 @@ main() async {
 
 class UniconApp extends StatefulWidget {
 	final db = DBInstance();
-	late final notifier = Notifications();
+	final notifier = Notifications();
 
 	late final articles = ArticleList(db: db);
 	late final events = EventList(db: db);
@@ -73,7 +73,6 @@ class UniconApp extends StatefulWidget {
 class _UniconAppState extends State<UniconApp> with SingleTickerProviderStateMixin {
 
   late final TabController _principalController = TabController(length: 4, vsync: this, initialIndex: 0);
-  late String lang;
 
   @override
     Widget build(BuildContext context) {

@@ -105,13 +105,18 @@ class CompetitionsInfo extends StatelessWidget {
 
 	@override
 		Widget build(BuildContext context) {
+      print('building competitions widget: $competitions');
 			var consumer = Consumer<CompetitionsList>(builder: (context, CompetitionsList competitions, child) {
-					competitions.list.sort((a, b) => (a as Competition).name.compareTo(b.name));
+        List<Widget> children = [const Center(child: Text('...'))];
+          if (competitions.list.isNotEmpty) {
+            competitions.list.sort((a, b) => (a as Competition).name.compareTo(b.name));
+            children = competitions.list.map((e) => CompCard(competition: e)).toList().cast<Widget>();
+          }
 					var refresh_indicator = RefreshIndicator(
 						onRefresh: competitions.refresh,
 						child: GridView(
 							gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 200, childAspectRatio: 2.0),
-							children: competitions.list.map((e) => CompCard(competition: e)).toList().cast<Widget>()
+							children: children
 						)
 					);
 				return refresh_indicator;

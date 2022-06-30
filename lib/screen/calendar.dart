@@ -20,9 +20,6 @@ class Calendar extends StatelessWidget {
 	@override
 		Widget build(BuildContext context) {
 			var consumer = Consumer<EventList>(builder: (context, events, child) {
-			if (events.list.isEmpty) {
-				return const Center(child: Text('plz wait'));
-			}
         List<Event> fitted_events = [];
         var min_time = const HourMinute(hour: 12);
         List<DateTime> dates = [];
@@ -127,7 +124,7 @@ void show_event_popup(Event event, BuildContext context) {
                  crossAxisAlignment: CrossAxisAlignment.center,
                  children: [
                    SizedBox(height: 80, width: 200, child:
-                     AutoSizeText(event.location!.replaceAll(',', '\n'), textAlign: TextAlign.right, minFontSize: 6)
+                     AutoSizeText(event.location?.replaceAll(',', '\n') ?? '', textAlign: TextAlign.right, minFontSize: 6)
                    ),
                    const Icon(Icons.location_pin)
                  ]
@@ -152,7 +149,7 @@ void show_event_popup(Event event, BuildContext context) {
   if (event.description != null) {
     alert_children.add(
       Html(
-        data: event.description!.replaceAll('\\n', '<br/>'),
+        data: event.description?.replaceAll('\\n', '<br/>'),
         onLinkTap: (s, u1, u2, u3) { launch_url(s.toString()); },
         style: { 'a': Style(color: const Color(config.AppColors.dark_blue)) }
       )

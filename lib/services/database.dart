@@ -46,7 +46,7 @@ class DBInstance {
 	}
 
   close() {
-    if (_db != null) _db!.close();
+    _db?.close();
   }
 
 	/// Read date of the most recent article in local database,
@@ -54,8 +54,8 @@ class DBInstance {
 	Future<DateTime?> get_last_sync_date() async {
 		await _dbi();
 		var sql = 'select modification_date from articles order by modification_date desc limit 1';
-		final result = await _db!.rawQuery(sql);
-		if (result.isEmpty) return null;
+		final result = await _db?.rawQuery(sql);
+		if (result == null || result.isEmpty) return null;
 		var first = result.first;
 		dynamic date = first.isEmpty ? null : first['date'];
 		return (date != null)
@@ -67,8 +67,8 @@ class DBInstance {
 	Future<DateTime?> get_last_event_sync_date() async {
 		await _dbi();
 		var sql = 'select modification_date from events order by modification_date desc limit 1';
-		final result = await _db!.rawQuery(sql);
-		if (result.isEmpty) return null;
+		final result = await _db?.rawQuery(sql);
+		if (result == null || result.isEmpty) return null;
 		var first = result.first;
 		dynamic date = first.isEmpty ? null : first['modification_date'];
 		return (date != null)
@@ -79,30 +79,32 @@ class DBInstance {
 	Future<List<double>?> get_loc(var addr) async {
 		await _dbi();
 		var sql = 'select lat, lon from places where address = ?';
-		final result = await _db!.rawQuery(sql, [addr]);
-		if (result.isEmpty) return null;
+		final result = await _db?.rawQuery(sql, [addr]);
+		if (result == null || result.isEmpty) return null;
 		var res = result.first;
 		return [res['lat'] as double, res['lon'] as double];
 	}
 
 	insert_loc(var addr, lat, lon) async {
 		await _dbi();
-		return await _db!.insert('places', {'address': addr, 'lat': lat, 'lon': lon});
+		return await _db?.insert('places', {'address': addr, 'lat': lat, 'lon': lon});
 	}
 
 	/// Read the saved locale
 	Future<String?> get_locale() async {
 		await _dbi();
-		List<Map<String, Object?>> res = await _db!.rawQuery('select locale from app_config');
-		log("saved locale: '$res'");
-		return res.isEmpty ? '' : res.first['locale'].toString();
+		var res = await _db?.rawQuery('select locale from app_config');
+    if (res == null) return '';
+    List<Map<String, Object?>> lang = res;
+		log("saved locale: '$lang'");
+		return res.isEmpty ? '' : lang.first['locale'].toString();
 	}
 
 	/// Save the locale to database
 	save_locale(String locale) async {
 		log("saving locale '$locale'");
     await _dbi();
-		_db!.insert('app_config', {'locale': locale, 'appid': appid},
+		_db?.insert('app_config', {'locale': locale, 'appid': appid},
 				conflictAlgorithm: ConflictAlgorithm.replace);
 	}
 
@@ -131,7 +133,7 @@ class DBInstance {
         break;
       }
       log('${migrations[cur_version]}');
-      migrations[cur_version]!.forEach(batch.execute);
+      migrations[cur_version]?.forEach(batch.execute);
     }
     await batch.commit();
   }
