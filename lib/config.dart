@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 
-
 class Strings {
   static const String Title = 'Unicon 20';
   static const String DrawTitle = 'Unicon';
@@ -17,7 +16,8 @@ class AppColors {
 }
 
 /// WordPress base URL (fetched from env to ease development)
-const wordpress_host = String.fromEnvironment('WP_HOST', defaultValue: 'http://unicon20.fr');
+const wordpress_host =
+    String.fromEnvironment('WP_HOST', defaultValue: 'http://unicon20.fr');
 
 /// Base endpoint, may changed between wp versions/plugins
 const wp_api_path = '/wp-json/wp/v2';
@@ -28,53 +28,54 @@ const competition_api_host = 'https://unicon2020.reg.unicycling-software.com';
 const competition_api_path = '/LANG/api/competitions';
 const competition_api_token = String.fromEnvironment('REG_TOKEN');
 
-
 /// Calendars
 var default_calendar_color = Colors.grey;
 const Map<String, Map<String, dynamic>> calendars = {
   'admin': {
-    'url': 'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/j39mlonvmepkdc4797nk88f7ok%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffbebec1)
   },
   'freestyle': {
-    'url': 'https://calendar.google.com/calendar/ical/4e19oc9m4f7jnfrt1c7hm3lekc%40group.calendar.google.com/public/basic.ics',
-   'color': Color(0xff17adb3) 
+    'url':
+        'https://calendar.google.com/calendar/ical/4e19oc9m4f7jnfrt1c7hm3lekc%40group.calendar.google.com/public/basic.ics',
+    'color': Color(0xff17adb3)
   },
   'muni': {
-    'url': 'https://calendar.google.com/calendar/ical/o0n78b4n7ssq326obekeasbf8k%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/o0n78b4n7ssq326obekeasbf8k%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xff1eb322)
   },
   'road': {
-    'url': 'https://calendar.google.com/calendar/ical/f53rlq1p3jcm4tf3jguaj1a5ss%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/f53rlq1p3jcm4tf3jguaj1a5ss%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffFF5E4D)
   },
-	/*
-  'road': {
-    'url': 'https://calendar.google.com/calendar/ical/f53rlq1p3jcm4tf3jguaj1a5ss%40group.calendar.google.com/public/basic.ics',
-    'color': Color(0xff9dee08)
-  },
-	*/
   'team': {
-    'url': 'https://calendar.google.com/calendar/ical/sb5l8ble394dohk4kdfnnsarlg%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/sb5l8ble394dohk4kdfnnsarlg%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xfff5b226)
   },
   'track': {
-    'url': 'https://calendar.google.com/calendar/ical/4lbqed8as0a1c2gaes252amn8k%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/4lbqed8as0a1c2gaes252amn8k%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xff93dc6c)
   },
   'urban': {
-    'url': 'https://calendar.google.com/calendar/ical/55rrt700v8beo61h185cfptu5k%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/55rrt700v8beo61h185cfptu5k%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xff7474d6)
   },
   'workshop': {
-    'url': 'https://calendar.google.com/calendar/ical/acg4v7l8j9i8li8mfg29i2758g%40group.calendar.google.com/public/basic.ics',
+    'url':
+        'https://calendar.google.com/calendar/ical/acg4v7l8j9i8li8mfg29i2758g%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffb46797)
   }
 };
 
 /// URL to fetch last update date of each calendar
-const calendar_check_url = String.fromEnvironment('CALDAV_DIFF_URL', defaultValue: 'https://unicon20-app-doc.lpo.host/app_calendars/results/');
-
+const calendar_check_url = String.fromEnvironment('CALDAV_DIFF_URL',
+    defaultValue: 'https://unicon20-app-doc.lpo.host/app_calendars/results/');
 
 /// Locales used in wordpress translation
 /// first is locale, second country code
@@ -100,10 +101,7 @@ const default_notif_channel_name = 'UNICON20';
 
 /// Categories and priority
 /// Only top priority category will be shown for each articles
-const categories_weight = {
-  'priority': 10,
-  'information': 5
-};
+const categories_weight = {'priority': 10, 'information': 5};
 
 /// Category which will be showed as important
 const important_category_name = 'priority';

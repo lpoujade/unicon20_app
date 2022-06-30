@@ -18,29 +18,22 @@ headless_task(HeadlessTask task) async {
   var competition_list = CompetitionsList(db: db);
 
   var evp = event_list.refresh();
-	var comp_list = await competition_list.refresh();
-	await article_list.fill();
+  var comp_list = await competition_list.refresh();
+  await article_list.fill();
   List<Article> new_articles = await article_list.refresh();
 
-	Article last = new_articles.first;
+  Article last = new_articles.first;
 
-	if (comp_list.isNotEmpty) {
-		notifier.show(
-				'Competitions updated', '', '',
-				'competitions',
-				'Competitions infos'
-				);
-	}
+  if (comp_list.isNotEmpty) {
+    notifier.show(
+        'Competitions updated', '', '', 'competitions', 'Competitions infos');
+  }
 
-	if (new_articles.isNotEmpty) {
-		notifier.show(
-				last.title, '',
-				'${last.id}',
-				last.categories.get_first()?.slug,
-				last.categories.get_first()?.name
-				);
-	}
-	await evp;
-	db.close();
-	BackgroundFetch.finish(taskId);
+  if (new_articles.isNotEmpty) {
+    notifier.show(last.title, '', '${last.id}',
+        last.categories.get_first()?.slug, last.categories.get_first()?.name);
+  }
+  await evp;
+  db.close();
+  BackgroundFetch.finish(taskId);
 }

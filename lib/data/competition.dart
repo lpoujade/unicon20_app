@@ -6,26 +6,27 @@ class Competition extends AData {
   final int id;
   final String name;
   final String? competitor_list_pdf;
-	final String? start_list_pdf;
-	final DateTime updated_at;
-	final ResultsList results;
+  final String? start_list_pdf;
+  final DateTime updated_at;
+  final ResultsList results;
 
-	Competition({required this.id,
-			required this.name,
-			required this.competitor_list_pdf,
-			required this.start_list_pdf,
-			required this.updated_at,
-			required this.results}
-	) : super(db_id_field: 'id');
+  Competition(
+      {required this.id,
+      required this.name,
+      required this.competitor_list_pdf,
+      required this.start_list_pdf,
+      required this.updated_at,
+      required this.results})
+      : super(db_id_field: 'id');
 
   @override
   Map<String, dynamic> toSqlMap() {
     return {
       'id': id,
       'name': name,
-			'updated_at': updated_at.millisecondsSinceEpoch,
-			'start_list_pdf': start_list_pdf,
-			'competitor_list_pdf': competitor_list_pdf
+      'updated_at': updated_at.millisecondsSinceEpoch,
+      'start_list_pdf': start_list_pdf,
+      'competitor_list_pdf': competitor_list_pdf
     };
   }
 
@@ -34,4 +35,3 @@ class Competition extends AData {
     return "Competition('$id', '$name', '$updated_at')";
   }
 }
-
