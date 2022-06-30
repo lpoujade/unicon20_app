@@ -34,7 +34,7 @@ class CompetitionsList extends ItemList<Competition> {
   fill() async {
    var raw_competitions = await super.get_from_db(); 
 
-	 raw_competitions.map((e) {
+	 list = raw_competitions.map((e) {
 			 return Competition(
 					 id: e['id'] as int,
 					 name: e['name'].toString(),
@@ -53,7 +53,6 @@ class CompetitionsList extends ItemList<Competition> {
 
 
 	Future<List<Competition>> refresh() async {
-
     if (_lang == null) {
       await init_lang();
     }
@@ -66,7 +65,6 @@ class CompetitionsList extends ItemList<Competition> {
 				retries: 3);
 		Map<String, String> auth_headers = {HttpHeaders.authorizationHeader: 'Token ${config.competition_api_token}'};
 		try {
-			print('get $url');
 			var response = await client.read(url, headers: auth_headers).timeout(const Duration(seconds: 60));
 			competitionsList = json.decode(response);
 		} catch(err) {
