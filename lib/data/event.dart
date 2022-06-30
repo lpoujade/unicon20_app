@@ -45,7 +45,7 @@ class Event extends AData {
       title = clean_ics_text_fields(json['SUMMARY']) ?? '<< missing event title >>',
       start = DateTime.parse(json['DTSTART'] ?? get_ics_tz_key(json, 'DTSTART')).toLocal(),
       end = DateTime.parse(json['DTEND'] ?? get_ics_tz_key(json, 'DTEND')).toLocal(),
-      location = clean_ics_text_fields(json['LOCATION']),
+      location = clean_ics_text_fields(json['LOCATION'])?.trim(),
       type = calendar,
       description = clean_ics_text_fields(json['DESCRIPTION']),
       summary = clean_ics_text_fields(json['SUMMARY']),

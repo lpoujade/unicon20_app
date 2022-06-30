@@ -103,7 +103,6 @@ class EventList extends ItemList<Event> {
 		for (Event event in list) {
 			var loc = event.location;
 			if (loc == null) continue;
-			if (loc == 'TBD') continue; // TODO remove once fixed upstream
 			if (!places.keys.contains(loc)) {
 				places[loc] = <Event>[];
 			}
@@ -116,13 +115,15 @@ class EventList extends ItemList<Event> {
 
 	fill_locations() async {
 		Map<String, List<double>> locs = {};
-		List<String> invalids = ['TBD', '']; // TODO remove once fixed upstream
+		var invalids = {};
 		late GeoFR geocode = GeoFR();
 		for (var ev in list) {
-			if (ev.location == null || invalids.contains(ev.location))
+			if (ev.location == null || invalids.keys.contains(ev.location)) {
+        if (invalids.keys.contains(ev.location)) invalids[ev.location]?.add(ev.title);
 				continue;
+      }
 			if (RegExp(r"-?[0-9]{1,2}\.[0-9]{6}, ?-?[0-9]{1,2}\.[0-9]{6}").hasMatch(ev.location!)) {
-				ev.coords = ev.location!.split(',').map((e) => double.parse(e)).toList();
+				ev.coords = ev.location.split(',').map((e) => double.parse(e)).toList();
 				notifyListeners();
 				continue;
 			}
@@ -143,7 +144,8 @@ class EventList extends ItemList<Event> {
 				coords = await geocode.geocode(ev.location!);
 			}
 			catch (err) {
-				invalids.add(ev.location!);
+        invalids[ev.location] = [ev.title];
+				// invalids.add(ev.location!);
 				continue;
 			}
 			sleep(const Duration(seconds: 1));
@@ -152,8 +154,10 @@ class EventList extends ItemList<Event> {
 			locs[ev.location!] = coords;
 			await db.insert_loc(ev.location, coords[0], coords[1]);
 		}
-		print("didn't found coords for: ");
-		for (var f in invalids) print("'$f'");
+    if (invalids.keys.isNotEmpty) {
+		  print("didn't found coords for: ");
+		  for (var f in invalids.keys) print("'$f' : '${invalids[f]}'");
+    }
 	}
 
 	get_day_extent() {

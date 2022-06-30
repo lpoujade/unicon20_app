@@ -109,7 +109,7 @@ FlutterWeekViewEvent get_wkview_event(context, Event calendar_event) {
 /// Create and open an [Alert] popup to show [Event] info
 void show_event_popup(Event event, BuildContext context) {
   List<DialogButton> buttons = [];
-  if (event.location != null && event.location != 'TBD' && event.location != '') { // TODO remove once fixed upstream
+  if (event.location != null && event.location != '') {
     buttons.add(
       DialogButton(
         color: Colors.transparent,
