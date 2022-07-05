@@ -19,6 +19,7 @@ import 'tools/headless_background_service.dart';
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: UniconApp(),
       title: config.Strings.Title,
       theme: ThemeData(

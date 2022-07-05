@@ -93,7 +93,7 @@ class CompetitionsList extends ItemList<Competition> {
       new_comps.add(Competition(
           id: comp_id,
           name: comp['name'],
-          competitor_list_pdf: comp['competition_list_pdf'],
+          competitor_list_pdf: comp['competitor_list_pdf'],
           start_list_pdf: comp['start_list_pdf'],
           updated_at: DateTime.parse(comp['updated_at']),
           results: results));

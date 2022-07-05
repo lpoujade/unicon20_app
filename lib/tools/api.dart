@@ -18,7 +18,6 @@ import '../services/database.dart';
 /// return a list of [Article]
 Future<List<Article>> get_posts_from_wp(
     {since, exclude_ids = const [], only_ids = const [], lang = ''}) async {
-  print('api using lang $lang');
   var lang_param = (lang.isEmpty || lang == 'en') ? '' : "/$lang";
   var path = '${config.wordpress_host}$lang_param${config.wp_api_path}/posts';
   var filters = ['_embed', 'per_page=100'];

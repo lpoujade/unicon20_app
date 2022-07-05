@@ -129,7 +129,6 @@ class CompetitionsInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('building competitions widget: $competitions');
     var consumer = Consumer<CompetitionsList>(
         builder: (context, CompetitionsList competitions, child) {
       List<Widget> children = [const Center(child: Text('...'))];

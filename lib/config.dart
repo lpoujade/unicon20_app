@@ -22,7 +22,7 @@ const wordpress_host =
 /// Base endpoint, may changed between wp versions/plugins
 const wp_api_path = '/wp-json/wp/v2';
 
-const competition_api_host = 'https://unicon2020.reg.unicycling-software.com';
+const competition_api_host = String.fromEnvironment('REG_HOST', defaultValue: 'https://unicon2020.reg.unicycling-software.com');
 // const competition_api_host = 'https://tous1mono2021.reg.unicycling-software.com';
 // const competition_api_host = 'https://cfm2019.reg.unicycling-software.com';
 const competition_api_path = '/LANG/api/competitions';
@@ -70,6 +70,10 @@ const Map<String, Map<String, dynamic>> calendars = {
     'url':
         'https://calendar.google.com/calendar/ical/acg4v7l8j9i8li8mfg29i2758g%40group.calendar.google.com/public/basic.ics',
     'color': Color(0xffb46797)
+  },
+  'animations': {
+    'url': 'https://calendar.google.com/calendar/ical/0jnh6bub8b7u9jqf3b2mvbvvno%40group.calendar.google.com/public/basic.ics',
+    'color': Colors.white
   }
 };
 

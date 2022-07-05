@@ -64,7 +64,6 @@ class News extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build articles widget');
     var consumer = Consumer<ArticleList>(builder: (context, articles, child) {
       if (articles.list.isNotEmpty)
         articles.list.sort((a, b) => (b.date as DateTime).compareTo(a.date));
