@@ -37,6 +37,7 @@ class CompetitionsList extends ItemList<Competition> {
       return Competition(
           id: e['id'] as int,
           name: e['name'].toString(),
+          subtitle: e['subtitle'].toString(),
           updated_at:
               DateTime.fromMillisecondsSinceEpoch(e['updated_at'] as int),
           competitor_list_pdf: e['competitor_list_pdf'].toString(),
@@ -93,6 +94,7 @@ class CompetitionsList extends ItemList<Competition> {
       new_comps.add(Competition(
           id: comp_id,
           name: comp['name'],
+          subtitle: comp['subtitle'],
           competitor_list_pdf: comp['competitor_list_pdf'],
           start_list_pdf: comp['start_list_pdf'],
           updated_at: DateTime.parse(comp['updated_at']),

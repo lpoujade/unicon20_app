@@ -11,7 +11,8 @@ import '../services/results_list.dart';
 class PDFDialog extends StatelessWidget {
   final String pdf;
   final String name;
-  const PDFDialog({Key? key, required this.pdf, required this.name})
+  final String subtitle;
+  const PDFDialog({Key? key, required this.pdf, required this.name, required this.subtitle})
       : super(key: key);
 
   @override
@@ -20,14 +21,14 @@ class PDFDialog extends StatelessWidget {
         insetPadding: const EdgeInsets.all(1.0),
         child: Column(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            Text(name),
+            Column(children: [Text(name), Text(subtitle)]),
             ElevatedButton(
                 onPressed: () => launchUrl(Uri.parse(pdf),
                     mode: LaunchMode.externalApplication),
                 child: const Text('download'))
           ]),
           Expanded(
-              child: const PDF(fitPolicy: FitPolicy.BOTH).cachedFromUrl(pdf,
+              child: const PDF(fitPolicy: FitPolicy.BOTH).fromUrl(pdf,
                   placeholder: (progress) => Center(
                           child: Column(children: [
                         Text('$progress %'),
@@ -54,7 +55,7 @@ class ResultsDialog extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) =>
-                            PDFDialog(name: res.name, pdf: res.pdf))
+                            PDFDialog(name: res.name, subtitle: res.subtitle, pdf: res.pdf))
                   })));
     }
 
@@ -74,16 +75,16 @@ class CompCard extends StatelessWidget {
     List<Widget> buttons = [];
 
     if (competitor_or_startlist != null && competitor_or_startlist != '')
-      buttons.add(IconButton(
+      buttons.add(Center(child: IconButton(
           icon: const Icon(Icons.groups),
           onPressed: () async {
             showDialog(
                 context: context,
                 builder: (context) => PDFDialog(
-                    name: competition.name, pdf: competitor_or_startlist));
-          }));
+                    name: competition.name, subtitle: competition.subtitle, pdf: competitor_or_startlist));
+          })));
     if (competition.results.list.isNotEmpty)
-      buttons.add(IconButton(
+      buttons.add(Center(child: IconButton(
           icon: const Icon(Icons.format_list_numbered),
           onPressed: () async {
             if (competition.results.list.length > 1)
@@ -96,18 +97,38 @@ class CompCard extends StatelessWidget {
                   context: context,
                   builder: (context) => PDFDialog(
                       name: competition.name,
+                      subtitle: competition.subtitle,
                       pdf: competition.results.list.first.pdf));
-          }));
+          })));
     return Padding(
         padding: const EdgeInsets.all(2),
-        child: ListTile(
+        child: GestureDetector(
+          onTap: () => {
+                  if ((competitor_or_startlist == null ||
+                          competitor_or_startlist == '') &&
+                      competition.results.list.isEmpty)
+                    Fluttertoast.showToast(
+                        msg: "Data not yet available for this competition",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 2,
+                        fontSize: 16.0)
+                },
+          child: Card(child: Column(children: [
+          Text(competition.name), Text(competition.subtitle),
+          Row(children: buttons)
+
+        ]))));
+        /*
+        child: Card(child: Column(children: [ListTile(
             title: Text(competition.name),
+            subtitle:  Text(competition.subtitle),
             tileColor: Colors.white,
-            subtitle: Row(children: buttons),
             shape: RoundedRectangleBorder(
                 side: const BorderSide(),
                 borderRadius: BorderRadius.circular(5)),
-            dense: true,
+            isThreeLine: true,
+            dense: false,
             onTap: () => {
                   if ((competitor_or_startlist == null ||
                           competitor_or_startlist == '') &&
@@ -118,7 +139,8 @@ class CompCard extends StatelessWidget {
                         gravity: ToastGravity.CENTER,
                         timeInSecForIosWeb: 2,
                         fontSize: 16.0)
-                }));
+                }), Row(children: buttons)])));
+                */
   }
 }
 

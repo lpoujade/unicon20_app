@@ -149,7 +149,6 @@ class EventList extends ItemList<Event> {
         invalids[ev.location] = [ev.title];
         continue;
       }
-      sleep(const Duration(seconds: 1));
       ev.coords = coords;
       notifyListeners();
       locs[ev.location!] = coords;
