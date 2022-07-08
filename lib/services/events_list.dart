@@ -1,7 +1,5 @@
 /// Manage events list
 
-import 'dart:io';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_retry/http_retry.dart';
