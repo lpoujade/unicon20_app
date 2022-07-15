@@ -36,7 +36,6 @@ class EventList extends ItemList<Event> {
           location: e['location'].toString(),
           type: e['type'].toString(),
           description: e['description'].toString(),
-          summary: e['summary'].toString(),
           modification_date: DateTime.fromMillisecondsSinceEpoch(
               e['modification_date'] as int));
     }).toList();

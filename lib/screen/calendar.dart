@@ -166,17 +166,11 @@ void show_event_popup(Event event, BuildContext context) {
     )
   ];
 
-  if (event.summary != null) {
-    alert_children.add(Text(event.summary ?? ""));
-  }
+  alert_children.add(Text(event.title));
 
   if (event.description != null) {
     alert_children.add(Html(
-        data: event.description
-        ?.replaceAll('\\n', '<br/>')
-        .replaceAllMapped(
-    RegExp(r'(http.*) ', caseSensitive: false),
-    (Match m) => "<a href='$m'>$m</a>"),
+        data: event.description?.replaceAll('\\n', '<br />'),
         onLinkTap: (s, u1, u2, u3) {
           launch_url(s.toString());
         },

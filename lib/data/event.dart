@@ -13,7 +13,6 @@ class Event extends AData {
   List<double>? coords;
   final String type;
   final String? description;
-  final String? summary;
   final DateTime modification_date;
 
   Event(
@@ -24,7 +23,6 @@ class Event extends AData {
       required this.location,
       required this.type,
       required this.description,
-      required this.summary,
       required this.modification_date})
       : super(db_id_field: 'uid');
 
@@ -36,7 +34,6 @@ class Event extends AData {
         location = e.location,
         type = e.type,
         description = e.description,
-        summary = e.summary,
         modification_date = e.modification_date,
         super(db_id_field: 'uid');
 
@@ -52,8 +49,7 @@ class Event extends AData {
             .toLocal(),
         location = clean_ics_text_fields(json['LOCATION'])?.trim(),
         type = calendar,
-        description = clean_ics_text_fields(json['DESCRIPTION']),
-        summary = clean_ics_text_fields(json['SUMMARY']),
+        description = clean_ics_text_fields(json['DESCRIPTION'])?.replaceAll(RegExp('</?html(-blob)?>|\r', multiLine: true), ''),
         modification_date = sync_date,
         super(db_id_field: 'uid');
 
@@ -72,7 +68,6 @@ class Event extends AData {
       'location': location ?? '',
       'type': type,
       'description': description ?? '',
-      'summary': summary ?? '',
       'modification_date': modification_date.millisecondsSinceEpoch
     };
   }

@@ -9,7 +9,7 @@ import '../config.dart' as config;
 launch_url(String raw_url) async {
   var url = Uri.parse(raw_url);
   if ((await canLaunchUrl(url)) != false) {
-    await launchUrl(url);
+    await launchUrl(url, mode: LaunchMode.externalApplication);
     return;
   }
   Fluttertoast.showToast(
